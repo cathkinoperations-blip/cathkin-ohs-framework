@@ -12,6 +12,8 @@
         td { padding: 9px 10px; border-bottom: 1px solid #e2e8f0; }
         tr:nth-child(even) { background-color: #f8fafc; }
         .status-valid { color: #276749; font-weight: bold; }
+        .badge-req { background-color: #c6f6d5; color: #22543d; font-size: 7.5pt; padding: 2px 5px; border-radius: 3px; font-weight: bold; }
+        .badge-opt { background-color: #e2e8f0; color: #4a5568; font-size: 7.5pt; padding: 2px 5px; border-radius: 3px; font-weight: bold; }
         .nav-link { display: inline-block; margin-bottom: 15px; color: #3182ce; text-decoration: none; font-weight: bold; font-size: 9pt; }
     </style>
 </head>
@@ -19,6 +21,7 @@
 
     <a href="01_module_legal_framework.html" class="nav-link">&larr; Back to Module 01</a>
     <h1>Cathkin Estates HOA — Statutory Appointments Register</h1>
+    <p style="font-size: 8.5pt; color: #4a5568;"><strong>Note:</strong> Scope configured for &lt;20 employees in accordance with OHS Act §17 and GSR 3 thresholds.</p>
 
     <table>
         <thead>
@@ -26,8 +29,9 @@
                 <th>Appointee Name</th>
                 <th>Statutory Role</th>
                 <th>Legal Reference</th>
+                <th>Threshold Status</th>
                 <th>Appointment Date</th>
-                <th>Competency / Certificate Status</th>
+                <th>Competency Status</th>
                 <th>Review Date</th>
             </tr>
         </thead>
@@ -36,6 +40,7 @@
                 <td><strong>HOA Chairman</strong></td>
                 <td>16.1 Officer</td>
                 <td>OHS Act §16(1)</td>
+                <td><span class="badge-req">Mandatory</span></td>
                 <td>2026-08-01</td>
                 <td>Board Governance Resolution</td>
                 <td><span class="status-valid">Annual</span></td>
@@ -44,6 +49,7 @@
                 <td><strong>Estate Manager</strong></td>
                 <td>16.2 Operational Lead</td>
                 <td>OHS Act §16(2)</td>
+                <td><span class="badge-req">Mandatory</span></td>
                 <td>2026-08-01</td>
                 <td>OHS Act Legal Liabilities Certificate</td>
                 <td><span class="status-valid">Annual</span></td>
@@ -52,6 +58,7 @@
                 <td><strong>Maintenance Lead</strong></td>
                 <td>First Aid Officer</td>
                 <td>GSR 3(4)</td>
+                <td><span class="badge-req">Mandatory (&gt;5 staff)</span></td>
                 <td>2026-08-01</td>
                 <td>Level 1 First Aid (Valid)</td>
                 <td><span class="status-valid">2029-08-01</span></td>
@@ -60,9 +67,19 @@
                 <td><strong>Security Supervisor</strong></td>
                 <td>Fire Protection Warden</td>
                 <td>ER 9 / SANS 10400-T</td>
+                <td><span class="badge-req">Mandatory</span></td>
                 <td>2026-08-01</td>
                 <td>Basic Fire Fighting Cert</td>
                 <td><span class="status-valid">2028-08-01</span></td>
+            </tr>
+            <tr>
+                <td><strong>Senior Field Hand</strong></td>
+                <td>H&S Representative</td>
+                <td>OHS Act §17</td>
+                <td><span class="badge-opt">Best Practice (&lt;20)</span></td>
+                <td>2026-08-01</td>
+                <td>Internal Risk Orientation</td>
+                <td><span class="status-valid">Annual</span></td>
             </tr>
         </tbody>
     </table>
