@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5x5 Risk Matrix & Master Baseline Register | Cathkin Estates HOA</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #2d3748; max-width: 950px; margin: 30px auto; padding: 20px; background-color: #f7fafc; }
+        h1 { font-size: 16pt; color: #1a365d; border-bottom: 3px solid #2b6cb0; padding-bottom: 8px; margin-bottom: 20px; }
+        h2 { font-size: 12pt; color: #2b6cb0; margin-top: 20px; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 8.5pt; margin-bottom: 25px; }
+        th { background-color: #1a365d; color: white; padding: 8px; text-align: left; }
+        td { padding: 8px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+        .nav-link { display: inline-block; margin-bottom: 15px; color: #3182ce; text-decoration: none; font-weight: bold; font-size: 9pt; }
+        
+        /* Risk Colors */
+        .risk-low { background-color: #c6f6d5; color: #22543d; font-weight: bold; text-align: center; }
+        .risk-med { background-color: #fefcbf; color: #744210; font-weight: bold; text-align: center; }
+        .risk-high { background-color: #feebc8; color: #7b341e; font-weight: bold; text-align: center; }
+        .risk-critical { background-color: #fed7d7; color: #742a2a; font-weight: bold; text-align: center; }
+        
+        /* Matrix Display */
+        .matrix-table td { text-align: center; font-weight: bold; width: 15%; }
+        .matrix-table th { text-align: center; }
+    </style>
+</head>
+<body>
+
+    <a href="02_module_hira.html" class="nav-link">&larr; Back to Module 02</a>
+    <h1>Cathkin Estates HOA — Master Baseline Risk Matrix & Register</h1>
+
+    <h2>1. 5x5 Risk Evaluation Matrix</h2>
+    <p><strong>Risk Score = Likelihood (1-5) x Severity (1-5)</strong></p>
+    <table class="matrix-table">
+        <thead>
+            <tr>
+                <th style="background-color: #2d3748;">Severity &rarr;<br>Likelihood &darr;</th>
+                <th>1 - Insignificant</th>
+                <th>2 - Minor</th>
+                <th>3 - Moderate</th>
+                <th>4 - Major</th>
+                <th>5 - Catastrophic</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>5 - Almost Certain</th>
+                <td class="risk-med">5 (Med)</td>
+                <td class="risk-high">10 (High)</td>
+                <td class="risk-high">15 (High)</td>
+                <td class="risk-critical">20 (Critical)</td>
+                <td class="risk-critical">25 (Critical)</td>
+            </tr>
+            <tr>
+                <th>4 - Likely</th>
+                <td class="risk-low">4 (Low)</td>
+                <td class="risk-med">8 (Med)</td>
+                <td class="risk-high">12 (High)</td>
+                <td class="risk-critical">16 (Critical)</td>
+                <td class="risk-critical">20 (Critical)</td>
+            </tr>
+            <tr>
+                <th>3 - Possible</th>
+                <td class="risk-low">3 (Low)</td>
+                <td class="risk-med">6 (Med)</td>
+                <td class="risk-med">9 (Med)</td>
+                <td class="risk-high">12 (High)</td>
+                <td class="risk-high">15 (High)</td>
+            </tr>
+            <tr>
+                <th>2 - Unlikely</th>
+                <td class="risk-low">2 (Low)</td>
+                <td class="risk-low">4 (Low)</td>
+                <td class="risk-med">6 (Med)</td>
+                <td class="risk-med">8 (Med)</td>
+                <td class="risk-high">10 (High)</td>
+            </tr>
+            <tr>
+                <th>1 - Rare</th>
+                <td class="risk-low">1 (Low)</td>
+                <td class="risk-low">2 (Low)</td>
+                <td class="risk-low">3 (Low)</td>
+                <td class="risk-low">4 (Low)</td>
+                <td class="risk-med">5 (Med)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>2. Estate Baseline Risk Register</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Activity / Area</th>
+                <th>Hazard Identified</th>
+                <th>Inherent Risk Score</th>
+                <th>Mandatory Risk Controls</th>
+                <th>Residual Risk</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Tractor & Slasher Operations</strong></td>
+                <td>PTO entanglement, rollover on steep slopes, flying debris.</td>
+                <td class="risk-critical">20 (Critical)</td>
+                <td>Mandatory PTO master guard, ROPS frame, pre-start checks, 50m exclusion zone for bystander residents.</td>
+                <td class="risk-med">6 (Med)</td>
+            </tr>
+            <tr>
+                <td><strong>Chemical Handling (Herbicides)</strong></td>
+                <td>Skin absorption, eye injury, environmental contamination / spill.</td>
+                <td class="risk-high">12 (High)</td>
+                <td>SDS available at store, 110% bunded storage, chemical aprons, face shields, nitrile gloves, spill kit on vehicle.</td>
+                <td class="risk-low">4 (Low)</td>
+            </tr>
+            <tr>
+                <td><strong>Road Repairs & Asphalt Work</strong></td>
+                <td>Traffic exposure, burn hazards, dust inhalation, manual lifting.</td>
+                <td class="risk-high">10 (High)</td>
+                <td>High-visibility vests, traffic cones, warning signage, dust masks, thermal gloves for hot-mix asphalt handling.</td>
+                <td class="risk-low">3 (Low)</td>
+            </tr>
+            <tr>
+                <td><strong>Workshop Maintenance</strong></td>
+                <td>Power tool injuries, eye hazards, electrical shock.</td>
+                <td class="risk-med">9 (Med)</td>
+                <td>Monthly power tool inspection, RCCD protection, safety glasses/goggles mandatory.</td>
+                <td class="risk-low">2 (Low)</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
