@@ -5,16 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>High-Risk Task Baseline HIRA | Cathkin Estates HOA</title>
     <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #2d3748; max-width: 900px; margin: 30px auto; padding: 25px; background-color: #ffffff; border: 1px solid #cbd5e0; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #2d3748; max-width: 950px; margin: 30px auto; padding: 25px; background-color: #ffffff; border: 1px solid #cbd5e0; }
         h1 { font-size: 15pt; color: #1a365d; border-bottom: 2px solid #1a365d; padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; }
-        h2 { font-size: 11pt; color: #2b6cb0; margin-top: 18px; margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+        h2 { font-size: 11pt; color: #2b6cb0; margin-top: 25px; margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
         p, li { font-size: 9pt; }
-        table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 8.5pt; }
-        th { background-color: #2d3748; color: white; padding: 6px 8px; text-align: left; }
-        td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0 20px 0; font-size: 8.5pt; }
+        th { background-color: #1a365d; color: white; padding: 7px 10px; text-align: left; }
+        td { padding: 7px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+        tr:nth-child(even) { background-color: #f8fafc; }
         .nav-link { display: inline-block; margin-bottom: 15px; color: #3182ce; text-decoration: none; font-weight: bold; font-size: 9pt; }
         .btn-print { background-color: #3182ce; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; float: right; }
-        @media print { .btn-print, .nav-link { display: none; } body { border: none; margin: 0; padding: 0; } }
+        
+        /* Risk Badges */
+        .risk-badge { font-weight: bold; padding: 3px 8px; border-radius: 4px; text-align: center; display: inline-block; font-size: 8pt; }
+        .risk-critical { background-color: #fed7d7; color: #742a2a; border: 1px solid #feb2b2; }
+        .risk-high { background-color: #feebc8; color: #7b341e; border: 1px solid #fbd38d; }
+        .risk-med { background-color: #fefcbf; color: #744210; border: 1px solid #faf089; }
+        
+        .score-header-badge { font-size: 8.5pt; font-weight: bold; padding: 2px 8px; border-radius: 12px; }
+
+        /* Footnotes Styling */
+        .footnotes-container { background: #f8fafc; border: 1px solid #e2e8f0; border-top: 3px solid #1a365d; padding: 15px 20px; border-radius: 4px; margin-top: 30px; font-size: 8pt; color: #4a5568; }
+        .footnotes-container h3 { font-size: 9pt; color: #1a365d; margin-top: 0; margin-bottom: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .footnotes-list { margin: 0; padding-left: 18px; }
+        .footnotes-list li { margin-bottom: 4px; }
+        .fn-ref { font-weight: bold; color: #2b6cb0; }
+        sup { font-size: 7pt; color: #2b6cb0; font-weight: bold; }
+
+        @media print { .btn-print, .nav-link { display: none; } body { border: none; margin: 0; padding: 0; max-width: 100%; } }
     </style>
 </head>
 <body>
@@ -24,69 +42,227 @@
 
     <h1>Cathkin Estates HOA — High-Risk Task Baseline Assessment</h1>
 
-    <h2>Task Focus: Tractor, Slasher & Heavy Equipment Operation</h2>
+    <!-- 1. FIRE MANAGEMENT (Inherent Score: 25) -->
+    <h2>
+        <span>Task Focus: Firebreaks & Controlled Burning Operations <sup>[1]</sup></span>
+        <span class="risk-badge risk-critical score-header-badge">Baseline Risk Score: 25 (Critical)</span>
+    </h2>
     <table>
         <thead>
             <tr>
-                <th>Task Sequence</th>
-                <th>Potential Hazard</th>
-                <th>Risk Level</th>
-                <th>Mandatory Controls & Safety Standard</th>
+                <th style="width: 22%;">Task Sequence</th>
+                <th style="width: 28%;">Potential Hazard</th>
+                <th style="width: 12%;">Risk Level</th>
+                <th style="width: 38%;">Mandatory Controls & Safety Standard</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>1. Pre-Burn Planning & Setup</strong></td>
+                <td>Unfavorable wind conditions, lack of emergency contacts, untrained staff.</td>
+                <td><span class="risk-badge risk-high">High</span></td>
+                <td>Verify burning schedule (Doc D2)<sup>[1]</sup>. Print/post emergency contact list (Okhahlamba Fire Dept, neighbours)<sup>[1]</sup>. Check FDI (Fire Danger Index) prior to ignition.</td>
+            </tr>
+            <tr>
+                <td><strong>2. Controlled Firebreak Burning</strong></td>
+                <td>Runaway veld fire, burn injuries, smoke inhalation, crew entrapment.</td>
+                <td><span class="risk-badge risk-critical">Critical</span></td>
+                <td>Full PPE mandatory (leather gloves, flame-retardant overalls, face shields). Dedicated fire unit on standby. Maintain clear escape routes and team radio communications.</td>
+            </tr>
+            <tr>
+                <td><strong>3. Mop-Up & Post-Burn Inspection</strong></td>
+                <td>Smoldering embers re-igniting after crew leaves area.</td>
+                <td><span class="risk-badge risk-high">High</span></td>
+                <td>Douse all hot spots and stumps with water. Conduct minimum 1-hour patrol post-extinction before declaring area safe.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 2. HIGH VOLTAGE & ELECTRICAL INFRASTRUCTURE (Inherent Score: 25) -->
+    <h2>
+        <span>Task Focus: High Voltage (11kV) & Electrical Substation Maintenance <sup>[1]</sup></span>
+        <span class="risk-badge risk-critical score-header-badge">Baseline Risk Score: 25 (Critical)</span>
+    </h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 22%;">Task Sequence</th>
+                <th style="width: 28%;">Potential Hazard</th>
+                <th style="width: 12%;">Risk Level</th>
+                <th style="width: 38%;">Mandatory Controls & Safety Standard</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>1. Substation Inspection & Liaison</strong></td>
+                <td>Arc flash, accidental contact with live high-voltage components.</td>
+                <td><span class="risk-badge risk-critical">Critical</span></td>
+                <td>Eskom liaison protocol must be followed (Doc D5)<sup>[1]</sup>. Only certified/registered electricians permitted to access live HT panels or transformers<sup>[1]</sup>.</td>
+            </tr>
+            <tr>
+                <td><strong>2. Isolation & Lockout (LOTO)</strong></td>
+                <td>Unexpected energization while maintenance is underway.</td>
+                <td><span class="risk-badge risk-critical">Critical</span></td>
+                <td>Strict Lockout/Tagout (LOTO) procedure required. Test for dead before starting work. Notify affected residents in advance of planned outages<sup>[1]</sup>.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 3. TRACTOR & SLASHER OPERATIONS (Inherent Score: 20) -->
+    <h2>
+        <span>Task Focus: Tractor, Slasher & Heavy Equipment Operation</span>
+        <span class="risk-badge risk-critical score-header-badge">Baseline Risk Score: 20 (Critical)</span>
+    </h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 22%;">Task Sequence</th>
+                <th style="width: 28%;">Potential Hazard</th>
+                <th style="width: 12%;">Risk Level</th>
+                <th style="width: 38%;">Mandatory Controls & Safety Standard</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td><strong>1. Pre-Start Inspection</strong></td>
                 <td>Fluid leaks, faulty brakes, damaged PTO guards, missing ROPS.</td>
-                <td>High</td>
+                <td><span class="risk-badge risk-high">High</span></td>
                 <td>Complete daily pre-start logbook. Do not operate equipment if PTO guard or brakes are compromised.</td>
             </tr>
             <tr>
                 <td><strong>2. Equipment Hitching</strong></td>
                 <td>Crush injuries between tractor and trailing slasher.</td>
-                <td>Critical</td>
+                <td><span class="risk-badge risk-critical">Critical</span></td>
                 <td>Ensure second person stands clear during reversing. Lock pin with safety linchpin before connecting PTO drive.</td>
             </tr>
             <tr>
                 <td><strong>3. Field Mowing & Slashing</strong></td>
                 <td>Rollover on slopes, flying stones/debris hitting bystanders.</td>
-                <td>Critical</td>
+                <td><span class="risk-badge risk-critical">Critical</span></td>
                 <td>No mowing on gradients exceeding safety limit. Maintain 50-meter clear exclusion zone from residents, vehicles, and livestock. Safety glasses and hearing protection mandatory.</td>
             </tr>
             <tr>
                 <td><strong>4. Maintenance & Debris Clearing</strong></td>
                 <td>Accidental engagement of PTO while clearing jammed slasher.</td>
-                <td>Critical</td>
+                <td><span class="risk-badge risk-critical">Critical</span></td>
                 <td>Turn off tractor engine, remove key from ignition, and wait for all rotating parts to stop completely before approaching slasher blades (Lockout/Tagout principle).</td>
             </tr>
         </tbody>
     </table>
 
-    <h2>Task Focus: Herbicide & Hazardous Chemical Application</h2>
+    <!-- 4. CHAINSAW & ALIEN CLEARING (Inherent Score: 20) -->
+    <h2>
+        <span>Task Focus: Chainsaw Operation & Tree Felling / Alien Clearing</span>
+        <span class="risk-badge risk-critical score-header-badge">Baseline Risk Score: 20 (Critical)</span>
+    </h2>
     <table>
         <thead>
             <tr>
-                <th>Task Sequence</th>
-                <th>Potential Hazard</th>
-                <th>Risk Level</th>
-                <th>Mandatory Controls & Safety Standard</th>
+                <th style="width: 22%;">Task Sequence</th>
+                <th style="width: 28%;">Potential Hazard</th>
+                <th style="width: 12%;">Risk Level</th>
+                <th style="width: 38%;">Mandatory Controls & Safety Standard</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>1. Chainsaw Pre-Use Checks</strong></td>
+                <td>Chain derailment, chain brake failure, fuel leaks.</td>
+                <td><span class="risk-badge risk-high">High</span></td>
+                <td>Test chain brake, chain tension, and throttle latch. Fuel unit outdoors with engine off and cool.</td>
+            </tr>
+            <tr>
+                <td><strong>2. Tree Felling & Bush Cutting</strong></td>
+                <td>Kickback, cut/laceration injuries from blade, falling timber onto operators.</td>
+                <td><span class="risk-badge risk-critical">Critical</span></td>
+                <td>Only certified operators permitted. Chainsaw chaps/cut-resistant trousers, face shield, hard hat, and steel-toe boots mandatory. Maintain 2x tree height exclusion zone.</td>
+            </tr>
+            <tr>
+                <td><strong>3. Branch Snagging & Stacking</strong></td>
+                <td>Eye injuries, pinch injuries, trip hazards on uneven ground.</td>
+                <td><span class="risk-badge risk-med">Medium</span></td>
+                <td>Wear leather work gloves and safety glasses. Keep work areas clear of timber clutter.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 5. WATER TREATMENT PLANT & CHEMICAL DOSING (Inherent Score: 15) -->
+    <h2>
+        <span>Task Focus: Water Treatment Plant Operation & Chemical Dosing <sup>[1]</sup></span>
+        <span class="risk-badge risk-high score-header-badge">Baseline Risk Score: 15 (High)</span>
+    </h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 22%;">Task Sequence</th>
+                <th style="width: 28%;">Potential Hazard</th>
+                <th style="width: 12%;">Risk Level</th>
+                <th style="width: 38%;">Mandatory Controls & Safety Standard</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>1. Chemical Dosing & Mixing</strong></td>
+                <td>Corrosive chemical splashes (chlorine/coagulants), toxic fumes.</td>
+                <td><span class="risk-badge risk-high">High</span></td>
+                <td>Trained operators only (Estate Manager + designated staff, Doc D4)<sup>[1]</sup>. Wear chemical apron, rubber gloves, and eye/face protection. Ensure eyewash bottle is filled.</td>
+            </tr>
+            <tr>
+                <td><strong>2. Sampling & Quality Inspection</strong></td>
+                <td>Pathogen exposure, slipping near water storage/dam.</td>
+                <td><span class="risk-badge risk-med">Medium</span></td>
+                <td>Monthly independent lab testing program<sup>[1]</sup>. Ranger field leak inspections<sup>[1]</sup>. Slip-resistant footwear required around wet treatment pads.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 6. HERBICIDE & HAZARDOUS CHEMICAL APPLICATION (Inherent Score: 12) -->
+    <h2>
+        <span>Task Focus: Herbicide & Hazardous Chemical Application</span>
+        <span class="risk-badge risk-high score-header-badge">Baseline Risk Score: 12 (High)</span>
+    </h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 22%;">Task Sequence</th>
+                <th style="width: 28%;">Potential Hazard</th>
+                <th style="width: 12%;">Risk Level</th>
+                <th style="width: 38%;">Mandatory Controls & Safety Standard</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td><strong>1. Decanting & Mixing</strong></td>
                 <td>Chemical splash to eyes/skin, toxic vapor inhalation.</td>
-                <td>High</td>
+                <td><span class="risk-badge risk-high">High</span></td>
                 <td>Decant in designated bunded, ventilated store. Wear face shield, chemical apron, nitrile gloves, and PVC boots. Keep eyewash station accessible.</td>
             </tr>
             <tr>
                 <td><strong>2. Field Application</strong></td>
                 <td>Spray drift onto non-target areas, operator exposure, applicator leakage.</td>
-                <td>Medium</td>
+                <td><span class="risk-badge risk-med">Medium</span></td>
                 <td>Do not spray in wind speeds exceeding 15 km/h. Inspect knapsack sprayers for leaks prior to filling. Wash hands before eating/drinking.</td>
             </tr>
         </tbody>
     </table>
+
+    <!-- Footnotes Section -->
+    <div class="footnotes-container">
+        <h3>Explanatory Footnotes & Manual Cross-References</h3>
+        <ol class="footnotes-list">
+            <li>
+                <span class="fn-ref">[1] Master Operations Document Citation:</span> Cross-referenced with the official <em>Cathkin Estates HOA Policies, Procedures and Operations Manual</em>.
+            </li>
+            <li>
+                <span class="fn-ref">(Doc D1 to D6) Operational Appendix Codes:</span>
+                <ul>
+                    <li><strong>Doc D2:</strong> Fire Control Management Plan & Controlled Burning Guidelines</li>
+                    <li><strong>Doc D4:</strong> Water Treatment Plant Operating Manual</li>
+                    <li><strong>Doc D5:</strong> Electrical Infrastructure & Eskom Liaison Protocols</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
 
 </body>
 </html>

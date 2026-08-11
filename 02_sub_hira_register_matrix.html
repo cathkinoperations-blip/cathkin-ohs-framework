@@ -7,7 +7,7 @@
     <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #2d3748; max-width: 950px; margin: 30px auto; padding: 20px; background-color: #f7fafc; }
         h1 { font-size: 16pt; color: #1a365d; border-bottom: 3px solid #2b6cb0; padding-bottom: 8px; margin-bottom: 20px; }
-        h2 { font-size: 12pt; color: #2b6cb0; margin-top: 20px; margin-bottom: 10px; }
+        h2 { font-size: 12pt; color: #2b6cb0; margin-top: 25px; margin-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; background: white; font-size: 8.5pt; margin-bottom: 25px; }
         th { background-color: #1a365d; color: white; padding: 8px; text-align: left; }
         td { padding: 8px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
@@ -23,6 +23,14 @@
         /* Matrix Display */
         .matrix-table td { text-align: center; font-weight: bold; width: 15%; }
         .matrix-table th { text-align: center; }
+
+        /* Footnotes Styling */
+        .footnotes-container { background: #ffffff; border: 1px solid #e2e8f0; border-top: 3px solid #1a365d; padding: 15px 20px; border-radius: 4px; margin-top: 20px; font-size: 8pt; color: #4a5568; }
+        .footnotes-container h3 { font-size: 9.5pt; color: #1a365d; margin-top: 0; margin-bottom: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .footnotes-list { margin: 0; padding-left: 18px; }
+        .footnotes-list li { margin-bottom: 6px; text-align: justify; }
+        .fn-ref { font-weight: bold; color: #2b6cb0; }
+        sup { font-size: 7pt; color: #2b6cb0; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -99,6 +107,23 @@
             </tr>
         </thead>
         <tbody>
+            <!-- Risk Score: 25 -->
+            <tr>
+                <td><strong>Controlled Burning & Firebreaks</strong></td>
+                <td>Runaway veld fires, smoke inhalation, severe burns, entrapment.</td>
+                <td class="risk-critical">25 (Critical)</td>
+                <td>Controlled burning program (Doc D2)<sup>[1]</sup>, emergency contact list posted/printed (Okhahlamba Emergency, neighbours)<sup>[1]</sup>, mandatory PPE (leather gloves, fire retardant suits), trained fire-fighting staff<sup>[1]</sup>.</td>
+                <td class="risk-med">8 (Med)</td>
+            </tr>
+            <tr>
+                <td><strong>High Voltage (11kV) & LV Transformer Maintenance</strong></td>
+                <td>Electrocution, arc flash, transformer oil leaks, total power outage.</td>
+                <td class="risk-critical">25 (Critical)</td>
+                <td>Eskom liaison protocol<sup>[1]</sup>, strictly licensed/contracted electricians for repairs<sup>[1]</sup>, lockout/tagout (LOTO), perimeter fencing on substations/transformers, prompt homeowner notifications<sup>[1]</sup>.</td>
+                <td class="risk-med">5 (Med)</td>
+            </tr>
+
+            <!-- Risk Score: 20 -->
             <tr>
                 <td><strong>Tractor & Slasher Operations</strong></td>
                 <td>PTO entanglement, rollover on steep slopes, flying debris.</td>
@@ -107,6 +132,24 @@
                 <td class="risk-med">6 (Med)</td>
             </tr>
             <tr>
+                <td><strong>Chainsaw Operations & Alien Clearing</strong></td>
+                <td>Severe lacerations, kickback, falling timber, high noise/vibration exposure.</td>
+                <td class="risk-critical">20 (Critical)</td>
+                <td>Chainsaw chaps/leggings, face shield, earmuffs, pre-use chain brake checks, certified/trained operators, drop zone exclusion area.</td>
+                <td class="risk-med">6 (Med)</td>
+            </tr>
+
+            <!-- Risk Score: 15 -->
+            <tr>
+                <td><strong>Water Treatment Plant Operation</strong></td>
+                <td>Chemical dosing exposure, waterborne pathogen contamination, pipe leaks, drowning risk at dam.</td>
+                <td class="risk-high">15 (High)</td>
+                <td>Operation training for Estate Manager + 2 staff (Doc D4)<sup>[1]</sup>, monthly professional lab water testing<sup>[1]</sup>, field ranger leak inspections<sup>[1]</sup>, chemical PPE, perimeter security at dam.</td>
+                <td class="risk-low">4 (Low)</td>
+            </tr>
+
+            <!-- Risk Score: 12 -->
+            <tr>
                 <td><strong>Chemical Handling (Herbicides)</strong></td>
                 <td>Skin absorption, eye injury, environmental contamination / spill.</td>
                 <td class="risk-high">12 (High)</td>
@@ -114,12 +157,23 @@
                 <td class="risk-low">4 (Low)</td>
             </tr>
             <tr>
+                <td><strong>Perimeter & Game Fence Maintenance</strong></td>
+                <td>Electric shock from game fence, wild animal escapes/attacks, security breaches.</td>
+                <td class="risk-high">12 (High)</td>
+                <td>Monthly security equipment checks (Doc D3/D6)<sup>[1]</sup>, warning signage on electric fence, ranger patrols, wild animal handling procedures.</td>
+                <td class="risk-low">4 (Low)</td>
+            </tr>
+
+            <!-- Risk Score: 10 -->
+            <tr>
                 <td><strong>Road Repairs & Asphalt Work</strong></td>
                 <td>Traffic exposure, burn hazards, dust inhalation, manual lifting.</td>
                 <td class="risk-high">10 (High)</td>
                 <td>High-visibility vests, traffic cones, warning signage, dust masks, thermal gloves for hot-mix asphalt handling.</td>
                 <td class="risk-low">3 (Low)</td>
             </tr>
+
+            <!-- Risk Score: 9 -->
             <tr>
                 <td><strong>Workshop Maintenance</strong></td>
                 <td>Power tool injuries, eye hazards, electrical shock.</td>
@@ -127,8 +181,36 @@
                 <td>Monthly power tool inspection, RCCD protection, safety glasses/goggles mandatory.</td>
                 <td class="risk-low">2 (Low)</td>
             </tr>
+            <tr>
+                <td><strong>Wildlife Handling & Game Counts</strong></td>
+                <td>Animal bites/trampling, vehicle collisions during counts or drives.</td>
+                <td class="risk-med">9 (Med)</td>
+                <td>Twice-yearly structured game counts (Doc D1-1)<sup>[1]</sup>, board approval before animal addition/removal<sup>[1]</sup>, distance maintenance guidelines, safe vehicle operation.</td>
+                <td class="risk-low">3 (Low)</td>
+            </tr>
         </tbody>
     </table>
+
+    <!-- Footnotes Section -->
+    <div class="footnotes-container">
+        <h3>Explanatory Footnotes & Reference Key</h3>
+        <ol class="footnotes-list">
+            <li>
+                <span class="fn-ref">[1] Master Operations Document Citation:</span> Refers to the official <em>Cathkin Estates HOA Policies, Procedures and Operations Manual (Oct 2025)</em>.
+            </li>
+            <li>
+                <span class="fn-ref">(Doc D1 to D6) Operational Appendix Codes:</span> Refers to specific standard operating procedures (SOPs) and operational registers attached to the estate manual:
+                <ul>
+                    <li><strong>Doc D1:</strong> Wildlife Management Plan | <strong>Doc D1-1:</strong> Wildlife Register (Game Counts, Births & Deaths)</li>
+                    <li><strong>Doc D2:</strong> Fire Control Management (Controlled Burning Programs & Veld Fire Protocols)</li>
+                    <li><strong>Doc D3:</strong> Game Fence Maintenance Protocol</li>
+                    <li><strong>Doc D4:</strong> Water Treatment Plant Operating Manual</li>
+                    <li><strong>Doc D5:</strong> Electrical Infrastructure & Eskom Liaison Procedures</li>
+                    <li><strong>Doc D6:</strong> Security Protocols & Perimeter Checks</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
 
 </body>
 </html>

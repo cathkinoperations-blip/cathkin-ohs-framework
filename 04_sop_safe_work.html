@@ -3,24 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Module 04: Standard Operating Procedures | Cathkin Estates HOA</title>
-    <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #2d3748; max-width: 900px; margin: 30px auto; padding: 0 20px; background-color: #fcfcfd; }
-        .header-banner { background-color: #1a365d; color: #ffffff; padding: 24px; border-radius: 6px; margin-bottom: 25px; border-bottom: 5px solid #3182ce; }
-        .header-banner h1 { font-size: 18pt; margin: 0 0 6px 0; font-weight: 700; color: #ffffff; }
-        .header-banner .subtitle { font-size: 11pt; color: #e2e8f0; margin: 0; font-weight: 300; }
-        .header-banner .meta-bar { margin-top: 15px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.2); font-size: 8.5pt; color: #cbd5e0; display: flex; justify-content: space-between; flex-wrap: wrap; }
-        h2 { font-size: 13pt; color: #1a365d; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; margin-top: 24px; margin-bottom: 12px; font-weight: 700; }
-        p, li { font-size: 9.5pt; text-align: justify; }
-        .action-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-        .action-card { background: #ffffff; border: 1px solid #e2e8f0; border-top: 3px solid #3182ce; padding: 15px; border-radius: 4px; }
-        .action-card h4 { margin: 0 0 8px 0; color: #1a365d; font-size: 10pt; }
-        .action-card p { font-size: 8.5pt; margin-bottom: 12px; color: #4a5568; }
-        .btn-link { display: inline-block; background-color: #3182ce; color: #ffffff; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 8.5pt; font-weight: bold; }
-        .btn-link:hover { background-color: #2b6cb0; }
-        .nav-footer { margin-top: 40px; padding-top: 15px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; }
-        .nav-footer a { background-color: #1a365d; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; font-size: 9pt; font-weight: bold; }
-    </style>
+    <title>Module 04: Safe Operating Procedures | Cathkin Estates HOA</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="header-banner">
@@ -29,30 +13,105 @@
         <div class="meta-bar">
             <span><strong>Document Ref:</strong> OHS-MOD-004</span>
             <span><strong>Regulatory Standard:</strong> OHS Act §8(2)(e)</span>
-            <span><strong>Equipment Focus:</strong> MF268 Xtra, Road Repair & Power Tools</span>
+            <span><strong>Scope:</strong> Master Estate Operations & High-Risk Activities</span>
         </div>
     </div>
 
     <h2>1. Purpose & Administrative Scope</h2>
-    <p>Safe Operating Procedures (SOPs) define mandatory operational steps to protect estate staff and property from harm. All operators must be formally trained on these SOPs before being authorized to operate estate equipment.</p>
+    <p>Safe Operating Procedures (SOPs) define mandatory operational steps to protect estate staff, contractors, and residents from harm. In accordance with Section 8(2)(e) of the OHS Act, all operators must be formally trained and declared competent on these SOPs before being authorized to execute high-risk maintenance tasks.</p>
 
-    <h2>2. Key Estate Operational SOPs</h2>
+    <h2>2. Estate Baseline Risk SOP Framework (Ordered by Risk Level)</h2>
     <div class="action-card-grid">
-        <div class="action-card">
-            <h4>SOP 01: Massey Ferguson 268 Xtra Tractor & Slasher</h4>
-            <p>Mandatory safe operating rules for driving, PTO engagement, slashing on slopes, and pre-start inspections.</p>
-            <a href="04_sub_sop_tractor_slasher.html" class="btn-link" target="_blank">Open Tractor SOP &rarr;</a>
+        
+        <!-- 1. CRITICAL RISK: FIRE MANAGEMENT (Score 25) -->
+        <div class="action-card action-card-critical">
+            <div>
+                <span class="badge badge-critical">Critical Risk (Score: 25)</span>
+                <h4>SOP 01: Controlled Burning & Veld Firebreak Protocols</h4>
+                <p>Radio verification protocol, mandatory cancellation sign-offs, FDI weather limits, emergency contacts, and fire retardant PPE[cite: 8].</p>
+            </div>
+            <a href="04_sub_sop_firebreaks.html" class="btn-link" target="_self">Open Firebreak SOP &rarr;</a>
         </div>
-        <div class="action-card">
-            <h4>SOP 02: Road Repairs & Asphalt Maintenance</h4>
-            <p>Safety procedures for double chip & spray, hot-mix patching, and interlocking paver repair work.</p>
-            <a href="04_sub_sop_road_maintenance.html" class="btn-link" target="_blank">Open Road Repair SOP &rarr;</a>
+
+        <!-- 2. CRITICAL RISK: ELECTRICAL (Score 25) -->
+        <div class="action-card action-card-critical">
+            <div>
+                <span class="badge badge-critical">Critical Risk (Score: 25)</span>
+                <h4>SOP 02: Electrical Infrastructure & Lockout/Tagout (LOTO)</h4>
+                <p>11kV transformer padlocks, monthly enclosure audits, Eskom escalation procedures, and contractor LOTO compliance[cite: 8].</p>
+            </div>
+            <a href="04_sub_sop_electrical.html" class="btn-link" target="_self">Open Electrical SOP &rarr;</a>
         </div>
+
+        <!-- 3. CRITICAL RISK: TRACTOR & SLASHER (Score 20) -->
+        <div class="action-card action-card-critical">
+            <div>
+                <span class="badge badge-critical">Critical Risk (Score: 20)</span>
+                <h4>SOP 03: Massey Ferguson 268 Xtra Tractor & Slasher</h4>
+                <p>Pre-start checks, PTO engagement rules, slope traversal limits, speed ranges (L1–L3), and 50m bystander exclusion zones[cite: 9].</p>
+            </div>
+            <a href="04_sub_sop_tractor_slasher.html" class="btn-link" target="_self">Open Tractor SOP &rarr;</a>
+        </div>
+
+        <!-- 4. CRITICAL RISK: CHAINSAW & TREE FELLING (Score 20) -->
+        <div class="action-card action-card-critical">
+            <div>
+                <span class="badge badge-critical">Critical Risk (Score: 20)</span>
+                <h4>SOP 04: Chainsaw Operations & Alien Clearing</h4>
+                <p>Two-man felling rules, chainsaw chaps/leggings, face shields, chain brake safety, and drop-zone radius clearance.</p>
+            </div>
+            <a href="04_sub_sop_chainsaw.html" class="btn-link" target="_self">Open Chainsaw SOP &rarr;</a>
+        </div>
+
+        <!-- 5. HIGH RISK: WATER TREATMENT PLANT (Score 15) -->
+        <div class="action-card action-card-high">
+            <div>
+                <span class="badge badge-high">High Risk (Score: 15)</span>
+                <h4>SOP 05: Water Treatment Plant Operations</h4>
+                <p>Chemical dosing safety, daily quality logging, filter backwash procedures, leak inspections, and dam perimeter security.</p>
+            </div>
+            <a href="04_sub_sop_water_plant.html" class="btn-link" target="_self">Open Water Plant SOP &rarr;</a>
+        </div>
+
+        <!-- 6. HIGH RISK: CHEMICAL HANDLING (Score 12) -->
+        <div class="action-card action-card-high">
+            <div>
+                <span class="badge badge-high">High Risk (Score: 12)</span>
+                <h4>SOP 06: Hazardous Chemical Handling & Herbicides</h4>
+                <p>SDS compliance, 110% bunded storage maintenance, nitrile gloves/aprons, aquatic buffer zones, and spill management.</p>
+            </div>
+            <a href="04_sub_sop_chemicals.html" class="btn-link" target="_self">Open Chemical SOP &rarr;</a>
+        </div>
+
+        <!-- 7. HIGH RISK: ROAD REPAIRS (Score 10) -->
+        <div class="action-card action-card-high">
+            <div>
+                <span class="badge badge-high">High Risk (Score: 10)</span>
+                <h4>SOP 07: Road Repairs & Asphalt Maintenance</h4>
+                <p>Traffic control signage, hot-mix asphalt application, PPE compliance, double chip & spray, and paver repairs.</p>
+            </div>
+            <a href="04_sub_sop_road_maintenance.html" class="btn-link" target="_self">Open Road Repair SOP &rarr;</a>
+        </div>
+
+        <!-- 8. MEDIUM RISK: WORKSHOP & POWER TOOLS (Score 9) -->
+        <div class="action-card action-card-med">
+            <div>
+                <span class="badge badge-med">Medium Risk (Score: 9)</span>
+                <h4>SOP 08: Workshop Safe Work & Power Tool Operation</h4>
+                <p>Monthly power tool inspections, RCCD earth leakage verification, grinder guarding, eye protection, and hot work safety.</p>
+            </div>
+            <a href="04_sub_sop_workshop.html" class="btn-link" target="_self">Open Workshop SOP &rarr;</a>
+        </div>
+
     </div>
 
+    <!-- Standard Framework Bottom Navigation -->
     <div class="nav-footer">
-        <a href="03_incident_reporting_coida.html">&larr; Back to Module 03</a>
-        <a href="05_contractor_management.html">Go to Module 05 &rarr;</a>
+        <a href="03_incident_reporting_coida.html" target="_self" class="btn-index">&larr; Module 03</a>
+        <a href="index.html" target="_self" class="btn-index">Main Index</a>
+        <a href="05_workplace_safety.html" target="_self" class="btn-index">Module 05 &rarr;</a>
+        <button onclick="window.print()" class="btn-print">Print Module</button>
     </div>
+
 </body>
 </html>

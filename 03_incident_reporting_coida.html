@@ -4,25 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Module 03: Incident Reporting & COIDA | Cathkin Estates HOA</title>
-    <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #2d3748; max-width: 900px; margin: 30px auto; padding: 0 20px; background-color: #fcfcfd; }
-        .header-banner { background-color: #1a365d; color: #ffffff; padding: 24px; border-radius: 6px; margin-bottom: 25px; border-bottom: 5px solid #3182ce; }
-        .header-banner h1 { font-size: 18pt; margin: 0 0 6px 0; font-weight: 700; color: #ffffff; }
-        .header-banner .subtitle { font-size: 11pt; color: #e2e8f0; margin: 0; font-weight: 300; }
-        .header-banner .meta-bar { margin-top: 15px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.2); font-size: 8.5pt; color: #cbd5e0; display: flex; justify-content: space-between; flex-wrap: wrap; }
-        h2 { font-size: 13pt; color: #1a365d; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; margin-top: 24px; margin-bottom: 12px; font-weight: 700; }
-        p, li { font-size: 9.5pt; text-align: justify; }
-        .callout { background-color: #ebf8ff; border-left: 4px solid #3182ce; padding: 12px 16px; margin: 15px 0; border-radius: 0 4px 4px 0; font-size: 9pt; }
-        .callout-title { font-weight: bold; color: #1a365d; margin-bottom: 4px; }
-        .action-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-        .action-card { background: #ffffff; border: 1px solid #e2e8f0; border-top: 3px solid #3182ce; padding: 15px; border-radius: 4px; }
-        .action-card h4 { margin: 0 0 8px 0; color: #1a365d; font-size: 10pt; }
-        .action-card p { font-size: 8.5pt; margin-bottom: 12px; color: #4a5568; }
-        .btn-link { display: inline-block; background-color: #3182ce; color: #ffffff; padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 8.5pt; font-weight: bold; }
-        .btn-link:hover { background-color: #2b6cb0; }
-        .nav-footer { margin-top: 40px; padding-top: 15px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; }
-        .nav-footer a { background-color: #1a365d; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; font-size: 9pt; font-weight: bold; }
-    </style>
+    <!-- Force all links on this page to open in the same window -->
+    <base target="_self">
+    <!-- Link to Central External Stylesheet -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="header-banner">
@@ -56,18 +41,19 @@
         <div class="action-card">
             <h4>GAR Annexure 1 Incident Register</h4>
             <p>Statutory register for tracking all workplace injuries, property damage, and near-misses.</p>
-            <a href="03_sub_gar_annexure_1_register.html" class="btn-link" target="_blank">Open Incident Register &rarr;</a>
+            <a href="03_sub_gar_annexure_1_register.html" class="btn-link" target="_self">Open Incident Register &rarr;</a>
         </div>
         <div class="action-card">
             <h4>WCL 2 Employer's Report Form</h4>
             <p>Official COIDA occupational injury report template for submission to the Compensation Commissioner.</p>
-            <a href="03_sub_wcl2_incident_form.html" class="btn-link" target="_blank">Open WCL 2 Form &rarr;</a>
+            <a href="03_sub_wcl2_incident_form.html" class="btn-link" target="_self">Open WCL 2 Form &rarr;</a>
         </div>
     </div>
 
     <div class="nav-footer">
-        <a href="02_hira.html">&larr; Back to Module 02</a>
-        <a href="04_sop_safe_work.html">Go to Module 04 &rarr;</a>
+        <a href="02_hira.html" target="_self">&larr; Back to Module 02</a>
+        <a href="index.html" target="_self">📋 Main Index</a>
+        <a href="04_sop_safe_work.html" target="_self">Go to Module 04 &rarr;</a>
     </div>
 </body>
 </html>
