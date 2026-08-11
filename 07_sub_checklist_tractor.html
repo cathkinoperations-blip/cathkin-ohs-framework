@@ -3,13 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tractor Daily Pre-Start Checklist | Cathkin Estates HOA</title>
+    <title>MF268 Tractor & Slasher Checklist | Cathkin Estates HOA</title>
     <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #2d3748; max-width: 900px; margin: 30px auto; padding: 25px; background-color: #ffffff; border: 1px solid #cbd5e0; }
-        h1 { font-size: 14pt; color: #1a365d; border-bottom: 2px solid #1a365d; padding-bottom: 6px; margin-bottom: 15px; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.5; color: #2d3748; max-width: 950px; margin: 20px auto; padding: 20px; background-color: #ffffff; border: 1px solid #cbd5e0; }
+        h1 { font-size: 14pt; color: #1a365d; border-bottom: 2px solid #1a365d; padding-bottom: 6px; margin-bottom: 12px; text-transform: uppercase; }
+        h2 { font-size: 11pt; color: #2c5282; margin-top: 15px; margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+        
+        .meta-box { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; background: #f7fafc; padding: 10px 15px; border: 1px solid #e2e8f0; font-size: 9pt; }
+        .meta-box label { font-weight: bold; margin-right: 5px; }
+        
         table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 15px; }
         th { background-color: #2d3748; color: white; padding: 6px 8px; text-align: left; }
-        td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+        
+        .risk-high { color: #c53030; font-weight: bold; }
+        .risk-med { color: #dd6b20; font-weight: bold; }
+        .risk-low { color: #38a169; font-weight: bold; }
+        
         .nav-link { display: inline-block; margin-bottom: 15px; color: #3182ce; text-decoration: none; font-weight: bold; font-size: 9pt; }
         .btn-print { background-color: #3182ce; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; float: right; }
         @media print { .btn-print, .nav-link { display: none; } body { border: none; margin: 0; padding: 0; } }
@@ -18,22 +28,78 @@
 <body>
     <button class="btn-print" onclick="window.print()">🖨️ Print Form</button>
     <a href="07_checklists_inspections.html" class="nav-link">&larr; Back to Module 07</a>
-    <h1>MF268 TRACTOR & SLASHER DAILY PRE-START LOG</h1>
-    <p><strong>Operator Name:</strong> ________________________ <strong>Date:</strong> _______________ <strong>Hours:</strong> _________</p>
+    
+    <h1>MF268 XTRA TRACTOR & SLASHER INSPECTION LOG</h1>
+
+    <div class="meta-box">
+        <div><label>Date:</label> ________________</div>
+        <div><label>Hours Meter:</label> ________________</div>
+        <div><label>Operator Name / Initials:</label> ________________</div>
+        <div><label>Manager Initials:</label> ________</div>
+    </div>
+
+    <h2>1. MASSEY FERGUSON 268 TRACTOR CHECKLIST</h2>
     <table>
         <thead>
             <tr>
-                <th>Inspection Item</th>
-                <th>Status (Pass / Fail)</th>
-                <th>Notes / Faults Logged</th>
+                <th style="width: 18%;">Component</th>
+                <th style="width: 32%;">Checklist Item / Action Required</th>
+                <th style="width: 15%;">Frequency</th>
+                <th style="width: 8%;">Risk</th>
+                <th style="width: 12%;">Status</th>
+                <th style="width: 15%;">Notes / Defects</th>
             </tr>
         </thead>
         <tbody>
-            <tr><td>Engine Oil Level & Coolant</td><td>[ Pass ] [ Fail ]</td><td></td></tr>
-            <tr><td>Brake Pedal Operation & Latch</td><td>[ Pass ] [ Fail ]</td><td></td></tr>
-            <tr><td>PTO Master Guard & Shroud</td><td>[ Pass ] [ Fail ]</td><td></td></tr>
-            <tr><td>Slasher Blade Attachment & Pin</td><td>[ Pass ] [ Fail ]</td><td></td></tr>
-            <tr><td>Tyre Pressures & Condition</td><td>[ Pass ] [ Fail ]</td><td></td></tr>
+            <tr><td>Engine Oil & Coolant</td><td>Check levels before engine start; inspect for leaks</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Hydraulic & Gear Oil</td><td>Check reservoir levels before operating implements</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Radiator Screen</td><td>Clear dust, chaff, and debris to prevent head overheating</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Wiring Harness & Battery</td><td>Check harness security and clean terminal connections</td><td>Daily</td><td class="risk-med">Med</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Differential & Trans</td><td>Inspect bottom housing for active fluid drips or leaks</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Pedal & Gear Selection</td><td>Select Low Range (L1–L3) for slashing/slopes; strictly NO clutch riding</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Wheel Nuts & Tyres</td><td>Check tightness & pressure (Front: 28–32 PSI | Rear: 16–20 PSI)</td><td>Daily / Mon</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Clutch Housing Weep-Hole</td><td>Audit bell housing weep hole for engine oil leakage (Rear Main Seal check)</td><td>Weekly (Mon)</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Lift Arms & Linkages</td><td>Check height alignment and inspect gear shift linkages</td><td>Weekly (Mon)</td><td class="risk-med">Med</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Grease Points & Hoses</td><td>Lubricate all grease nipples & check hydraulic hoses for wear</td><td>Monthly</td><td class="risk-med">Med</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <h2>2. SLASHER & PTO IMPLEMENT CHECKLIST</h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 18%;">Component</th>
+                <th style="width: 32%;">Checklist Item / Action Required</th>
+                <th style="width: 15%;">Frequency</th>
+                <th style="width: 8%;">Risk</th>
+                <th style="width: 12%;">Status</th>
+                <th style="width: 15%;">Notes / Defects</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Slasher Gearbox Oil</td><td>Check oil level; inspect input/output seals for leaks</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>PTO Master Guard & Shaft</td><td>Ensure guard spins freely; inspect shaft universal joints for play</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Blades & Blade Bolts</td><td>Inspect for dullness/cracks; check flywheel bolt tightness</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Skid Runners & Casters</td><td>Check skid wear and ensure trailing casters hold deck 2–3cm clear of ground</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Debris Deck</td><td>Clear packed grass/brush from top deck to eliminate fire hazard</td><td>Daily</td><td class="risk-low">Low</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Slip Clutch Assembly</td><td>Inspect friction plates and adjust springs if slipping/locked</td><td>Weekly (Mon)</td><td class="risk-med">Med</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Telescopic Shaft Tube</td><td>Ensure shaft slides easily and is lubricated to prevent binding shock</td><td>Weekly (Mon)</td><td class="risk-med">Med</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <h2>3. DEFECT REMEDY & REPAIR ACTION LOG</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Defect / Issue Identified</th>
+                <th>Corrective Action Taken</th>
+                <th>Target Date</th>
+                <th>Manager Sign-off</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td style="height: 28px;"></td><td></td><td></td><td></td></tr>
+            <tr><td style="height: 28px;"></td><td></td><td></td><td></td></tr>
         </tbody>
     </table>
 </body>

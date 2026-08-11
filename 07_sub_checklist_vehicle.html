@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Daily Checklist | Cathkin Estates HOA</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.5; color: #2d3748; max-width: 950px; margin: 20px auto; padding: 20px; background-color: #ffffff; border: 1px solid #cbd5e0; }
+        h1 { font-size: 14pt; color: #1a365d; border-bottom: 2px solid #1a365d; padding-bottom: 6px; margin-bottom: 12px; text-transform: uppercase; }
+        .meta-box { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; background: #f7fafc; padding: 10px 15px; border: 1px solid #e2e8f0; font-size: 9pt; }
+        .meta-box label { font-weight: bold; margin-right: 5px; }
+        table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 15px; }
+        th { background-color: #2d3748; color: white; padding: 6px 8px; text-align: left; }
+        td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+        .risk-high { color: #c53030; font-weight: bold; }
+        .risk-med { color: #dd6b20; font-weight: bold; }
+        .risk-low { color: #38a169; font-weight: bold; }
+        .nav-link { display: inline-block; margin-bottom: 15px; color: #3182ce; text-decoration: none; font-weight: bold; font-size: 9pt; }
+        .btn-print { background-color: #3182ce; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; float: right; }
+        @media print { .btn-print, .nav-link { display: none; } body { border: none; margin: 0; padding: 0; } }
+    </style>
+</head>
+<body>
+    <button class="btn-print" onclick="window.print()">🖨️ Print Form</button>
+    <a href="07_checklists_inspections.html" class="nav-link">&larr; Back to Module 07</a>
+    
+    <h1>BAKKIE & VEHICLE PRE-START INSPECTION LOG</h1>
+    
+    <div class="meta-box">
+        <div><label>Vehicle Select:</label> [ ] Toyota 1 (Old) &nbsp; [ ] Toyota 2 (New)</div>
+        <div><label>Date:</label> _______________</div>
+        <div><label>Odometer (km):</label> _______________</div>
+        <div><label>Worker Initials:</label> _______</div>
+        <div><label>Manager Initials:</label> _______</div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 18%;">Component</th>
+                <th style="width: 35%;">Checklist Item / Action Required</th>
+                <th style="width: 15%;">Frequency</th>
+                <th style="width: 8%;">Risk</th>
+                <th style="width: 12%;">Status</th>
+                <th style="width: 12%;">Defects Logged</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Engine Oil</td><td>Check level, top up if low, change per intervals</td><td>Daily / Weekly</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Power Steering Fluid</td><td>Check level, top up if low, change per intervals</td><td>Daily / Weekly</td><td class="risk-med">Med</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Radiator Fluid</td><td>Check level, top up if low, change per intervals</td><td>Daily / Weekly</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Tyres</td><td>Inspect for wear, punctures, and correct PSI</td><td>Daily / Weekly</td><td class="risk-med">Med</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Differential / Diff</td><td>Look for oil leaks</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Lights</td><td>Test indicators, brake lights, and headlights</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Tow Hitch</td><td>Ensure tow hitch is secure</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Body Panels</td><td>Inspect for new dents and scratches</td><td>Daily</td><td class="risk-low">Low</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Suspension</td><td>Check shock absorbers for leaks after rough tracks</td><td>Weekly (Mon)</td><td class="risk-low">Low</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Air Filter</td><td>Tap out dust and debris, replace if clogged</td><td>Weekly (Mon)</td><td class="risk-med">Med</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Brake Pads & Fluid</td><td>Check fluid level, listen for squeals or grinding</td><td>Monthly (1st Mon)</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>Battery</td><td>Clean off terminal corrosion and check connections</td><td>Monthly</td><td class="risk-med">Med</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+            <tr><td>CV Joints</td><td>Check for excessive play and damaged boots</td><td>Six Monthly (Jul/Jan)</td><td class="risk-low">Low</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+        </tbody>
+    </table>
+
+    <h2>REMEDY & MAINTENANCE ACTION LOG</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Defect / Issue Identified</th>
+                <th>Remedy Action Taken</th>
+                <th>Date Resolved</th>
+                <th>Invoice #</th>
+                <th>Manager Sign-off</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td style="height: 25px;"></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td style="height: 25px;"></td><td></td><td></td><td></td><td></td></tr>
+        </tbody>
+    </table>
+</body>
+</html>
