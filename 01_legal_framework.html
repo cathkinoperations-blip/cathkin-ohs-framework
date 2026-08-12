@@ -8,6 +8,85 @@
     <base target="_self">
     <!-- Link to Central External Stylesheet -->
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Governance Organigramme Custom Layout Styles (Tree Structure) */
+        .org-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 20px 0;
+            overflow-x: auto;
+        }
+        .org-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+        }
+        .org-box {
+            background: #ffffff;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            padding: 12px 18px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            width: 280px;
+        }
+        .org-box.primary-vertical {
+            background: #1a365d;
+            color: white;
+            border-color: #1a365d;
+            width: 320px;
+        }
+        .org-box.primary-vertical .org-subtitle {
+            color: #e2e8f0;
+        }
+        .org-title {
+            font-weight: bold;
+            font-size: 10pt;
+            margin-bottom: 3px;
+        }
+        .org-subtitle {
+            font-size: 8pt;
+            color: #4a5568;
+        }
+        .org-connector-v {
+            width: 2px;
+            height: 25px;
+            background: #cbd5e0;
+        }
+        
+        /* Branching layout for the three committees */
+        .org-branch-row {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 20px;
+            width: 100%;
+            position: relative;
+        }
+        .org-branch-row .org-box {
+            width: 220px;
+            background: #f7fafc;
+            border-color: #2b6cb0;
+        }
+        
+        /* Horizontal connector bar above the committees */
+        .org-h-bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .org-h-bar {
+            width: 65%;
+            height: 2px;
+            background: #cbd5e0;
+            position: relative;
+        }
+    </style>
 </head>
 <body>
 
@@ -26,91 +105,77 @@
     <p>To ensure effective operational management across estate maintenance, contractor activities, and common property, Section 16(2) provides the statutory mechanism to delegate specific health and safety duties to competent personnel (such as the Estate Manager or designated Operations Lead).</p>
 
     <div class="callout">
-        <div class="callout-title">HSSE GOVERNANCE & IMPLEMENTATION MODEL</div>
-        Cathkin Estates HOA maintains governance oversight through specialized committee structures:
-        <ul>
-            <li><strong>HSSE Committee:</strong> Safety policy, environmental compliance, risk registers, and audits.</li>
-            <li><strong>Operations Committee:</strong> Estate infrastructure, equipment maintenance, and project execution.</li>
-            <li><strong>Finance Committee:</strong> Budgetary allocation, repair limits, and fiscal controls.</li>
-            <li><strong>Architectural Review Committee (ARC):</strong> Architectural compliance, building guidelines, and contractor construction controls.</li>
-        </ul>
+        <div class="callout-title">LEGAL GOVERNANCE & STATUTORY HIERARCHY MODEL</div>
+        Cathkin Estates HOA maintains a clear vertical statutory chain of command running directly from Homeowners through the Board (§16.1), branching out to oversight committees (Finance, HSSE, and Architectural), and flowing down to the Estate Manager (§16.2) and Developers & Contractors (§37.2).
     </div>
 
-<h2>2. Governance Organigramme</h2>
-    <p>The organigramme below illustrates the reporting structure, statutory accountability, oversight committees, and operational implementation workflow:</p>
+    <h2>2. Governance Organigramme</h2>
+    <p>The organigramme below illustrates the direct vertical legal framework alongside governance pillars:</p>
 
     <div class="org-container">
         <div class="org-tree">
-            <!-- Level 1: Executive Board -->
-            <div class="org-node top-exec">
-                <div class="org-title">HOA BOARD & CHAIRMAN</div>
-                <div class="org-subtitle">OHS Act §16(1) Ultimate Legal Liability</div>
+            <!-- Level 1: Members -->
+            <div class="org-box">
+                <div class="org-title">MEMBERS</div>
+                <div class="org-subtitle">(Homeowners / AGM)</div>
             </div>
 
             <div class="org-connector-v"></div>
 
-            <!-- Level 2: Oversight Committees -->
-            <div class="org-branches">
-                <!-- HSSE Branch -->
-                <div class="org-branch">
-                    <div class="org-node level-committee">
-                        <div class="org-title">HSSE COMMITTEE</div>
-                        <div class="org-subtitle">Safety, Risk & Environmental Oversight</div>
-                    </div>
-                </div>
+            <!-- Level 2: Board of Directors (§16.1) -->
+            <div class="org-box primary-vertical">
+                <div class="org-title">THE BOARD OF DIRECTORS</div>
+                <div class="org-subtitle">(Collective Statutory Liability)<br>(OHS Act §16(1))</div>
+            </div>
 
-                <!-- Operations Branch (Direct reporting line to Estate Manager) -->
-                <div class="org-branch ops-main-branch">
-                    <div class="org-node level-committee highlight-ops">
-                        <div class="org-title">OPERATIONS COMMITTEE</div>
-                        <div class="org-subtitle">Infrastructure & Project Strategy</div>
-                    </div>
-
-                    <div class="org-connector-v"></div>
-
-                    <!-- Level 3: Operational Lead (Reports directly to Ops Committee) -->
-                    <div class="org-node level-ops">
-                        <div class="org-title">ESTATE MANAGER</div>
-                        <div class="org-subtitle">OHS Act §16(2) Statutory Operational Appointment</div>
-                    </div>
-
-                    <div class="org-connector-v"></div>
-
-                    <!-- Level 4: Execution Teams -->
-                    <div class="org-branches execution-row">
-                        <div class="org-branch">
-                            <div class="org-node sub-node">
-                                <strong>In-House Maintenance Team</strong><br>Daily Checklists, PPE, Machinery
-                            </div>
-                        </div>
-                        <div class="org-branch">
-                            <div class="org-node sub-node">
-                                <strong>Statutory Appointees</strong><br>First Aid, Fire Warden, Investigator
-                            </div>
-                        </div>
-                        <div class="org-branch">
-                            <div class="org-node sub-node">
-                                <strong>Contractors & Service Providers</strong><br>Section 37(2) Mandates & COIDA
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Architectural Review Committee Branch -->
-                <div class="org-branch">
-                    <div class="org-node level-committee">
-                        <div class="org-title">ARCHITECTURAL REVIEW (ARC)</div>
-                        <div class="org-subtitle">Building Guidelines & Rules</div>
-                    </div>
-                </div>
+            <div class="org-connector-v"></div>
             
-                <!-- Finance Branch -->
-                <div class="org-branch">
-                    <div class="org-node level-committee">
-                        <div class="org-title">FINANCE COMMITTEE</div>
-                        <div class="org-subtitle">Budgetary Allocation & Controls</div>
-                    </div>
+            <!-- Horizontal Branch Bar -->
+            <div class="org-h-bar-container">
+                <div class="org-h-bar"></div>
+                <div class="org-connector-v" style="height: 15px;"></div>
+            </div>
+
+            <!-- Level 3: Three Committees Branch Row -->
+            <div class="org-branch-row">
+                <!-- Finance Comm -->
+                <div class="org-box">
+                    <div class="org-title">FINANCE COMMITTEE</div>
+                    <div class="org-subtitle">Budgetary &<br>Fiscal Controls</div>
                 </div>
+
+                <!-- HSSE Portfolio -->
+                <div class="org-box" style="border-color: #3182ce; background-color: #ebf8ff;">
+                    <div class="org-title">HSSE / OPERATIONS PORTFOLIO</div>
+                    <div class="org-subtitle">Risk & Safety<br>Oversight</div>
+                </div>
+
+                <!-- Architectural Review Committee -->
+                <div class="org-box">
+                    <div class="org-title">ARCHITECTURAL REVIEW COMMITTEE</div>
+                    <div class="org-subtitle">Design & Bylaw<br>Compliance</div>
+                </div>
+            </div>
+
+            <!-- Connectors down from committees to convergence bar -->
+            <div class="org-h-bar-container" style="margin-top: 15px;">
+                <div class="org-connector-v" style="height: 15px;"></div>
+                <div class="org-h-bar"></div>
+                <div class="org-connector-v"></div>
+            </div>
+
+            <!-- Level 4: Estate Manager (§16.2) -->
+            <div class="org-box" style="border-color: #3182ce; background-color: #ebf8ff; width: 320px;">
+                <div class="org-title">ESTATE MANAGER</div>
+                <div class="org-subtitle">Executive Operations<br>(OHS Act §16(2))</div>
+            </div>
+
+            <div class="org-connector-v"></div>
+
+            <!-- Level 5: Developers & Contractors (§37.2) -->
+            <div class="org-box" style="border-color: #dd6b20; background-color: #fffaf0; width: 320px;">
+                <div class="org-title">DEVELOPERS & CONTRACTORS</div>
+                <div class="org-subtitle">(Section 37(2) & COIDA Compliance)</div>
             </div>
         </div>
     </div>
@@ -189,21 +254,50 @@
     </div>
 
     <h2>5. OHS Governance & Committee Framework</h2>
-    <p>Strategic oversight is maintained across the specialized committees (<strong>HSSE</strong>, <strong>Operations</strong>, <strong>Finance</strong>, and <strong>ARC</strong>), with <strong>Estate Management</strong> executing safety and environmental protocols on the ground.</p>
+    <p>Strategic oversight is maintained across the specialized governance pillars (<strong>HSSE</strong>, <strong>Finance</strong>, and <strong>Architectural Review</strong>), while the primary vertical chain of command runs from Homeowners through the Board (§16.1) down to the Estate Manager (§16.2) and Contractors (§37.2).</p>
 
-    <h3>HSSE & ARC Committee Collaboration:</h3>
+    <h3>SECTION 2.1: EXPLANATORY NOTES FOR THE GOVERNANCE ORGANIGRAMME</h3>
+    
+    <h4>1. Purpose of the Framework</h4>
+    <p>This organigramme defines the operational hierarchy, reporting lines, and statutory divisions of power within the Cathkin Estates Homeowners Association. It moves away from centralized individual oversight to establish a modern governance framework based on the segregation of duties, collective board liability, and proactive risk management.</p>
+
+    <h4>2. Structural Breakdown & Flow of Authority</h4>
+    
+    <p><strong>Tier 1: The Supreme Authority – Members (Homeowners / AGM)</strong><br>
+    <em>Status:</em> Ultimate Accountable Body.<br>
+    <em>Role:</em> Sitting at the apex of the structure, the Members hold ultimate decision-making power. Through the Annual General Meeting (AGM), they elect the Board of Directors, approve the global annual budget, and amend the founding Memorandum of Incorporation (MOI) or Constitution.</p>
+
+    <p><strong>Tier 2: The Executive Authority – The Board of Directors</strong><br>
+    <em>Status:</em> Collective Fiduciary Body.<br>
+    <em>Role:</em> The Board acts as a collective unit. No single individual, including the Chairman, holds unilateral executive authority. All strategic decisions, major expenditures, and rule adoptions require a formal board vote and resolution.<br>
+    <em>Statutory Alignment:</em> Holds ultimate, non-delegable corporate liability under Section 76 of the Companies Act and criminal health and safety liability under Section 16(1) of the Occupational Health and Safety (OHS) Act.</p>
+
+    <p><strong>Tier 3: The Regulatory Filter – Horizontal Committees & Portfolios</strong><br>
+    Before any strategic instruction reaches the operational team, it must pass through one of three horizontal regulatory gates. This ensures technical vetting, fiscal discipline, and strict legislative compliance:</p>
+
     <ul>
-        <li><strong>HSSE Committee:</strong> Audits safety compliance, chemical storage, hazard registers, and COIDA standings.</li>
-        <li><strong>Architectural Review Committee (ARC):</strong> Oversees building site environmental management plans (EMPs), contractor compliance with estate building rules, and construction site safety protocols.</li>
+        <li><strong>A. Finance Committee (Formal Sub-Committee):</strong><br>
+        <em>Nature:</em> A formally constituted advisory body composed of directors and volunteer financial experts from the community.<br>
+        <em>Function:</em> Responsible for budgetary allocations, long-term capital reserve calculations, financial audits, and fiscal policy. It implements a strict Delegation of Authority (DoA) matrix, restricting spending power within predefined budgetary limits.</li>
+        
+        <li><strong>B. HSSE / Operations Portfolio (Direct Board Assignment):</strong><br>
+        <em>Nature:</em> An internal board portfolio managed directly by a designated director rather than an independent administrative committee.<br>
+        <em>Function:</em> Retains hands-on board oversight regarding workplace safety, estate environmental preservation, and liability minimization. It ensures that infrastructure risks are prioritized within the estate budget.</li>
+        
+        <li><strong>C. Architectural Review Committee (Formal Sub-Committee):</strong><br>
+        <em>Nature:</em> A formal committee enforcing aesthetic and technical structural conformity across the estate.<br>
+        <em>Function:</em> Vets building plans, construction variations, and structural alterations against estate guidelines, ensuring compliance with the National Building Regulations (Act 103 of 1977) before municipal submission.</li>
     </ul>
 
-    <h3>Operations Implementation Responsibilities:</h3>
-    <ul>
-        <li>Daily on-the-ground implementation of safety checklists (vehicles, tractors, chemical store).</li>
-        <li>Enforcing PPE compliance, low-range gear selection on machinery, and operational safety rules.</li>
-        <li>Conducting daily toolbox talks, hazard identification, and contractor site inductions.</li>
-        <li>Immediate reporting of incidents and operational hazards to the HSSE Committee.</li>
-    </ul>
+    <p><strong>Tier 4: The Operational Execution – Estate Manager</strong><br>
+    <em>Status:</em> Executive Operations.<br>
+    <em>Role:</em> Sits beneath the regulatory gate to run day-to-day estate management, infrastructure up-keep, and rule enforcement. The Estate Manager acts on the collective policies of the Board, not on individual requests from single directors.<br>
+    <em>Statutory Alignment:</em> Receives formal, written delegation from the Board under Section 16(2) of the OHS Act to act as the on-site competent safety head.</p>
+
+    <p><strong>Tier 5: The Ground Level – Developers & Contractors</strong><br>
+    <em>Status:</em> Third-Party Service Providers.<br>
+    <em>Role:</em> The boots on the ground executing structural development, security services, landscaping, and maintenance.<br>
+    <em>Statutory Alignment:</em> Strictly insulated from the estate’s liability pool via mandatory Section 37(2) written health and safety agreements and verified COIDA (Compensation for Occupational Injuries and Diseases Act) compliance files managed by the Estate Manager.</p>
 
     <div class="nav-footer">
         <a href="index.html" target="_self">&larr; Main Index</a>

@@ -7,9 +7,9 @@
     <style>
         body { 
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
-            line-height: 1.5; 
+            line-height: 1.65; 
             color: #2d3748; 
-            max-width: 900px; 
+            max-width: 950px; 
             margin: 30px auto; 
             padding: 30px; 
             background-color: #ffffff; 
@@ -17,28 +17,51 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
         .header { border-bottom: 3px solid #1a365d; padding-bottom: 12px; margin-bottom: 20px; }
-        .header h1 { font-size: 15pt; color: #1a365d; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
-        .header .subtitle { font-size: 9.5pt; color: #4a5568; margin-top: 4px; font-weight: bold; }
+        .header h1 { font-size: 18pt; color: #1a365d; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+        .header .subtitle { font-size: 11pt; color: #4a5568; margin-top: 4px; font-weight: bold; }
         
-        h2 { font-size: 10.5pt; color: #1a365d; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-top: 18px; margin-bottom: 8px; text-transform: uppercase; }
-        p, li { font-size: 8.5pt; text-align: justify; margin-bottom: 8px; }
-        ul { margin-top: 4px; padding-left: 20px; }
-        li { margin-bottom: 4px; }
+        h2 { font-size: 12.5pt; color: #1a365d; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-top: 22px; margin-bottom: 10px; text-transform: uppercase; }
+        p, li { font-size: 11pt; text-align: justify; margin-bottom: 10px; }
+        ul { margin-top: 6px; padding-left: 24px; }
+        li { margin-bottom: 6px; }
         
-        .appointment-box { background-color: #f7fafc; border: 1px solid #e2e8f0; padding: 14px; margin: 15px 0; border-radius: 4px; font-size: 8.5pt; }
-        .fill-line { border-bottom: 1px solid #a0aec0; display: inline-block; padding: 0 5px; font-weight: bold; color: #1a365d; }
+        .appointment-box { background-color: #f7fafc; border: 1px solid #e2e8f0; padding: 18px; margin: 18px 0; border-radius: 4px; font-size: 11pt; line-height: 1.8; }
         
-        .signature-table { width: 100%; margin-top: 25px; border-collapse: collapse; page-break-inside: avoid; }
-        .signature-table td { width: 50%; vertical-align: top; padding: 10px; font-size: 8.5pt; }
-        .sig-line { border-bottom: 1px solid #2d3748; margin-top: 35px; margin-bottom: 4px; width: 85%; }
+        /* Editable Input Boxes Style */
+        .editable-input {
+            border: 1px dashed #a0aec0;
+            background-color: #ffffff;
+            color: #1a365d;
+            font-weight: bold;
+            font-family: inherit;
+            font-size: 10.5pt;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 0 2px;
+            outline: none;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        .editable-input:focus {
+            border-color: #3182ce;
+            background-color: #ebf8ff;
+            border-style: solid;
+        }
         
-        .nav-link { display: inline-block; margin-bottom: 15px; color: #3182ce; text-decoration: none; font-weight: bold; font-size: 9pt; }
-        .btn-print { background-color: #1a365d; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; float: right; font-size: 8.5pt; }
+        .signature-table { width: 100%; margin-top: 30px; border-collapse: collapse; page-break-inside: avoid; }
+        .signature-table td { width: 50%; vertical-align: top; padding: 12px; font-size: 10.5pt; }
+        .sig-line { border-bottom: 1px solid #2d3748; margin-top: 40px; margin-bottom: 6px; width: 85%; }
+        
+        .nav-link { display: inline-block; margin-bottom: 15px; color: #3182ce; text-decoration: none; font-weight: bold; font-size: 10pt; }
+        .nav-link:hover { text-decoration: underline; }
+        
+        .btn-print { background-color: #1a365d; color: white; padding: 9px 18px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; float: right; font-size: 9.5pt; }
         .btn-print:hover { background-color: #2b6cb0; }
         
         @media print { 
             .btn-print, .nav-link { display: none; } 
             body { border: none; margin: 0; padding: 0; box-shadow: none; max-width: 100%; } 
+            .editable-input { border: none; border-bottom: 1px solid #a0aec0; background: transparent; padding: 0; border-radius: 0; }
         }
     </style>
 </head>
@@ -52,56 +75,56 @@
     </div>
 
     <div class="appointment-box">
-        I, <span class="fill-line" style="min-width: 200px;">[ CEO / Board Chairperson / Delegate ]</span>, in my capacity as the person in overall control of <strong>Cathkin Estates Homeowners Association (HOA)</strong>, hereby appoint <span class="fill-line" style="min-width: 200px;">[ Appointee Name ]</span>, in the position of <span class="fill-line" style="min-width: 150px;">[ Estate Manager / Operations Manager ]</span>, as a person assigned with duties in terms of <strong>Section 16(2) of the Occupational Health and Safety Act, 85 of 1993</strong>, with effect from <span class="fill-line" style="min-width: 120px;">[ Effective Date ]</span>[cite: 14].
+        I, <span contenteditable="true" class="editable-input" style="min-width: 220px;">[ CEO / Board Chairperson / Delegate ]</span>, in my capacity as the person in overall control of <strong>Cathkin Estates Homeowners Association (HOA)</strong>, hereby appoint <span contenteditable="true" class="editable-input" style="min-width: 200px;">[ Appointee Name ]</span>, in the position of <span contenteditable="true" class="editable-input" style="min-width: 180px;">[ Estate Manager / Operations Manager ]</span>, as a person assigned with duties in terms of <strong>Section 16(2) of the Occupational Health and Safety Act, 85 of 1993</strong>, with effect from <span contenteditable="true" class="editable-input" style="min-width: 140px;">[ Effective Date ]</span>.
         <br><br>
-        This appointment applies to <strong>Cathkin Estates (All common areas, operations, maintenance facilities, water infrastructure, road networks, and administrative grounds)</strong> and remains in force until withdrawn in writing, amended, or replaced by a further written appointment[cite: 14].
+        This appointment applies to <strong>Cathkin Estates (All common areas, operations, maintenance facilities, water infrastructure, road networks, and administrative grounds)</strong> and remains in force until withdrawn in writing, amended, or replaced by a further written appointment.
     </div>
 
     <h2>1. Scope of Appointment</h2>
-    <p>The appointee is assigned responsibility, subject to the control and directions of the Chief Executive Officer / Employer, to assist in ensuring that the employer’s duties under the Occupational Health and Safety Act and its applicable regulations are properly discharged within the area of responsibility stated above[cite: 14].</p>
+    <p>The appointee is assigned responsibility, subject to the control and directions of the Chief Executive Officer / Employer, to assist in ensuring that the employer’s duties under the Occupational Health and Safety Act and its applicable regulations are properly discharged within the area of responsibility stated above.</p>
 
     <h2>2. Duties and Responsibilities</h2>
-    <p>The appointee shall perform the following statutory functions within their area of responsibility[cite: 14]:</p>
+    <p>The appointee shall perform the following statutory functions within their area of responsibility:</p>
     <ul>
-        <li>Take reasonable steps to ensure that the workplace, systems of work, plant, machinery, equipment, and activities within the area of responsibility are safe and without risk to health, as far as is reasonably practicable[cite: 14].</li>
-        <li>Ensure that hazards are identified, risks are assessed, and appropriate control measures are implemented, monitored, and reviewed[cite: 14].</li>
-        <li>Ensure that employees, contractors, and other relevant persons receive appropriate health and safety information, instruction, training, and supervision[cite: 14].</li>
-        <li>Ensure that incidents, near misses, unsafe acts, and unsafe conditions are reported, investigated, and addressed within a reasonable period[cite: 14].</li>
-        <li>Promote compliance with applicable health and safety policies, procedures, safe work instructions, and statutory requirements[cite: 14].</li>
-        <li>Ensure that health and safety representatives, committees, and responsible persons are supported where applicable[cite: 14].</li>
-        <li>Report material health and safety risks, non-compliance, resource constraints, and corrective actions to the Chief Executive Officer or designated senior management[cite: 14].</li>
-        <li>Keep appropriate records of inspections, meetings, incidents, training, corrective actions, and other health and safety matters within the area of responsibility[cite: 14].</li>
+        <li>Take reasonable steps to ensure that the workplace, systems of work, plant, machinery, equipment, and activities within the area of responsibility are safe and without risk to health, as far as is reasonably practicable.</li>
+        <li>Ensure that hazards are identified, risks are assessed, and appropriate control measures are implemented, monitored, and reviewed.</li>
+        <li>Ensure that employees, contractors, and other relevant persons receive appropriate health and safety information, instruction, training, and supervision.</li>
+        <li>Ensure that incidents, near misses, unsafe acts, and unsafe conditions are reported, investigated, and addressed within a reasonable period.</li>
+        <li>Promote compliance with applicable health and safety policies, procedures, safe work instructions, and statutory requirements.</li>
+        <li>Ensure that health and safety representatives, committees, and responsible persons are supported where applicable.</li>
+        <li>Report material health and safety risks, non-compliance, resource constraints, and corrective actions to the Chief Executive Officer or designated senior management.</li>
+        <li>Keep appropriate records of inspections, meetings, incidents, training, corrective actions, and other health and safety matters within the area of responsibility.</li>
     </ul>
 
     <h2>3. Authority and Resources</h2>
-    <p>The appointee is authorized to take reasonable and necessary steps within the area of responsibility to give effect to this appointment, including requiring compliance with health and safety procedures, escalating non-compliance, requesting appropriate resources, and stopping or referring unsafe work where there is an immediate or serious risk to health or safety[cite: 14].</p>
+    <p>The appointee is authorized to take reasonable and necessary steps within the area of responsibility to give effect to this appointment, including requiring compliance with health and safety procedures, escalating non-compliance, requesting appropriate resources, and stopping or referring unsafe work where there is an immediate or serious risk to health or safety.</p>
 
     <h2>4. Reporting</h2>
-    <p>The appointee must report to <span class="fill-line" style="min-width: 180px;">[ Executive Committee / Board Chairperson ]</span> on health and safety matters at intervals reasonably required by the employer, and must immediately escalate any serious incident, imminent danger, statutory non-compliance, or material resource constraint[cite: 14].</p>
+    <p>The appointee must report to <span contenteditable="true" class="editable-input" style="min-width: 240px;">[ Executive Committee / Board Chairperson ]</span> on health and safety matters at intervals reasonably required by the employer, and must immediately escalate any serious incident, imminent danger, statutory non-compliance, or material resource constraint.</p>
 
     <h2>5. Acknowledgment by Appointee</h2>
-    <p>I, <span class="fill-line" style="min-width: 180px;">[ Appointee Name ]</span>, confirm that I understand the nature and scope of this appointment, the duties assigned to me, and that I will act subject to the control and directions of the Chief Executive Officer or designated senior management[cite: 14]. I further confirm that I will bring to management’s attention any material limitation, lack of authority, lack of competency, lack of information, or lack of resources that may prevent me from properly fulfilling these duties[cite: 14].</p>
+    <p>I, <span contenteditable="true" class="editable-input" style="min-width: 200px;">[ Appointee Name ]</span>, confirm that I understand the nature and scope of this appointment, the duties assigned to me, and that I will act subject to the control and directions of the Chief Executive Officer or designated senior management. I further confirm that I will bring to management’s attention any material limitation, lack of authority, lack of competency, lack of information, or lack of resources that may prevent me from properly fulfilling these duties.</p>
 
     <!-- SIGNATURE SECTION -->
     <table class="signature-table">
         <tr>
             <td>
-                <strong>FOR AND ON BEHALF OF THE EMPLOYER:</strong>[cite: 14]
+                <strong>FOR AND ON BEHALF OF THE EMPLOYER:</strong>
                 <div class="sig-line"></div>
-                Signature[cite: 14]
+                Signature
                 <br><br>
-                <strong>Name:</strong> ___________________________________[cite: 14]<br>
-                <strong>Designation:</strong> ______________________________[cite: 14]<br>
-                <strong>Date:</strong> _____________________________________[cite: 14]
+                <strong>Name:</strong> <span contenteditable="true" class="editable-input" style="min-width: 180px;">[ Full Name ]</span><br><br>
+                <strong>Designation:</strong> <span contenteditable="true" class="editable-input" style="min-width: 180px;">[ Title / Position ]</span><br><br>
+                <strong>Date:</strong> <span contenteditable="true" class="editable-input" style="min-width: 140px;">[ Date ]</span>
             </td>
             <td>
-                <strong>ACCEPTANCE BY APPOINTEE:</strong>[cite: 14]
+                <strong>ACCEPTANCE BY APPOINTEE:</strong>
                 <div class="sig-line"></div>
-                Signature[cite: 14]
+                Signature
                 <br><br>
-                <strong>Name:</strong> ___________________________________[cite: 14]<br>
-                <strong>Designation:</strong> ______________________________[cite: 14]<br>
-                <strong>Date:</strong> _____________________________________[cite: 14]
+                <strong>Name:</strong> <span contenteditable="true" class="editable-input" style="min-width: 180px;">[ Full Name ]</span><br><br>
+                <strong>Designation:</strong> <span contenteditable="true" class="editable-input" style="min-width: 180px;">[ Title / Position ]</span><br><br>
+                <strong>Date:</strong> <span contenteditable="true" class="editable-input" style="min-width: 140px;">[ Date ]</span>
             </td>
         </tr>
     </table>
