@@ -95,6 +95,31 @@
         </tbody>
     </table>
 
+    <h2>Add New Risk Entry</h2>
+    <form id="add-risk-form" style="background: white; padding: 15px; border: 1px solid #e2e8f0; margin-bottom: 25px; border-radius: 4px;">
+        <div style="margin-bottom: 10px;">
+            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Activity / Area:</label>
+            <input type="text" id="new-activity" required style="width: 100%; padding: 6px; box-sizing: border-box;">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Hazard Identified:</label>
+            <input type="text" id="new-hazard" required style="width: 100%; padding: 6px; box-sizing: border-box;">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Inherent Risk Score (e.g., 25 (Critical)):</label>
+            <input type="text" id="new-inherent" required style="width: 100%; padding: 6px; box-sizing: border-box;">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Mandatory Risk Controls:</label>
+            <textarea id="new-controls" required style="width: 100%; padding: 6px; box-sizing: border-box; height: 60px;"></textarea>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Residual Risk (e.g., 8 (Med)):</label>
+            <input type="text" id="new-residual" required style="width: 100%; padding: 6px; box-sizing: border-box;">
+        </div>
+        <button type="submit" style="background-color: #2b6cb0; color: white; border: none; padding: 8px 15px; font-weight: bold; cursor: pointer; border-radius: 3px;">Save New Risk</button>
+    </form>
+
     <h2>2. Estate Baseline Risk Register</h2>
     <table>
         <thead>
@@ -132,43 +157,75 @@
         </ol>
     </div>
 <script>
-        async function fetchRiskRegister() {
-    try {
-        const response = await fetch('https://cathkin-ohs-framework.vercel.app/api/risks');
-        if (!response.ok) throw new Error('Failed to fetch risk register');
-        
-        const risks = await response.json();
-        const tbody = document.getElementById('risk-table-body');
-        tbody.innerHTML = ''; // Clear loading state if any
+    const API_URL = 'https://cathkin-ohs-framework.vercel.app/api/risks';
 
-        risks.forEach(item => {
-            const row = document.createElement('tr');
+    async function fetchRiskRegister() {
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error('Failed to fetch risk register');
             
-            // Determine risk score CSS class styling dynamically based on score text
-            const inherentClass = item.inherent_score.includes('Critical') ? 'risk-critical' : 
-                                  item.inherent_score.includes('High') ? 'risk-high' : 
-                                  item.inherent_score.includes('Med') ? 'risk-med' : 'risk-low';
-                                  
-            const residualClass = item.residual_score.includes('Critical') ? 'risk-critical' : 
-                                  item.residual_score.includes('High') ? 'risk-high' : 
-                                  item.residual_score.includes('Med') ? 'risk-med' : 'risk-low';
+            const risks = await response.json();
+            const tbody = document.getElementById('risk-table-body');
+            tbody.innerHTML = ''; 
 
-            row.innerHTML = `
-                <td><strong>${item.activity}</strong></td>
-                <td>${item.hazard}</td>
-                <td class="${inherentClass}">${item.inherent_score}</td>
-                <td>${item.controls}</td>
-                <td class="${residualClass}">${item.residual_score}</td>
-            `;
-            tbody.appendChild(row);
-        });
-    } catch (error) {
-        console.error('Error loading risks:', error);
+            risks.forEach(item => {
+                const row = document.createElement('tr');
+                
+                const inherentClass = item.inherent_score.includes('Critical') ? 'risk-critical' : 
+                                      item.inherent_score.includes('High') ? 'risk-high' : 
+                                      item.inherent_score.includes('Med') ? 'risk-med' : 'risk-low';
+                                      
+                const residualClass = item.residual_score.includes('Critical') ? 'risk-critical' : 
+                                      item.residual_score.includes('High') ? 'risk-high' : 
+                                      item.residual_score.includes('Med') ? 'risk-med' : 'risk-low';
+
+                row.innerHTML = `
+                    <td><strong>${item.activity}</strong></td>
+                    <td>${item.hazard}</td>
+                    <td class="${inherentClass}">${item.inherent_score}</td>
+                    <td>${item.controls}</td>
+                    <td class="${residualClass}">${item.residual_score}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error loading risks:', error);
+        }
     }
-}
 
-// Run on page load
-document.addEventListener('DOMContentLoaded', fetchRiskRegister);
-    </script>
+    // Handle form submission to add new risks to database
+    document.getElementById('add-risk-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const payload = {
+            activity: document.getElementById('new-activity').value,
+            hazard: document.getElementById('new-hazard').value,
+            inherent_score: document.getElementById('new-inherent').value,
+            controls: document.getElementById('new-controls').value,
+            residual_score: document.getElementById('new-residual').value
+        };
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                document.getElementById('add-risk-form').reset();
+                fetchRiskRegister(); // Refresh table automatically
+                alert('Risk added successfully to database!');
+            } else {
+                alert('Failed to save risk.');
+            }
+        } catch (error) {
+            console.error('Error saving risk:', error);
+        }
+    });
+
+    // Run on page load
+    document.addEventListener('DOMContentLoaded', fetchRiskRegister);
+</script>
 </body>
 </html>
