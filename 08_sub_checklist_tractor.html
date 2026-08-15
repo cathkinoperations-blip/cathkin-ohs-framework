@@ -7,102 +7,299 @@
     <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.5; color: #2d3748; max-width: 950px; margin: 20px auto; padding: 20px; background-color: #ffffff; border: 1px solid #cbd5e0; }
         h1 { font-size: 14pt; color: #1a365d; border-bottom: 2px solid #1a365d; padding-bottom: 6px; margin-bottom: 12px; text-transform: uppercase; }
-        h2 { font-size: 11pt; color: #2c5282; margin-top: 15px; margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; }
+        h2 { font-size: 11pt; color: #2c5282; margin-top: 25px; margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
         
         .meta-box { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; background: #f7fafc; padding: 10px 15px; border: 1px solid #e2e8f0; font-size: 9pt; align-items: center; }
         .meta-box label { font-weight: bold; margin-right: 5px; }
+        .meta-box input[type="text"], .meta-box input[type="date"] { padding: 3px 6px; font-size: 8.5pt; border: 1px solid #cbd5e0; border-radius: 3px; }
         
         table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 15px; }
         th { background-color: #2d3748; color: white; padding: 6px 8px; text-align: left; }
         td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+        tr:nth-child(even) { background-color: #f8fafc; }
         
         .risk-high { color: #c53030; font-weight: bold; }
         .risk-med { color: #dd6b20; font-weight: bold; }
         .risk-low { color: #38a169; font-weight: bold; }
+
+        .status-options { display: flex; gap: 10px; font-size: 8pt; font-weight: bold; }
+        .status-options label { cursor: pointer; }
         
         .nav-link { display: inline-block; margin-bottom: 15px; color: #3182ce; text-decoration: none; font-weight: bold; font-size: 9pt; }
         .btn-print { background-color: #3182ce; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; float: right; }
-        @media print { .btn-print, .nav-link { display: none; } body { border: none; margin: 0; padding: 0; } }
+        .btn-action { background-color: #2b6cb0; color: white; border: none; padding: 4px 10px; cursor: pointer; border-radius: 3px; font-size: 8pt; font-weight: bold; }
+        .btn-submit { background-color: #38a169; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; font-size: 10pt; font-weight: bold; display: block; margin: 20px auto; }
+
+        .dynamic-form-box { background: #f8fafc; padding: 12px; border: 1px solid #e2e8f0; border-radius: 4px; margin-bottom: 20px; }
+        .dynamic-form-box input, .dynamic-form-box select { padding: 5px; font-size: 8pt; border: 1px solid #cbd5e0; border-radius: 3px; }
+
+        @media print { .btn-print, .nav-link, .dynamic-form-box, .btn-action, .btn-submit { display: none; } body { border: none; margin: 0; padding: 0; } }
     </style>
 </head>
 <body>
     <button class="btn-print" onclick="window.print()">🖨️ Print Form</button>
-    <a href="07_checklists_inspections.html" class="nav-link">&larr; Back to Module 07</a>
+    <a href="08_checklists_inspections.html" class="nav-link">&larr; Back to Module 08</a>
     
     <h1>MF268 XTRA TRACTOR & SLASHER INSPECTION LOG</h1>
 
     <div class="meta-box">
-        <div><label>Date:</label> ________________</div>
-        <div><label>Hours Meter:</label> ________________</div>
-        <div><label>Operator Name / Initials:</label> ________________</div>
-        <div><label>Manager Initials:</label> ________</div>
-        <div><label>PPE Inspected & Worn:</label> [ ] Boots [ ] Vest [ ] Glasses [ ] Earmuffs</div>
+        <div><label>Date:</label><input type="date" id="log-date"></div>
+        <div><label>Hours Meter:</label><input type="text" id="log-hours" placeholder="e.g. 1420 hrs" style="width: 90px;"></div>
+        <div><label>Operator:</label><input type="text" id="log-operator" placeholder="Full Name"></div>
+        <div><label>Manager Initials:</label><input type="text" id="log-manager" style="width: 50px;"></div>
+        <div style="width: 100%; border-top: 1px dashed #cbd5e0; padding-top: 6px; margin-top: 2px;">
+            <label>PPE Inspected & Worn:</label>
+            <label><input type="checkbox" class="ppe-check" value="Boots"> Boots</label> &nbsp;
+            <label><input type="checkbox" class="ppe-check" value="Vest"> Vest</label> &nbsp;
+            <label><input type="checkbox" class="ppe-check" value="Glasses"> Glasses</label> &nbsp;
+            <label><input type="checkbox" class="ppe-check" value="Earmuffs"> Earmuffs</label>
+        </div>
     </div>
 
-    <h2>1. MASSEY FERGUSON 268 TRACTOR CHECKLIST</h2>
+    <h2>
+        <span>1. MASSEY FERGUSON 268 TRACTOR CHECKLIST</span>
+        <button class="btn-action" onclick="toggleAddRowForm('tractor')">+ Add Item</button>
+    </h2>
+    <div id="tractor-form-container" class="dynamic-form-box" style="display:none;">
+        <h4 style="margin:0 0 6px 0; font-size: 8.5pt; color:#1a365d;">Add Custom Tractor Inspection Item</h4>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <input type="text" id="tr-comp" placeholder="Component (e.g. Alternator)" style="flex:2;">
+            <input type="text" id="tr-desc" placeholder="Action Required / Check details" style="flex:3;">
+            <select id="tr-freq"><option value="Daily">Daily</option><option value="Weekly (Mon)">Weekly (Mon)</option><option value="Monthly">Monthly</option></select>
+            <select id="tr-risk"><option value="High">High</option><option value="Med">Med</option><option value="Low">Low</option></select>
+            <button class="btn-action" onclick="addNewItem('tractor')">Save to Database</button>
+        </div>
+    </div>
     <table>
         <thead>
             <tr>
                 <th style="width: 18%;">Component</th>
-                <th style="width: 32%;">Checklist Item / Action Required</th>
-                <th style="width: 15%;">Frequency</th>
-                <th style="width: 8%;">Risk</th>
-                <th style="width: 12%;">Status</th>
+                <th style="width: 30%;">Checklist Item / Action Required</th>
+                <th style="width: 12%;">Frequency</th>
+                <th style="width: 7%;">Risk</th>
+                <th style="width: 18%;">Status</th>
                 <th style="width: 15%;">Notes / Defects</th>
             </tr>
         </thead>
-        <tbody>
-            <tr><td>Engine Oil, Fuel & Coolant</td><td>Check fuel, oil, and coolant levels before engine start; inspect for leaks</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>Brake Pedal Latch</td><td>Verify dual brake pedals are securely latched together for road transit</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>Hydraulic & Gear Oil</td><td>Check reservoir levels before operating implements</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>Radiator Screen</td><td>Clear dust, chaff, and debris to prevent head overheating</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>Wiring Harness & Battery</td><td>Check harness security and clean terminal connections</td><td>Daily</td><td class="risk-med">Med</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>Differential & Trans</td><td>Inspect bottom housing for active fluid drips or leaks</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>Pedal & Gear Selection</td><td>Select Low Range (L1–L3) for slashing/slopes; strictly NO clutch riding</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>Wheel Nuts & Tyres</td><td>Check tightness & pressure (Front: 28–32 PSI | Rear: 16–20 PSI)</td><td>Daily / Mon</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>Clutch Housing Weep-Hole</td><td>Audit bell housing weep hole for engine oil leakage (Rear Main Seal check)</td><td>Weekly (Mon)</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>Lift Arms & Linkages</td><td>Check height alignment and inspect gear shift linkages</td><td>Weekly (Mon)</td><td class="risk-med">Med</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>Grease Points & Hoses</td><td>Lubricate all grease nipples & check hydraulic hoses for wear</td><td>Monthly</td><td class="risk-med">Med</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+        <tbody id="tractor-tbody">
+            <tr><td colspan="6" style="text-align: center; color: #718096;">Loading items from database...</td></tr>
         </tbody>
     </table>
 
-    <h2>2. SLASHER & PTO IMPLEMENT CHECKLIST</h2>
+    <h2>
+        <span>2. SLASHER & PTO IMPLEMENT CHECKLIST</span>
+        <button class="btn-action" onclick="toggleAddRowForm('slasher')">+ Add Item</button>
+    </h2>
+    <div id="slasher-form-container" class="dynamic-form-box" style="display:none;">
+        <h4 style="margin:0 0 6px 0; font-size: 8.5pt; color:#1a365d;">Add Custom Slasher Inspection Item</h4>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <input type="text" id="sl-comp" placeholder="Component" style="flex:2;">
+            <input type="text" id="sl-desc" placeholder="Action Required" style="flex:3;">
+            <select id="sl-freq"><option value="Daily">Daily</option><option value="Weekly (Mon)">Weekly (Mon)</option><option value="Monthly">Monthly</option></select>
+            <select id="sl-risk"><option value="High">High</option><option value="Med">Med</option><option value="Low">Low</option></select>
+            <button class="btn-action" onclick="addNewItem('slasher')">Save to Database</button>
+        </div>
+    </div>
     <table>
         <thead>
             <tr>
                 <th style="width: 18%;">Component</th>
-                <th style="width: 32%;">Checklist Item / Action Required</th>
-                <th style="width: 15%;">Frequency</th>
-                <th style="width: 8%;">Risk</th>
-                <th style="width: 12%;">Status</th>
+                <th style="width: 30%;">Checklist Item / Action Required</th>
+                <th style="width: 12%;">Frequency</th>
+                <th style="width: 7%;">Risk</th>
+                <th style="width: 18%;">Status</th>
                 <th style="width: 15%;">Notes / Defects</th>
             </tr>
         </thead>
-        <tbody>
-            <tr><td>Slasher Gearbox Oil</td><td>Check oil level; inspect input/output seals for leaks</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>PTO Master Guard & Shaft</td><td>Ensure guard spins freely; inspect shaft universal joints for play</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>Blades & Blade Bolts</td><td>Inspect for dullness/cracks; check flywheel bolt tightness</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>Skid Runners & Casters</td><td>Check skid wear and ensure trailing casters hold deck 2–3cm clear of ground</td><td>Daily</td><td class="risk-high">High</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>Debris Deck</td><td>Clear packed grass/brush from top deck to eliminate fire hazard</td><td>Daily</td><td class="risk-low">Low</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>Slip Clutch Assembly</td><td>Inspect friction plates and adjust springs if slipping/locked</td><td>Weekly (Mon)</td><td class="risk-med">Med</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
-            <tr><td>Telescopic Shaft Tube</td><td>Ensure shaft slides easily and is lubricated to prevent binding shock</td><td>Weekly (Mon)</td><td class="risk-med">Med</td><td>[ ] Pass [ ] Fail</td><td></td></tr>
+        <tbody id="slasher-tbody">
+            <tr><td colspan="6" style="text-align: center; color: #718096;">Loading items from database...</td></tr>
         </tbody>
     </table>
 
-    <h2>3. DEFECT REMEDY & REPAIR ACTION LOG</h2>
+    <h2>
+        <span>3. DEFECT REMEDY & REPAIR ACTION LOG</span>
+        <button class="btn-action" onclick="addDefectRow()">+ Add Defect Entry</button>
+    </h2>
     <table>
         <thead>
             <tr>
-                <th>Defect / Issue Identified</th>
-                <th>Corrective Action Taken</th>
-                <th>Target Date</th>
-                <th>Manager Sign-off</th>
+                <th style="width: 35%;">Defect / Issue Identified</th>
+                <th style="width: 35%;">Corrective Action Taken</th>
+                <th style="width: 15%;">Target Date</th>
+                <th style="width: 15%;">Manager Sign-off</th>
             </tr>
         </thead>
-        <tbody>
-            <tr><td style="height: 28px;"></td><td></td><td></td><td></td></tr>
-            <tr><td style="height: 28px;"></td><td></td><td></td><td></td></tr>
+        <tbody id="defect-tbody">
+            <tr class="defect-row">
+                <td><input type="text" class="def-desc" placeholder="Describe issue..." style="width:95%; border:none; background:transparent;"></td>
+                <td><input type="text" class="def-action" placeholder="Action taken..." style="width:95%; border:none; background:transparent;"></td>
+                <td><input type="date" class="def-date" style="border:none; background:transparent;"></td>
+                <td><input type="text" class="def-sign" placeholder="Sign" style="width:80px; border:none; background:transparent;"></td>
+            </tr>
         </tbody>
     </table>
+
+    <button class="btn-submit" onclick="submitInspectionLog()">💾 Submit & Save Inspection Log</button>
+
+<script>
+    const API_BASE = 'https://cathkin-ohs-framework.vercel.app/api'; // Matches your Vercel/Neon deployment base
+
+    async function fetchChecklistItems() {
+        try {
+            const res = await fetch(`${API_BASE}/checklist-items?category=tractor,slasher`);
+            if (!res.ok) throw new Error('Failed to fetch checklist items');
+            const items = await res.json();
+            
+            renderTableSections(items);
+        } catch (error) {
+            console.error('Error loading items, using defaults:', error);
+            // Fallback default items if offline or initial setup
+            renderTableSections([]);
+        }
+    }
+
+    function renderTableSections(items) {
+        const tractorTbody = document.getElementById('tractor-tbody');
+        const slasherTbody = document.getElementById('slasher-tbody');
+        
+        tractorTbody.innerHTML = '';
+        slasherTbody.innerHTML = '';
+
+        const tractors = items.filter(i => i.category === 'tractor');
+        const slashers = items.filter(i => i.category === 'slasher');
+
+        tractors.forEach((item, idx) => {
+            tractorTbody.innerHTML += generateRowHtml(item, idx);
+        });
+
+        slashers.forEach((item, idx) => {
+            slasherTbody.innerHTML += generateRowHtml(item, idx);
+        });
+    }
+
+    function generateRowHtml(item, index) {
+        const riskClass = item.risk_level === 'High' ? 'risk-high' : item.risk_level === 'Med' ? 'risk-med' : 'risk-low';
+        return `
+            <tr data-id="${item.id}">
+                <td><strong>${item.component}</strong></td>
+                <td>${item.description}</td>
+                <td>${item.frequency}</td>
+                <td><span class="${riskClass}">${item.risk_level}</span></td>
+                <td>
+                    <div class="status-options">
+                        <label><input type="radio" name="status-${item.id}" value="Pass"> Pass</label>
+                        <label><input type="radio" name="status-${item.id}" value="Fail"> Fail</label>
+                        <label><input type="radio" name="status-${item.id}" value="NA"> N/A</label>
+                    </div>
+                </td>
+                <td><input type="text" class="item-note" placeholder="Add note..." style="width: 100%; border: 1px solid #e2e8f0; padding: 2px 4px; font-size: 8pt; border-radius: 2px;"></td>
+            </tr>
+        `;
+    }
+
+    function toggleAddRowForm(category) {
+        const box = document.getElementById(`${category}-form-container`);
+        box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function addNewItem(category) {
+        const comp = document.getElementById(`${category === 'tractor' ? 'tr' : 'sl'}-comp`).value;
+        const desc = document.getElementById(`${category === 'tractor' ? 'tr' : 'sl'}-desc`).value;
+        const freq = document.getElementById(`${category === 'tractor' ? 'tr' : 'sl'}-freq`).value;
+        const risk = document.getElementById(`${category === 'tractor' ? 'tr' : 'sl'}-risk`).value;
+
+        if (!comp || !desc) { alert('Please fill in component and description.'); return; }
+
+        try {
+            const res = await fetch(`${API_BASE}/checklist-items`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category, component: comp, description: desc, frequency: freq, risk_level: risk })
+            });
+            if (!res.ok) throw new Error('Failed to save new item');
+            
+            alert('New item successfully saved to Neon database!');
+            toggleAddRowForm(category);
+            fetchChecklistItems(); // Refresh table
+        } catch (err) {
+            alert('Error saving item: ' + err.message);
+        }
+    }
+
+    function addDefectRow() {
+        const tbody = document.getElementById('defect-tbody');
+        const tr = document.createElement('tr');
+        tr.className = 'defect-row';
+        tr.innerHTML = `
+            <td><input type="text" class="def-desc" placeholder="Describe issue..." style="width:95%; border:none; background:transparent;"></td>
+            <td><input type="text" class="def-action" placeholder="Action taken..." style="width:95%; border:none; background:transparent;"></td>
+            <td><input type="date" class="def-date" style="border:none; background:transparent;"></td>
+            <td><input type="text" class="def-sign" placeholder="Sign" style="width:80px; border:none; background:transparent;"></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    async function submitInspectionLog() {
+        const logDate = document.getElementById('log-date').value;
+        const hours = document.getElementById('log-hours').value;
+        const operator = document.getElementById('log-operator').value;
+        const manager = document.getElementById('log-manager').value;
+
+        if (!operator) { alert('Please enter the Operator name.'); return; }
+
+        // Gather PPE
+        const ppe = Array.from(document.querySelectorAll('.ppe-check:checked')).map(el => el.value);
+
+        // Gather Item Statuses
+        const results = [];
+        document.querySelectorAll('#tractor-tbody tr, #slasher-tbody tr').forEach(tr => {
+            const id = tr.getAttribute('data-id');
+            if (!id) return;
+            const selectedStatus = tr.querySelector(`input[name="status-${id}"]:checked`);
+            const note = tr.querySelector('.item-note').value;
+            results.push({
+                itemId: id,
+                status: selectedStatus ? selectedStatus.value : 'Unchecked',
+                note: note
+            });
+        });
+
+        // Gather Defects
+        const defects = [];
+        document.querySelectorAll('.defect-row').forEach(tr => {
+            const desc = tr.querySelector('.def-desc').value;
+            if (desc) {
+                defects.push({
+                    description: desc,
+                    action: tr.querySelector('.def-action').value,
+                    targetDate: tr.querySelector('.def-date').value,
+                    signOff: tr.querySelector('.def-sign').value
+                });
+            }
+        });
+
+        const payload = { logDate, hours, operator, manager, ppe, results, defects };
+
+        try {
+            const res = await fetch(`${API_BASE}/inspection-logs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw new Error('Failed to submit inspection log');
+            
+            alert('Inspection log successfully submitted and saved to Neon!');
+            window.location.reload();
+        } catch (err) {
+            alert('Error submitting log: ' + err.message);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
+        fetchChecklistItems();
+    });
+</script>
+
 </body>
 </html>
