@@ -129,10 +129,11 @@
                 <th>Inherent Risk Score</th>
                 <th>Mandatory Risk Controls</th>
                 <th>Residual Risk</th>
+                <th style="text-align: center;">Actions</th>
             </tr>
         </thead>
         <tbody id="risk-table-body">
-            <!-- Data will be loaded dynamically via JavaScript -->
+            <!-- Data loaded dynamically -->
         </tbody>
     </table>
 
@@ -156,6 +157,7 @@
             </li>
         </ol>
     </div>
+
 <script>
     const API_URL = 'https://cathkin-ohs-framework.vercel.app/api/risks';
 
@@ -170,6 +172,7 @@
 
             risks.forEach(item => {
                 const row = document.createElement('tr');
+                row.id = `row-${item.id}`;
                 
                 const inherentClass = item.inherent_score.includes('Critical') ? 'risk-critical' : 
                                       item.inherent_score.includes('High') ? 'risk-high' : 
@@ -185,6 +188,10 @@
                     <td class="${inherentClass}">${item.inherent_score}</td>
                     <td>${item.controls}</td>
                     <td class="${residualClass}">${item.residual_score}</td>
+                    <td style="text-align: center; white-space: nowrap;">
+                        <button onclick="editRow(${item.id}, '${escapeHtml(item.activity)}', '${escapeHtml(item.hazard)}', '${escapeHtml(item.inherent_score)}', '${escapeHtml(item.controls)}', '${escapeHtml(item.residual_score)}')" style="background: #3182ce; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 3px; font-size: 7.5pt; margin-right: 4px;">Edit</button>
+                        <button onclick="deleteRisk(${item.id})" style="background: #e53e3e; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 3px; font-size: 7.5pt;">Delete</button>
+                    </td>
                 `;
                 tbody.appendChild(row);
             });
@@ -193,10 +200,14 @@
         }
     }
 
-    // Handle form submission to add new risks to database
+    // Helper to prevent quotes breaking inline JS parameters
+    function escapeHtml(str) {
+        return str.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+    }
+
+    // Handle adding new risks
     document.getElementById('add-risk-form').addEventListener('submit', async function(e) {
         e.preventDefault();
-        
         const payload = {
             activity: document.getElementById('new-activity').value,
             hazard: document.getElementById('new-hazard').value,
@@ -205,27 +216,72 @@
             residual_score: document.getElementById('new-residual').value
         };
 
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
 
-            if (response.ok) {
-                document.getElementById('add-risk-form').reset();
-                fetchRiskRegister(); // Refresh table automatically
-                alert('Risk added successfully to database!');
-            } else {
-                alert('Failed to save risk.');
-            }
-        } catch (error) {
-            console.error('Error saving risk:', error);
+        if (response.ok) {
+            document.getElementById('add-risk-form').reset();
+            fetchRiskRegister();
         }
     });
 
-    // Run on page load
+    // Delete a risk
+    async function deleteRisk(id) {
+        if (!confirm('Are you sure you want to delete this risk entry?')) return;
+        
+        const response = await fetch(`${API_URL}?id=${id}`, { method: 'DELETE' });
+        if (response.ok) {
+            fetchRiskRegister();
+        } else {
+            alert('Failed to delete risk.');
+        }
+    }
+
+    // Convert row into input fields for inline editing
+    function editRow(id, activity, hazard, inherent, controls, residual) {
+        const row = document.getElementById(`row-${id}`);
+        row.innerHTML = `
+            <td><input type="text" id="edit-activity-${id}" value="${activity}" style="width: 100%; font-size: 8.5pt;"></td>
+            <td><input type="text" id="edit-hazard-${id}" value="${hazard}" style="width: 100%; font-size: 8.5pt;"></td>
+            <td><input type="text" id="edit-inherent-${id}" value="${inherent}" style="width: 100%; font-size: 8.5pt;"></td>
+            <td><textarea id="edit-controls-${id}" style="width: 100%; font-size: 8.5pt; height: 40px;">${controls}</textarea></td>
+            <td><input type="text" id="edit-residual-${id}" value="${residual}" style="width: 100%; font-size: 8.5pt;"></td>
+            <td style="text-align: center; white-space: nowrap;">
+                <button onclick="saveEdit(${id})" style="background: #38a169; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 3px; font-size: 7.5pt; margin-right: 4px;">Save</button>
+                <button onclick="fetchRiskRegister()" style="background: #718096; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 3px; font-size: 7.5pt;">Cancel</button>
+            </td>
+        `;
+    }
+
+    // Save edited row to database
+    async function saveEdit(id) {
+        const payload = {
+            id: id,
+            activity: document.getElementById(`edit-activity-${id}`).value,
+            hazard: document.getElementById(`edit-hazard-${id}`).value,
+            inherent_score: document.getElementById(`edit-inherent-${id}`).value,
+            controls: document.getElementById(`edit-controls-${id}`).value,
+            residual_score: document.getElementById(`edit-residual-${id}`).value
+        };
+
+        const response = await fetch(API_URL, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            fetchRiskRegister();
+        } else {
+            alert('Failed to update risk.');
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', fetchRiskRegister);
 </script>
+
 </body>
 </html>
