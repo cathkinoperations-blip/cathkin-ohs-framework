@@ -133,42 +133,42 @@
     </div>
 <script>
         async function fetchRiskRegister() {
-            try {
-                const response = await fetch('https://cathkin-ohs-framework.vercel.app/api/risks');
-                if (!response.ok) throw new Error('Failed to fetch risk register');
-                
-                const risks = await response.json();
-                const tbody = document.getElementById('risk-table-body');
-                tbody.innerHTML = ''; // Clear loading state if any
+    try {
+        const response = await fetch('https://cathkin-ohs-framework.vercel.app/api/risks');
+        if (!response.ok) throw new Error('Failed to fetch risk register');
+        
+        const risks = await response.json();
+        const tbody = document.getElementById('risk-table-body');
+        tbody.innerHTML = ''; // Clear loading state if any
 
-                risks.forEach(item => {
-                    const row = document.createElement('tr');
-                    
-                    // Determine risk score CSS class styling dynamically based on score text
-                    const inherentClass = item.inherent_score.includes('Critical') ? 'risk-critical' : 
-                                          item.inherent_score.includes('High') ? 'risk-high' : 
-                                          item.inherent_score.includes('Med') ? 'risk-med' : 'risk-low';
-                                          
-                    const residualClass = item.residual_score.includes('Critical') ? 'risk-critical' : 
-                                          item.residual_score.includes('High') ? 'risk-high' : 
-                                          item.residual_score.includes('Med') ? 'risk-med' : 'risk-low';
+        risks.forEach(item => {
+            const row = document.createElement('tr');
+            
+            // Determine risk score CSS class styling dynamically based on score text
+            const inherentClass = item.inherent_score.includes('Critical') ? 'risk-critical' : 
+                                  item.inherent_score.includes('High') ? 'risk-high' : 
+                                  item.inherent_score.includes('Med') ? 'risk-med' : 'risk-low';
+                                  
+            const residualClass = item.residual_score.includes('Critical') ? 'risk-critical' : 
+                                  item.residual_score.includes('High') ? 'risk-high' : 
+                                  item.residual_score.includes('Med') ? 'risk-med' : 'risk-low';
 
-                    row.innerHTML = `
-                        <td><strong>${item.activity}</strong></td>
-                        <td>${item.hazard}</td>
-                        <td class="${inherentClass}">${item.inherent_score}</td>
-                        <td>${item.controls}</td>
-                        <td class="${residualClass}">${item.residual_score}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            } catch (error) {
-                console.error('Error loading risks:', error);
-            }
-        }
+            row.innerHTML = `
+                <td><strong>${item.activity}</strong></td>
+                <td>${item.hazard}</td>
+                <td class="${inherentClass}">${item.inherent_score}</td>
+                <td>${item.controls}</td>
+                <td class="${residualClass}">${item.residual_score}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Error loading risks:', error);
+    }
+}
 
-        // Run on page load
-        document.addEventListener('DOMContentLoaded', fetchRiskRegister);
+// Run on page load
+document.addEventListener('DOMContentLoaded', fetchRiskRegister);
     </script>
 </body>
 </html>
