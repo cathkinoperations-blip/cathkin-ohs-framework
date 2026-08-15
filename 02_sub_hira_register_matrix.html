@@ -134,7 +134,7 @@
 <script>
         async function fetchRiskRegister() {
             try {
-                const response = await fetch('/api/risks');
+                const response = await fetch('https://cathkin-ohs-framework.vercel.app/api/risks');
                 if (!response.ok) throw new Error('Failed to fetch risk register');
                 
                 const risks = await response.json();
