@@ -4,33 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MF268 Tractor & Slasher Inspection Log | Cathkin Estates HOA</title>
+    <!-- Force all links on this page to open in the same window -->
+    <base target="_self">
+    <!-- Link to Central External Stylesheet -->
+    <link rel="stylesheet" href="style.css">
     <style>
-        :root {
-            --primary: #1e3a8a;
-            --primary-light: #eff6ff;
-            --accent: #2563eb;
-            --success-text: #16a34a;
-            --fail-text: #dc2626;
-            --na-text: #64748b;
-            --border: #e2e8f0;
-            --text: #1e293b;
-        }
-
-        body { 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-            line-height: 1.6; 
-            color: var(--text); 
-            max-width: 1000px; 
-            margin: 20px auto; 
-            padding: 24px; 
-            background-color: #f8fafc; 
-        }
-
+        /* Page-specific form layout enhancements matching central theme */
         .card {
             background: #ffffff;
-            border-radius: 12px;
+            border-radius: 8px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border);
+            border: 1px solid #cbd5e1;
             padding: 24px;
             margin-bottom: 24px;
         }
@@ -42,9 +26,6 @@
             margin-bottom: 20px;
         }
 
-        h1 { font-size: 16pt; color: var(--primary); margin: 0; font-weight: 800; }
-        h2 { font-size: 11pt; color: var(--primary); margin-top: 0; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary-light); padding-bottom: 8px; }
-
         /* Mode Selector Tabs */
         .mode-selector {
             display: flex;
@@ -52,23 +33,23 @@
             margin-bottom: 20px;
             background: #e2e8f0;
             padding: 4px;
-            border-radius: 8px;
+            border-radius: 6px;
             width: fit-content;
         }
         .mode-btn {
             background: transparent;
             border: none;
             padding: 8px 16px;
-            font-size: 9pt;
+            font-size: 9.5pt;
             font-weight: 600;
             cursor: pointer;
-            border-radius: 6px;
+            border-radius: 4px;
             color: #475569;
             transition: all 0.2s;
         }
         .mode-btn.active {
             background: #ffffff;
-            color: var(--primary);
+            color: var(--primary-color, #1e3a8a);
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
@@ -76,30 +57,30 @@
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
             gap: 16px; 
-            background: var(--primary-light); 
+            background: #f8fafc; 
             padding: 16px; 
-            border-radius: 8px; 
-            border: 1px solid #bfdbfe;
+            border-radius: 6px; 
+            border: 1px solid #e2e8f0;
             margin-bottom: 24px; 
         }
-        .meta-field label { display: block; font-weight: 600; font-size: 8.5pt; color: #1e40af; margin-bottom: 4px; text-transform: uppercase; }
-        .meta-field input { width: 100%; padding: 8px 12px; font-size: 10pt; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; box-sizing: border-box; }
+        .meta-field label { display: block; font-weight: 600; font-size: 8.5pt; color: #1e293b; margin-bottom: 4px; text-transform: uppercase; }
+        .meta-field input { width: 100%; padding: 8px 12px; font-size: 10pt; border: 1px solid #cbd5e1; border-radius: 4px; background: #fff; box-sizing: border-box; }
 
         .ppe-container {
             grid-column: 1 / -1;
             display: flex;
             flex-wrap: wrap;
             gap: 16px;
-            padding-top: 8px;
-            border-top: 1px dashed #bfdbfe;
+            padding-top: 12px;
+            border-top: 1px dashed #cbd5e1;
             margin-top: 4px;
             align-items: center;
         }
-        .ppe-container label { font-weight: 600; color: #1e40af; font-size: 9pt; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .ppe-container label { font-weight: 600; color: #1e293b; font-size: 9pt; display: flex; align-items: center; gap: 6px; cursor: pointer; }
 
         table { width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 10px; }
-        th { background-color: #f1f5f9; color: #475569; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 9pt; border-bottom: 2px solid var(--border); }
-        td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        th { background-color: #f1f5f9; color: #334155; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 9pt; border-bottom: 2px solid #cbd5e1; }
+        td { padding: 12px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
         tr:hover { background-color: #f8fafc; }
 
         .risk-badge { padding: 3px 8px; border-radius: 12px; font-size: 7.5pt; font-weight: 700; text-transform: uppercase; }
@@ -111,26 +92,26 @@
         .status-toggle label { padding: 6px 12px; font-size: 8.5pt; font-weight: 600; cursor: pointer; border-radius: 4px; transition: all 0.2s; color: #475569; }
         .status-toggle input { display: none; }
         .status-toggle input:checked + span { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .status-pass input:checked + span { color: var(--success-text); background: #dcfce7; }
-        .status-fail input:checked + span { color: var(--fail-text); background: #fee2e2; }
-        .status-na input:checked + span { color: var(--na-text); background: #e2e8f0; }
+        .status-pass input:checked + span { color: #16a34a; background: #dcfce7; }
+        .status-fail input:checked + span { color: #dc2626; background: #fee2e2; }
+        .status-na input:checked + span { color: #64748b; background: #e2e8f0; }
 
-        .item-note { width: 100%; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 9pt; box-sizing: border-box; }
+        .item-note { width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 9pt; box-sizing: border-box; }
 
-        .btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; font-size: 9pt; display: inline-flex; align-items: center; gap: 6px; }
-        .btn-primary { background: var(--accent); color: white; }
+        .btn { padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; border: none; font-size: 9pt; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: #2563eb; color: white; }
         .btn-secondary { background: #e2e8f0; color: #334155; }
         .btn-success { background: #16a34a; color: white; padding: 12px 24px; font-size: 11pt; }
 
-        .dynamic-form-box { background: #f8fafc; padding: 16px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 20px; }
+        .dynamic-form-box { background: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 20px; }
         .dynamic-form-grid { display: flex; gap: 8px; flex-wrap: wrap; }
-        .dynamic-form-grid input, .dynamic-form-grid select { padding: 8px; font-size: 9pt; border: 1px solid var(--border); border-radius: 6px; flex: 1; min-width: 140px; }
+        .dynamic-form-grid input, .dynamic-form-grid select { padding: 8px; font-size: 9pt; border: 1px solid #cbd5e1; border-radius: 4px; flex: 1; min-width: 140px; }
 
-        .nav-link { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 9.5pt; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 16px; }
+        .nav-footer-custom { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .action-footer { text-align: center; margin-top: 30px; }
 
         @media print { 
-            .btn, .nav-link, .dynamic-form-box, .status-toggle, .mode-selector { display: none; } 
+            .btn, .nav-footer-custom, .dynamic-form-box, .status-toggle, .mode-selector { display: none; } 
             body { background: #fff; margin: 0; padding: 10px; max-width: 100%; }
             .card { box-shadow: none; border: none; padding: 0; }
         }
@@ -138,8 +119,11 @@
 </head>
 <body>
 
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <a href="08_checklists_inspections.html" class="nav-link">&larr; Back to Module 08</a>
+    <div class="nav-footer-custom">
+        <div style="display: flex; gap: 16px; align-items: center;">
+            <a href="08_checklists_inspections.html">&larr; Back to Module 08 Hub</a>
+            <a href="08_inspection_history.html" style="font-weight: 600;">📊 View Audit History</a>
+        </div>
         <button class="btn btn-secondary" onclick="window.print()">🖨️ Print / Save PDF</button>
     </div>
 
@@ -175,7 +159,7 @@
                 <input type="text" id="log-manager" placeholder="Initials" style="max-width: 100px;">
             </div>
             <div class="ppe-container" id="ppe-section">
-                <span style="font-weight: 700; font-size: 9pt; color: #1e40af;">Mandatory PPE Worn & Inspected:</span>
+                <span style="font-weight: 700; font-size: 9pt; color: #1e293b;">Mandatory PPE Worn & Inspected:</span>
                 <label><input type="checkbox" class="ppe-check" value="Boots"> Safety Boots</label>
                 <label><input type="checkbox" class="ppe-check" value="Vest"> Hi-Viz Vest</label>
                 <label><input type="checkbox" class="ppe-check" value="Glasses"> Eye Protection</label>
@@ -189,7 +173,7 @@
             <button class="btn btn-secondary" onclick="toggleAddRowForm('tractor')" style="font-size: 8pt; padding: 4px 10px;">+ Add Item</button>
         </h2>
         <div id="tractor-form-container" class="dynamic-form-box" style="display:none;">
-            <h4 style="margin:0 0 8px 0; font-size: 9pt; color:var(--primary);">Add Custom Tractor Item</h4>
+            <h4 style="margin:0 0 8px 0; font-size: 9pt;">Add Custom Tractor Item</h4>
             <div class="dynamic-form-grid">
                 <input type="text" id="tr-comp" placeholder="Component" style="flex:2;">
                 <input type="text" id="tr-desc" placeholder="Action Required" style="flex:3;">
@@ -220,7 +204,7 @@
             <button class="btn btn-secondary" onclick="toggleAddRowForm('slasher')" style="font-size: 8pt; padding: 4px 10px;">+ Add Item</button>
         </h2>
         <div id="slasher-form-container" class="dynamic-form-box" style="display:none;">
-            <h4 style="margin:0 0 8px 0; font-size: 9pt; color:var(--primary);">Add Custom Slasher Item</h4>
+            <h4 style="margin:0 0 8px 0; font-size: 9pt;">Add Custom Slasher Item</h4>
             <div class="dynamic-form-grid">
                 <input type="text" id="sl-comp" placeholder="Component" style="flex:2;">
                 <input type="text" id="sl-desc" placeholder="Action Required" style="flex:3;">
@@ -277,7 +261,7 @@
 <script>
     const API_BASE = 'https://cathkin-ohs-framework.vercel.app/api';
     let allChecklistItems = [];
-    let currentMode = 'Daily'; // Default view
+    let currentMode = 'Daily';
 
     async function fetchChecklistItems() {
         try {
@@ -310,7 +294,6 @@
         tractorTbody.innerHTML = '';
         slasherTbody.innerHTML = '';
 
-        // Filter items based on active mode
         const filtered = allChecklistItems.filter(item => {
             const freq = item.frequency.toLowerCase();
             if (currentMode === 'Daily') {

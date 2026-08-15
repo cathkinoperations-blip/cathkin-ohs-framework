@@ -4,32 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inspection Logs & Audit History | Cathkin Estates HOA</title>
+    <!-- Force all links on this page to open in the same window -->
+    <base target="_self">
+    <!-- Link to Central External Stylesheet -->
+    <link rel="stylesheet" href="style.css">
     <style>
-        :root {
-            --primary: #1e3a8a;
-            --primary-light: #eff6ff;
-            --accent: #2563eb;
-            --success-text: #16a34a;
-            --fail-text: #dc2626;
-            --border: #e2e8f0;
-            --text: #1e293b;
-        }
-
-        body { 
-            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
-            line-height: 1.6; 
-            color: var(--text); 
-            max-width: 1100px; 
-            margin: 20px auto; 
-            padding: 24px; 
-            background-color: #f8fafc; 
-        }
-
         .card {
             background: #ffffff;
-            border-radius: 12px;
+            border-radius: 8px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border);
+            border: 1px solid #cbd5e1;
             padding: 24px;
             margin-bottom: 24px;
         }
@@ -41,27 +25,20 @@
             margin-bottom: 20px;
         }
 
-        h1 { font-size: 16pt; color: var(--primary); margin: 0; font-weight: 800; }
-        h2 { font-size: 11pt; color: var(--primary); margin-top: 0; margin-bottom: 12px; border-bottom: 2px solid var(--primary-light); padding-bottom: 6px; }
-
         table { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin-top: 10px; }
-        th { background-color: #f1f5f9; color: #475569; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 8.5pt; border-bottom: 2px solid var(--border); text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        th { background-color: #f1f5f9; color: #334155; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 8.5pt; border-bottom: 2px solid #cbd5e1; text-transform: uppercase; }
+        td { padding: 12px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
         tr:hover { background-color: #f8fafc; }
 
         .badge { padding: 3px 8px; border-radius: 12px; font-size: 7.5pt; font-weight: 700; text-transform: uppercase; }
         .badge-daily { background: #e0f2fe; color: #0369a1; }
         .badge-weekly { background: #f3e8ff; color: #7e22ce; }
         
-        .nav-link { color: var(--accent); text-decoration: none; font-weight: 600; font-size: 9.5pt; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 16px; }
-        .nav-link:hover { text-decoration: underline; }
-
-        .btn { padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; font-size: 8.5pt; background: #e2e8f0; color: #334155; }
+        .btn { padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; border: none; font-size: 8.5pt; background: #e2e8f0; color: #334155; }
         .btn:hover { background: #cbd5e1; }
-        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary { background: #2563eb; color: #fff; }
         .btn-primary:hover { background: #1d4ed8; }
 
-        /* Expandable details styling */
         .log-details-row { background: #f8fafc; display: none; }
         .log-details-content { padding: 16px; font-size: 9pt; color: #334155; }
         .defect-tag { background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 8pt; display: inline-block; margin-bottom: 4px; }
@@ -69,8 +46,8 @@
 </head>
 <body>
 
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <a href="08_checklists_inspections.html" class="nav-link">&larr; Back to Module 08 Hub</a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <a href="08_checklists_inspections.html">&larr; Back to Module 08 Hub</a>
         <button class="btn btn-primary" onclick="fetchInspectionLogs()">🔄 Refresh Records</button>
     </div>
 
@@ -114,7 +91,7 @@
             renderLogsTable(logs);
         } catch (error) {
             console.error('Error:', error);
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--fail-text); padding: 30px;">Error loading logs from database.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #dc2626; padding: 30px;">Error loading logs from database.</td></tr>`;
         }
     }
 
@@ -135,7 +112,6 @@
             const ppeCount = log.ppe ? log.ppe.length : 0;
             const logId = log.id || index;
 
-            // Main row
             tbody.innerHTML += `
                 <tr>
                     <td><strong>${log.log_date || 'N/A'}</strong></td>
