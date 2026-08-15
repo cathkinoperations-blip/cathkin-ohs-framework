@@ -95,31 +95,6 @@
         </tbody>
     </table>
 
-    <h2>Add New Risk Entry</h2>
-    <form id="add-risk-form" style="background: white; padding: 15px; border: 1px solid #e2e8f0; margin-bottom: 25px; border-radius: 4px;">
-        <div style="margin-bottom: 10px;">
-            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Activity / Area:</label>
-            <input type="text" id="new-activity" required style="width: 100%; padding: 6px; box-sizing: border-box;">
-        </div>
-        <div style="margin-bottom: 10px;">
-            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Hazard Identified:</label>
-            <input type="text" id="new-hazard" required style="width: 100%; padding: 6px; box-sizing: border-box;">
-        </div>
-        <div style="margin-bottom: 10px;">
-            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Inherent Risk Score (e.g., 25 (Critical)):</label>
-            <input type="text" id="new-inherent" required style="width: 100%; padding: 6px; box-sizing: border-box;">
-        </div>
-        <div style="margin-bottom: 10px;">
-            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Mandatory Risk Controls:</label>
-            <textarea id="new-controls" required style="width: 100%; padding: 6px; box-sizing: border-box; height: 60px;"></textarea>
-        </div>
-        <div style="margin-bottom: 10px;">
-            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Residual Risk (e.g., 8 (Med)):</label>
-            <input type="text" id="new-residual" required style="width: 100%; padding: 6px; box-sizing: border-box;">
-        </div>
-        <button type="submit" style="background-color: #2b6cb0; color: white; border: none; padding: 8px 15px; font-weight: bold; cursor: pointer; border-radius: 3px;">Save New Risk</button>
-    </form>
-
     <h2>2. Estate Baseline Risk Register</h2>
     <table>
         <thead>
@@ -136,6 +111,74 @@
             <!-- Data loaded dynamically -->
         </tbody>
     </table>
+
+
+    <h2>Add New Risk Entry</h2>
+    <form id="add-risk-form" style="background: white; padding: 15px; border: 1px solid #e2e8f0; margin-bottom: 25px; border-radius: 4px;">
+        <div style="margin-bottom: 10px;">
+            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Activity / Area:</label>
+            <input type="text" id="new-activity" required style="width: 100%; padding: 6px; box-sizing: border-box;">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Hazard Identified:</label>
+            <input type="text" id="new-hazard" required style="width: 100%; padding: 6px; box-sizing: border-box;">
+        </div>
+        
+        <!-- Inherent Risk Calculation Selectors -->
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <div style="flex: 1;">
+                <label style="font-size: 8.5pt; font-weight: bold; display: block;">Inherent Likelihood (1-5):</label>
+                <select id="new-inh-like" required style="width: 100%; padding: 6px;">
+                    <option value="5">5 - Almost Certain</option>
+                    <option value="4">4 - Likely</option>
+                    <option value="3">3 - Possible</option>
+                    <option value="2">2 - Unlikely</option>
+                    <option value="1">1 - Rare</option>
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label style="font-size: 8.5pt; font-weight: bold; display: block;">Inherent Severity (1-5):</label>
+                <select id="new-inh-sev" required style="width: 100%; padding: 6px;">
+                    <option value="5">5 - Catastrophic</option>
+                    <option value="4">4 - Major</option>
+                    <option value="3">3 - Moderate</option>
+                    <option value="2">2 - Minor</option>
+                    <option value="1">1 - Insignificant</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Mandatory Risk Controls:</label>
+            <textarea id="new-controls" required style="width: 100%; padding: 6px; box-sizing: border-box; height: 60px;"></textarea>
+        </div>
+
+        <!-- Residual Risk Calculation Selectors -->
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <div style="flex: 1;">
+                <label style="font-size: 8.5pt; font-weight: bold; display: block;">Residual Likelihood with Controls (1-5):</label>
+                <select id="new-res-like" required style="width: 100%; padding: 6px;">
+                    <option value="5">5 - Almost Certain</option>
+                    <option value="4">4 - Likely</option>
+                    <option value="3">3 - Possible</option>
+                    <option value="2" selected>2 - Unlikely</option>
+                    <option value="1">1 - Rare</option>
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label style="font-size: 8.5pt; font-weight: bold; display: block;">Residual Severity with Controls (1-5):</label>
+                <select id="new-res-sev" required style="width: 100%; padding: 6px;">
+                    <option value="5">5 - Catastrophic</option>
+                    <option value="4">4 - Major</option>
+                    <option value="3" selected>3 - Moderate</option>
+                    <option value="2">2 - Minor</option>
+                    <option value="1">1 - Insignificant</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" style="background-color: #2b6cb0; color: white; border: none; padding: 8px 15px; font-weight: bold; cursor: pointer; border-radius: 3px;">Calculate & Save Risk</button>
+    </form>
 
     <!-- Footnotes Section -->
     <div class="footnotes-container">
@@ -157,9 +200,30 @@
             </li>
         </ol>
     </div>
+    
 
 <script>
     const API_URL = 'https://cathkin-ohs-framework.vercel.app/api/risks';
+
+    // Matrix calculation logic matching your 5x5 grid criteria
+    function calculateRiskScore(likelihood, severity) {
+        const l = parseInt(likelihood);
+        const s = parseInt(severity);
+        const product = l * s;
+
+        let category = 'Low';
+        if (product >= 16 || (l === 5 && s >= 4) || (l === 4 && s === 5)) {
+            category = 'Critical';
+        } else if (product >= 10 || (l === 5 && s === 3) || (l === 3 && s >= 4) || (l === 4 && s === 3)) {
+            category = 'High';
+        } else if (product >= 5 || (l === 5 && s === 1) || (l === 1 && s === 5) || (l === 2 && s >= 3) || (l === 3 && s <= 2)) {
+            category = 'Med';
+        } else {
+            category = 'Low';
+        }
+
+        return `${product} (${category})`;
+    }
 
     async function fetchRiskRegister() {
         try {
@@ -189,7 +253,7 @@
                     <td>${item.controls}</td>
                     <td class="${residualClass}">${item.residual_score}</td>
                     <td style="text-align: center; white-space: nowrap;">
-                        <button onclick="editRow(${item.id}, '${escapeHtml(item.activity)}', '${escapeHtml(item.hazard)}', '${escapeHtml(item.inherent_score)}', '${escapeHtml(item.controls)}', '${escapeHtml(item.residual_score)}')" style="background: #3182ce; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 3px; font-size: 7.5pt; margin-right: 4px;">Edit</button>
+                        <button onclick="editRow(${item.id}, '${escapeHtml(item.activity)}', '${escapeHtml(item.hazard)}', '${escapeHtml(item.controls)}')" style="background: #3182ce; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 3px; font-size: 7.5pt; margin-right: 4px;">Edit</button>
                         <button onclick="deleteRisk(${item.id})" style="background: #e53e3e; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 3px; font-size: 7.5pt;">Delete</button>
                     </td>
                 `;
@@ -205,15 +269,21 @@
         return str.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
     }
 
-    // Handle adding new risks
+    // Handle adding new risks using calculated dropdown scores
     document.getElementById('add-risk-form').addEventListener('submit', async function(e) {
         e.preventDefault();
+        
+        const inhLike = document.getElementById('new-inh-like').value;
+        const inhSev = document.getElementById('new-inh-sev').value;
+        const resLike = document.getElementById('new-res-like').value;
+        const resSev = document.getElementById('new-res-sev').value;
+
         const payload = {
             activity: document.getElementById('new-activity').value,
             hazard: document.getElementById('new-hazard').value,
-            inherent_score: document.getElementById('new-inherent').value,
+            inherent_score: calculateRiskScore(inhLike, inhSev),
             controls: document.getElementById('new-controls').value,
-            residual_score: document.getElementById('new-residual').value
+            residual_score: calculateRiskScore(resLike, resSev)
         };
 
         const response = await fetch(API_URL, {
@@ -225,6 +295,8 @@
         if (response.ok) {
             document.getElementById('add-risk-form').reset();
             fetchRiskRegister();
+        } else {
+            alert('Failed to save new risk.');
         }
     });
 
@@ -240,15 +312,21 @@
         }
     }
 
-    // Convert row into input fields for inline editing
-    function editRow(id, activity, hazard, inherent, controls, residual) {
+    // Convert row into input fields and dropdowns for inline editing with auto-calculation
+    function editRow(id, activity, hazard, controls) {
         const row = document.getElementById(`row-${id}`);
         row.innerHTML = `
             <td><input type="text" id="edit-activity-${id}" value="${activity}" style="width: 100%; font-size: 8.5pt;"></td>
             <td><input type="text" id="edit-hazard-${id}" value="${hazard}" style="width: 100%; font-size: 8.5pt;"></td>
-            <td><input type="text" id="edit-inherent-${id}" value="${inherent}" style="width: 100%; font-size: 8.5pt;"></td>
+            <td>
+                <div style="font-size: 7.5pt;">L: <select id="edit-inh-like-${id}"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select></div>
+                <div style="font-size: 7.5pt; margin-top:2px;">S: <select id="edit-inh-sev-${id}"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select></div>
+            </td>
             <td><textarea id="edit-controls-${id}" style="width: 100%; font-size: 8.5pt; height: 40px;">${controls}</textarea></td>
-            <td><input type="text" id="edit-residual-${id}" value="${residual}" style="width: 100%; font-size: 8.5pt;"></td>
+            <td>
+                <div style="font-size: 7.5pt;">L: <select id="edit-res-like-${id}"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2" selected>2</option><option value="1">1</option></select></div>
+                <div style="font-size: 7.5pt; margin-top:2px;">S: <select id="edit-res-sev-${id}"><option value="5">5</option><option value="4">4</option><option value="3" selected>3</option><option value="2">2</option><option value="1">1</option></select></div>
+            </td>
             <td style="text-align: center; white-space: nowrap;">
                 <button onclick="saveEdit(${id})" style="background: #38a169; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 3px; font-size: 7.5pt; margin-right: 4px;">Save</button>
                 <button onclick="fetchRiskRegister()" style="background: #718096; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 3px; font-size: 7.5pt;">Cancel</button>
@@ -256,15 +334,20 @@
         `;
     }
 
-    // Save edited row to database
+    // Save edited row to database using calculated scores from dropdowns
     async function saveEdit(id) {
+        const inhLike = document.getElementById(`edit-inh-like-${id}`).value;
+        const inhSev = document.getElementById(`edit-inh-sev-${id}`).value;
+        const resLike = document.getElementById(`edit-res-like-${id}`).value;
+        const resSev = document.getElementById(`edit-res-sev-${id}`).value;
+
         const payload = {
             id: id,
             activity: document.getElementById(`edit-activity-${id}`).value,
             hazard: document.getElementById(`edit-hazard-${id}`).value,
-            inherent_score: document.getElementById(`edit-inherent-${id}`).value,
+            inherent_score: calculateRiskScore(inhLike, inhSev),
             controls: document.getElementById(`edit-controls-${id}`).value,
-            residual_score: document.getElementById(`edit-residual-${id}`).value
+            residual_score: calculateRiskScore(resLike, resSev)
         };
 
         const response = await fetch(API_URL, {
