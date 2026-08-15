@@ -5,7 +5,6 @@ const pool = new Pool({
 });
 
 export default async function handler(req, res) {
-  // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -21,8 +20,8 @@ export default async function handler(req, res) {
       let params = [];
 
       if (category) {
-        const categories = category.split(',');
-        query += ' WHERE category = ANY($1)';
+        const categories = category.split(',').map(c => c.trim().toLowerCase());
+        query += ' WHERE LOWER(category) = ANY($1)';
         params = [categories];
       }
       query += ' ORDER BY id ASC';
@@ -37,7 +36,7 @@ export default async function handler(req, res) {
         INSERT INTO checklist_items (category, component, description, frequency, risk_level) 
         VALUES ($1, $2, $3, $4, $5) RETURNING *;
       `;
-      const values = [category, component, description, frequency, risk_level];
+      const values = [category.toLowerCase(), component, description, frequency, risk_level];
       const { rows } = await pool.query(query, values);
       return res.status(201).json(rows[0]);
     }
@@ -46,6 +45,6 @@ export default async function handler(req, res) {
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   } catch (error) {
     console.error('Database error:', error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: error.message });
   }
 }
