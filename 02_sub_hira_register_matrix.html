@@ -3,73 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>High-Risk Task Baseline HIRA | Cathkin Estates HOA</title>
+    <title>5x5 Risk Matrix & Master Baseline Register | Cathkin Estates HOA</title>
     <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #2d3748; max-width: 950px; margin: 30px auto; padding: 25px; background-color: #ffffff; border: 1px solid #cbd5e0; }
-        h1 { font-size: 15pt; color: #1a365d; border-bottom: 2px solid #1a365d; padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; }
-        h2 { font-size: 11pt; color: #2b6cb0; margin-top: 25px; margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
-        p, li { font-size: 9pt; }
-        table { width: 100%; border-collapse: collapse; margin: 12px 0 20px 0; font-size: 8.5pt; }
-        th { background-color: #1a365d; color: white; padding: 7px 10px; text-align: left; }
-        td { padding: 7px 10px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #2d3748; max-width: 950px; margin: 30px auto; padding: 20px; background-color: #f7fafc; }
+        h1 { font-size: 16pt; color: #1a365d; border-bottom: 3px solid #2b6cb0; padding-bottom: 8px; margin-bottom: 20px; }
+        h2 { font-size: 12pt; color: #2b6cb0; margin-top: 25px; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 8.5pt; margin-bottom: 25px; }
+        th { background-color: #1a365d; color: white; padding: 8px; text-align: left; }
+        td { padding: 8px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
         tr:nth-child(even) { background-color: #f8fafc; }
         .nav-link { display: inline-block; margin-bottom: 15px; color: #3182ce; text-decoration: none; font-weight: bold; font-size: 9pt; }
-        .btn-print { background-color: #3182ce; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; float: right; }
         
-        /* Risk Badges */
-        .risk-badge { font-weight: bold; padding: 3px 8px; border-radius: 4px; text-align: center; display: inline-block; font-size: 8pt; }
-        .risk-critical { background-color: #fed7d7; color: #742a2a; border: 1px solid #feb2b2; }
-        .risk-high { background-color: #feebc8; color: #7b341e; border: 1px solid #fbd38d; }
-        .risk-med { background-color: #fefcbf; color: #744210; border: 1px solid #faf089; }
+        /* Risk Colors */
+        .risk-low { background-color: #c6f6d5; color: #22543d; font-weight: bold; text-align: center; }
+        .risk-med { background-color: #fefcbf; color: #744210; font-weight: bold; text-align: center; }
+        .risk-high { background-color: #feebc8; color: #7b341e; font-weight: bold; text-align: center; }
+        .risk-critical { background-color: #fed7d7; color: #742a2a; font-weight: bold; text-align: center; }
         
-        .score-header-badge { font-size: 8.5pt; font-weight: bold; padding: 2px 8px; border-radius: 12px; }
+        /* Matrix Display */
+        .matrix-table td { text-align: center; font-weight: bold; width: 15%; }
+        .matrix-table th { text-align: center; }
 
         /* Footnotes Styling */
-        .footnotes-container { background: #f8fafc; border: 1px solid #e2e8f0; border-top: 3px solid #1a365d; padding: 15px 20px; border-radius: 4px; margin-top: 30px; font-size: 8pt; color: #4a5568; }
-        .footnotes-container h3 { font-size: 9pt; color: #1a365d; margin-top: 0; margin-bottom: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .footnotes-container { background: #ffffff; border: 1px solid #e2e8f0; border-top: 3px solid #1a365d; padding: 15px 20px; border-radius: 4px; margin-top: 20px; font-size: 8pt; color: #4a5568; }
+        .footnotes-container h3 { font-size: 9.5pt; color: #1a365d; margin-top: 0; margin-bottom: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
         .footnotes-list { margin: 0; padding-left: 18px; }
-        .footnotes-list li { margin-bottom: 4px; }
+        .footnotes-list li { margin-bottom: 6px; text-align: justify; }
         .fn-ref { font-weight: bold; color: #2b6cb0; }
         sup { font-size: 7pt; color: #2b6cb0; font-weight: bold; }
-
-        @media print { .btn-print, .nav-link { display: none; } body { border: none; margin: 0; padding: 0; max-width: 100%; } }
     </style>
 </head>
 <body>
 
-    <button class="btn-print" onclick="window.print()">🖨️ Print High-Risk HIRA Form</button>
     <a href="02_hira.html" class="nav-link">&larr; Back to Module 02</a>
+    <h1>Cathkin Estates HOA — Master Baseline Risk Matrix & Register -- Dynamic</h1>
 
-    <h1>Cathkin Estates HOA — High-Risk Task Baseline Assessment --- Dynamic2</h1>
+    <h2>1. 5x5 Risk Evaluation Matrix</h2>
+    <p><strong>Risk Score = Likelihood (1-5) x Severity (1-5)</strong></p>
+    <table class="matrix-table">
+        <thead>
+            <tr>
+                <th style="background-color: #2d3748;">Severity &rarr;<br>Likelihood &darr;</th>
+                <th>1 - Insignificant</th>
+                <th>2 - Minor</th>
+                <th>3 - Moderate</th>
+                <th>4 - Major</th>
+                <th>5 - Catastrophic</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>5 - Almost Certain</th>
+                <td class="risk-med">5 (Med)</td>
+                <td class="risk-high">10 (High)</td>
+                <td class="risk-high">15 (High)</td>
+                <td class="risk-critical">20 (Critical)</td>
+                <td class="risk-critical">25 (Critical)</td>
+            </tr>
+            <tr>
+                <th>4 - Likely</th>
+                <td class="risk-low">4 (Low)</td>
+                <td class="risk-med">8 (Med)</td>
+                <td class="risk-high">12 (High)</td>
+                <td class="risk-critical">16 (Critical)</td>
+                <td class="risk-critical">20 (Critical)</td>
+            </tr>
+            <tr>
+                <th>3 - Possible</th>
+                <td class="risk-low">3 (Low)</td>
+                <td class="risk-med">6 (Med)</td>
+                <td class="risk-med">9 (Med)</td>
+                <td class="risk-high">12 (High)</td>
+                <td class="risk-high">15 (High)</td>
+            </tr>
+            <tr>
+                <th>2 - Unlikely</th>
+                <td class="risk-low">2 (Low)</td>
+                <td class="risk-low">4 (Low)</td>
+                <td class="risk-med">6 (Med)</td>
+                <td class="risk-med">8 (Med)</td>
+                <td class="risk-high">10 (High)</td>
+            </tr>
+            <tr>
+                <th>1 - Rare</th>
+                <td class="risk-low">1 (Low)</td>
+                <td class="risk-low">2 (Low)</td>
+                <td class="risk-low">3 (Low)</td>
+                <td class="risk-low">4 (Low)</td>
+                <td class="risk-med">5 (Med)</td>
+            </tr>
+        </tbody>
+    </table>
 
-    <!-- Dynamic HIRA Sections Container -->
-    <div id="hira-container">
-        <p>Loading High-Risk Task Sequences...</p>
-    </div>
+    <h2>2. Estate Baseline Risk Register</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Activity / Area</th>
+                <th>Hazard Identified</th>
+                <th>Inherent Risk Score</th>
+                <th>Mandatory Risk Controls</th>
+                <th>Residual Risk</th>
+                <th style="text-align: center;">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="risk-table-body">
+            <!-- Data loaded dynamically -->
+        </tbody>
+    </table>
+
+
+    <h2>Add New Risk Entry</h2>
+    <form id="add-risk-form" style="background: white; padding: 15px; border: 1px solid #e2e8f0; margin-bottom: 25px; border-radius: 4px;">
+        <div style="margin-bottom: 10px;">
+            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Activity / Area:</label>
+            <input type="text" id="new-activity" required style="width: 100%; padding: 6px; box-sizing: border-box;">
+        </div>
+        <div style="margin-bottom: 10px;">
+            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Hazard Identified:</label>
+            <input type="text" id="new-hazard" required style="width: 100%; padding: 6px; box-sizing: border-box;">
+        </div>
+        
+        <!-- Inherent Risk Calculation Selectors -->
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <div style="flex: 1;">
+                <label style="font-size: 8.5pt; font-weight: bold; display: block;">Inherent Likelihood (1-5):</label>
+                <select id="new-inh-like" required style="width: 100%; padding: 6px;">
+                    <option value="5">5 - Almost Certain</option>
+                    <option value="4">4 - Likely</option>
+                    <option value="3">3 - Possible</option>
+                    <option value="2">2 - Unlikely</option>
+                    <option value="1">1 - Rare</option>
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label style="font-size: 8.5pt; font-weight: bold; display: block;">Inherent Severity (1-5):</label>
+                <select id="new-inh-sev" required style="width: 100%; padding: 6px;">
+                    <option value="5">5 - Catastrophic</option>
+                    <option value="4">4 - Major</option>
+                    <option value="3">3 - Moderate</option>
+                    <option value="2">2 - Minor</option>
+                    <option value="1">1 - Insignificant</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <label style="font-size: 8.5pt; font-weight: bold; display: block;">Mandatory Risk Controls:</label>
+            <textarea id="new-controls" required style="width: 100%; padding: 6px; box-sizing: border-box; height: 60px;"></textarea>
+        </div>
+
+        <!-- Residual Risk Calculation Selectors -->
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <div style="flex: 1;">
+                <label style="font-size: 8.5pt; font-weight: bold; display: block;">Residual Likelihood with Controls (1-5):</label>
+                <select id="new-res-like" required style="width: 100%; padding: 6px;">
+                    <option value="5">5 - Almost Certain</option>
+                    <option value="4">4 - Likely</option>
+                    <option value="3">3 - Possible</option>
+                    <option value="2" selected>2 - Unlikely</option>
+                    <option value="1">1 - Rare</option>
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label style="font-size: 8.5pt; font-weight: bold; display: block;">Residual Severity with Controls (1-5):</label>
+                <select id="new-res-sev" required style="width: 100%; padding: 6px;">
+                    <option value="5">5 - Catastrophic</option>
+                    <option value="4">4 - Major</option>
+                    <option value="3" selected>3 - Moderate</option>
+                    <option value="2">2 - Minor</option>
+                    <option value="1">1 - Insignificant</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" style="background-color: #2b6cb0; color: white; border: none; padding: 8px 15px; font-weight: bold; cursor: pointer; border-radius: 3px;">Calculate & Save Risk</button>
+    </form>
 
     <!-- Footnotes Section -->
     <div class="footnotes-container">
-        <h3>Explanatory Footnotes & Manual Cross-References</h3>
+        <h3>Explanatory Footnotes & Reference Key</h3>
         <ol class="footnotes-list">
             <li>
-                <span class="fn-ref">[1] Master Operations Document Citation:</span> Cross-referenced with the official <em>Cathkin Estates HOA Policies, Procedures and Operations Manual</em>.
+                <span class="fn-ref">[1] Master Operations Document Citation:</span> Refers to the official <em>Cathkin Estates HOA Policies, Procedures and Operations Manual (Oct 2025)</em>.
             </li>
             <li>
-                <span class="fn-ref">(Doc D1 to D6) Operational Appendix Codes:</span>
+                <span class="fn-ref">(Doc D1 to D6) Operational Appendix Codes:</span> Refers to specific standard operating procedures (SOPs) and operational registers attached to the estate manual:
                 <ul>
-                    <li><strong>Doc D2:</strong> Fire Control Management Plan & Controlled Burning Guidelines</li>
+                    <li><strong>Doc D1:</strong> Wildlife Management Plan | <strong>Doc D1-1:</strong> Wildlife Register (Game Counts, Births & Deaths)</li>
+                    <li><strong>Doc D2:</strong> Fire Control Management (Controlled Burning Programs & Veld Fire Protocols)</li>
+                    <li><strong>Doc D3:</strong> Game Fence Maintenance Protocol</li>
                     <li><strong>Doc D4:</strong> Water Treatment Plant Operating Manual</li>
-                    <li><strong>Doc D5:</strong> Electrical Infrastructure & Eskom Liaison Protocols</li>
+                    <li><strong>Doc D5:</strong> Electrical Infrastructure & Eskom Liaison Procedures</li>
+                    <li><strong>Doc D6:</strong> Security Protocols & Perimeter Checks</li>
                 </ul>
             </li>
         </ol>
     </div>
+    
 
 <script>
     const API_RISKS = 'https://cathkin-ohs-framework.vercel.app/api/risks';
     const API_STEPS = 'https://cathkin-ohs-framework.vercel.app/api/task_steps';
 
-    // Matrix calculation logic returning combined numeric score and text
+    // Matrix calculation logic matching your 5x5 grid
     function calculateRiskScore(likelihood, severity) {
         const l = parseInt(likelihood);
         const s = parseInt(severity);
@@ -89,7 +226,7 @@
             badgeClass = 'risk-med';
         }
 
-        return { text: `${product} (${category})`, badgeClass };
+        return { text: `${category}`, badgeClass };
     }
 
     // Helper to prevent quotes breaking inline JS parameters
@@ -161,7 +298,7 @@
                     tr.innerHTML = `
                         <td><strong>${step.task_sequence}</strong></td>
                         <td>${step.hazard}</td>
-                        <td><span class="risk-badge ${evalResult.badgeClass}">${evalResult.text}</span></td>
+                        <td><span class="risk-badge ${evalResult.badgeClass}">${step.risk_score}</span></td>
                         <td>${step.controls}</td>
                         <td style="text-align: center; white-space: nowrap;">
                             <button onclick="editStep(${step.id}, '${escapeHtml(step.task_sequence)}', '${escapeHtml(step.hazard)}', ${step.likelihood}, ${step.severity}, '${escapeHtml(step.controls)}')" style="background: #3182ce; color: white; border: none; padding: 3px 6px; cursor: pointer; border-radius: 3px; font-size: 7.5pt; margin-right: 3px;">Edit</button>
@@ -205,6 +342,7 @@
         }
     }
 
+    // Convert step row into editable input fields & dropdowns
     function editStep(id, sequence, hazard, likelihood, severity, controls) {
         const row = document.getElementById(`step-row-${id}`);
         row.innerHTML = `
@@ -222,6 +360,7 @@
         `;
     }
 
+    // Save edited step to database
     async function saveStepEdit(id) {
         const like = document.getElementById(`edit-like-${id}`).value;
         const sev = document.getElementById(`edit-sev-${id}`).value;

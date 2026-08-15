@@ -40,7 +40,7 @@
     <button class="btn-print" onclick="window.print()">🖨️ Print High-Risk HIRA Form</button>
     <a href="02_hira.html" class="nav-link">&larr; Back to Module 02</a>
 
-    <h1>Cathkin Estates HOA — High-Risk Task Baseline Assessment</h1>
+    <h1>Cathkin Estates HOA — High-Risk Task Baseline Assessment --- Dynamic2</h1>
 
     <!-- Dynamic HIRA Sections Container -->
     <div id="hira-container">
@@ -65,12 +65,11 @@
         </ol>
     </div>
 
-
 <script>
     const API_RISKS = 'https://cathkin-ohs-framework.vercel.app/api/risks';
     const API_STEPS = 'https://cathkin-ohs-framework.vercel.app/api/task_steps';
 
-    // Matrix calculation logic matching your 5x5 grid
+    // Matrix calculation logic returning combined numeric score and text
     function calculateRiskScore(likelihood, severity) {
         const l = parseInt(likelihood);
         const s = parseInt(severity);
@@ -90,7 +89,13 @@
             badgeClass = 'risk-med';
         }
 
-        return { text: `${category}`, badgeClass };
+        return { text: `${product} (${category})`, badgeClass };
+    }
+
+    // Helper to prevent quotes breaking inline JS parameters
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
     }
 
     async function fetchHiraData() {
@@ -119,11 +124,11 @@
                     <table>
                         <thead>
                             <tr>
-                                <th style="width: 22%;">Task Sequence</th>
-                                <th style="width: 28%;">Potential Hazard</th>
+                                <th style="width: 20%;">Task Sequence</th>
+                                <th style="width: 25%;">Potential Hazard</th>
                                 <th style="width: 12%;">Risk Level</th>
                                 <th style="width: 30%;">Mandatory Controls & Safety Standard</th>
-                                <th style="width: 8%; text-align: center;">Actions</th>
+                                <th style="width: 13%; text-align: center;">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="steps-table-${risk.id}">
@@ -156,9 +161,10 @@
                     tr.innerHTML = `
                         <td><strong>${step.task_sequence}</strong></td>
                         <td>${step.hazard}</td>
-                        <td><span class="risk-badge ${evalResult.badgeClass}">${step.risk_score}</span></td>
+                        <td><span class="risk-badge ${evalResult.badgeClass}">${evalResult.text}</span></td>
                         <td>${step.controls}</td>
                         <td style="text-align: center; white-space: nowrap;">
+                            <button onclick="editStep(${step.id}, '${escapeHtml(step.task_sequence)}', '${escapeHtml(step.hazard)}', ${step.likelihood}, ${step.severity}, '${escapeHtml(step.controls)}')" style="background: #3182ce; color: white; border: none; padding: 3px 6px; cursor: pointer; border-radius: 3px; font-size: 7.5pt; margin-right: 3px;">Edit</button>
                             <button onclick="deleteStep(${step.id})" style="background: #e53e3e; color: white; border: none; padding: 3px 6px; cursor: pointer; border-radius: 3px; font-size: 7.5pt;">Delete</button>
                         </td>
                     `;
@@ -196,6 +202,51 @@
             fetchHiraData();
         } else {
             alert('Failed to add task step.');
+        }
+    }
+
+    function editStep(id, sequence, hazard, likelihood, severity, controls) {
+        const row = document.getElementById(`step-row-${id}`);
+        row.innerHTML = `
+            <td><input type="text" id="edit-seq-${id}" value="${sequence}" style="width: 100%; font-size: 8pt;"></td>
+            <td><input type="text" id="edit-haz-${id}" value="${hazard}" style="width: 100%; font-size: 8pt;"></td>
+            <td>
+                <div style="font-size: 7.5pt;">L: <select id="edit-like-${id}"><option value="5"${likelihood===5?' selected':''}>5</option><option value="4"${likelihood===4?' selected':''}>4</option><option value="3"${likelihood===3?' selected':''}>3</option><option value="2"${likelihood===2?' selected':''}>2</option><option value="1"${likelihood===1?' selected':''}>1</option></select></div>
+                <div style="font-size: 7.5pt; margin-top:2px;">S: <select id="edit-sev-${id}"><option value="5"${severity===5?' selected':''}>5</option><option value="4"${severity===4?' selected':''}>4</option><option value="3"${severity===3?' selected':''}>3</option><option value="2"${severity===2?' selected':''}>2</option><option value="1"${severity===1?' selected':''}>1</option></select></div>
+            </td>
+            <td><textarea id="edit-ctrl-${id}" style="width: 100%; font-size: 8pt; height: 35px;">${controls}</textarea></td>
+            <td style="text-align: center; white-space: nowrap;">
+                <button onclick="saveStepEdit(${id})" style="background: #38a169; color: white; border: none; padding: 3px 6px; cursor: pointer; border-radius: 3px; font-size: 7.5pt; margin-right: 3px;">Save</button>
+                <button onclick="fetchHiraData()" style="background: #718096; color: white; border: none; padding: 3px 6px; cursor: pointer; border-radius: 3px; font-size: 7.5pt;">Cancel</button>
+            </td>
+        `;
+    }
+
+    async function saveStepEdit(id) {
+        const like = document.getElementById(`edit-like-${id}`).value;
+        const sev = document.getElementById(`edit-sev-${id}`).value;
+        const evalResult = calculateRiskScore(like, sev);
+
+        const payload = {
+            id: id,
+            task_sequence: document.getElementById(`edit-seq-${id}`).value,
+            hazard: document.getElementById(`edit-haz-${id}`).value,
+            likelihood: parseInt(like),
+            severity: parseInt(sev),
+            risk_score: evalResult.text,
+            controls: document.getElementById(`edit-ctrl-${id}`).value
+        };
+
+        const res = await fetch(API_STEPS, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            fetchHiraData();
+        } else {
+            alert('Failed to update task step.');
         }
     }
 
