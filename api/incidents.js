@@ -96,6 +96,7 @@ export default async function handler(req, res) {
             return res.status(200).json({ success: true, evaluation: JSON.parse(response.text) });
         }
 
+        // Inside action === 'create'
         if (req.method === 'POST' && action === 'create') {
             const { incident_date, reported_by, incident_type, location, description, severity, corrective_action, responsible_person, incident_image_url } = req.body;
             const query = `INSERT INTO incident_register (incident_date, reported_by, incident_type, location, description, severity, corrective_action, responsible_person, status, incident_image_url) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'Open', $9) RETURNING *;`;
@@ -103,11 +104,12 @@ export default async function handler(req, res) {
             return res.status(200).json({ success: true, incident: result.rows[0] });
         }
 
+        // Inside action === 'close'
         if (req.method === 'POST' && action === 'close') {
             const { id, close_image_url, ai_close_assessment } = req.body;
             const result = await pool.query(`UPDATE incident_register SET status = 'Closed', verified_at = NOW(), close_image_url = $2, ai_close_assessment = $3 WHERE id = $1 RETURNING *;`, [id, close_image_url, ai_close_assessment]);
             return res.status(200).json({ success: true, incident: result.rows[0] });
-        }
+}
 
         return res.status(400).json({ success: false, error: 'Invalid action parameter' });
     } catch (err) {

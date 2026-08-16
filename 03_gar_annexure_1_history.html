@@ -27,13 +27,13 @@
         <table class="table" id="history-table">
             <thead>
                 <tr>
-                    <th>Incident Date</th>
+                    <th>Incident Date & Opening Photos</th>
                     <th>Type & Location</th>
                     <th>Description</th>
                     <th>Severity</th>
                     <th>CAPA & Owner</th>
                     <th>Status</th>
-                    <th>Close-Out Date</th>
+                    <th>Close-Out Date & Verification Photos</th>
                 </tr>
             </thead>
             <tbody>
@@ -52,15 +52,45 @@
 
             if (data.success && data.incidents && data.incidents.length > 0) {
                 data.incidents.forEach(inc => {
+                    // Render Opening Photos thumbnails
+                    let openPhotosHtml = '';
+                    if (inc.incident_image_url) {
+                        const images = inc.incident_image_url.split(',');
+                        openPhotosHtml = '<div style="display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap;">';
+                        images.forEach((imgSrc, idx) => {
+                            const trimmed = imgSrc.trim();
+                            if (trimmed) {
+                                openPhotosHtml += `<a href="${trimmed}" target="_blank"><img src="${trimmed}" style="width: 35px; height: 35px; object-fit: cover; border-radius: 3px; border: 1px solid #cbd5e0;" title="Opening Photo ${idx + 1}"></a>`;
+                            }
+                        });
+                        openPhotosHtml += '</div>';
+                    }
+
+                    // Render Close-Out Photos thumbnails
+                    let closePhotosHtml = '';
+                    if (inc.close_image_url) {
+                        const images = inc.close_image_url.split(',');
+                        closePhotosHtml = '<div style="display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap;">';
+                        images.forEach((imgSrc, idx) => {
+                            const trimmed = imgSrc.trim();
+                            if (trimmed) {
+                                closePhotosHtml += `<a href="${trimmed}" target="_blank"><img src="${trimmed}" style="width: 35px; height: 35px; object-fit: cover; border-radius: 3px; border: 1px solid #cbd5e0;" title="Close-Out Photo ${idx + 1}"></a>`;
+                            }
+                        });
+                        closePhotosHtml += '</div>';
+                    }
+
+                    const assessmentNote = inc.ai_close_assessment ? `<br><small style="color: #2b6cb0;"><strong>AI Audit:</strong> ${inc.ai_close_assessment}</small>` : '';
+
                     tbody.innerHTML += `
                         <tr>
-                            <td>${new Date(inc.incident_date).toLocaleDateString()}</td>
+                            <td>${new Date(inc.incident_date).toLocaleDateString()}${openPhotosHtml}</td>
                             <td><strong>${inc.incident_type}</strong><br><small>${inc.location}</small></td>
                             <td>${inc.description}</td>
                             <td><span style="background: #edf2f7; color: #4a5568; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.severity}</span></td>
                             <td><small><strong>Action:</strong> ${inc.corrective_action}<br><strong>Owner:</strong> ${inc.responsible_person}</small></td>
                             <td><span style="background: #c6f6d5; color: #22543d; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.status}</span></td>
-                            <td>${inc.verified_at ? new Date(inc.verified_at).toLocaleDateString() : 'N/A'}</td>
+                            <td>${inc.verified_at ? new Date(inc.verified_at).toLocaleDateString() : 'N/A'}${closePhotosHtml}${assessmentNote}</td>
                         </tr>
                     `;
                 });
