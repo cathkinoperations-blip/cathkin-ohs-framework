@@ -105,88 +105,89 @@
     </div>
 
     <script>
-        async function loadIncidents() {
-            try {
-                const response = await fetch('/api/get-incidents');
-                const data = await response.json();
-                const tbody = document.querySelector('#incidents-table tbody');
-                tbody.innerHTML = '';
+    async function loadIncidents() {
+        try {
+            const response = await fetch('/api/incidents?action=list');
+            const data = await response.json();
+            const tbody = document.querySelector('#incidents-table tbody');
+            tbody.innerHTML = '';
 
-                if (data.success && data.incidents && data.incidents.length > 0) {
-                    data.incidents.forEach(inc => {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td>${new Date(inc.incident_date).toLocaleString()}</td>
-                                <td><strong>${inc.incident_type}</strong></td>
-                                <td>${inc.location}</td>
-                                <td>${inc.description}</td>
-                                <td><span style="background: #feebc8; color: #9c4221; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.severity}</span></td>
-                                <td><small><strong>Action:</strong> ${inc.corrective_action}<br><strong>Owner:</strong> ${inc.responsible_person}</small></td>
-                                <td><span style="background: #ebf8ff; color: #2b6cb0; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.status}</span></td>
-                                <td><button onclick="closeIncident('${inc.id}')" style="background: #e53e3e; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px;">Close & Verify</button></td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #718096; padding: 20px;">No active open incidents recorded.</td></tr>`;
-                }
-            } catch (err) {
-                console.error('Failed to load incidents:', err);
-            }
-        }
-
-        async function closeIncident(id) {
-            if (!confirm('Are you sure you want to close this incident and record the verification date?')) return;
-
-            try {
-                const response = await fetch('/api/resolve-incident', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id })
+            if (data.success && data.incidents && data.incidents.length > 0) {
+                data.incidents.forEach(inc => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${new Date(inc.incident_date).toLocaleString()}</td>
+                            <td><strong>${inc.incident_type}</strong></td>
+                            <td>${inc.location}</td>
+                            <td>${inc.description}</td>
+                            <td><span style="background: #feebc8; color: #9c4221; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.severity}</span></td>
+                            <td><small><strong>Action:</strong> ${inc.corrective_action}<br><strong>Owner:</strong> ${inc.responsible_person}</small></td>
+                            <td><span style="background: #ebf8ff; color: #2b6cb0; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.status}</span></td>
+                            <td><button onclick="closeIncident('${inc.id}')" style="background: #e53e3e; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px;">Close & Verify</button></td>
+                        </tr>
+                    `;
                 });
-                const data = await response.json();
-                if (data.success) {
-                    loadIncidents();
-                } else {
-                    alert('Failed to close incident: ' + data.error);
-                }
-            } catch (err) {
-                alert('Error: ' + err.message);
+            } else {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #718096; padding: 20px;">No active open incidents recorded.</td></tr>`;
             }
+        } catch (err) {
+            console.error('Failed to load incidents:', err);
         }
+    }
 
-        document.getElementById('incident-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const payload = {
-                incident_date: document.getElementById('incident_date').value,
-                reported_by: document.getElementById('reported_by').value,
-                incident_type: document.getElementById('incident_type').value,
-                location: document.getElementById('location').value,
-                description: document.getElementById('description').value,
-                severity: document.getElementById('severity').value,
-                corrective_action: document.getElementById('corrective_action').value,
-                responsible_person: document.getElementById('responsible_person').value
-            };
+    async function closeIncident(id) {
+        if (!confirm('Are you sure you want to close this incident and record the verification date?')) return;
 
-            try {
-                const response = await fetch('/api/create-incident', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await response.json();
-                if (data.success) {
-                    document.getElementById('incident-form').reset();
-                    loadIncidents();
-                } else {
-                    alert('Failed to save incident: ' + data.error);
-                }
-            } catch (err) {
-                alert('Error: ' + err.message);
+        try {
+            const response = await fetch('/api/incidents', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'close', id })
+            });
+            const data = await response.json();
+            if (data.success) {
+                loadIncidents();
+            } else {
+                alert('Failed to close incident: ' + data.error);
             }
-        });
+        } catch (err) {
+            alert('Error: ' + err.message);
+        }
+    }
 
-        document.addEventListener('DOMContentLoaded', loadIncidents);
+    document.getElementById('incident-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+            action: 'create',
+            incident_date: document.getElementById('incident_date').value,
+            reported_by: document.getElementById('reported_by').value,
+            incident_type: document.getElementById('incident_type').value,
+            location: document.getElementById('location').value,
+            description: document.getElementById('description').value,
+            severity: document.getElementById('severity').value,
+            corrective_action: document.getElementById('corrective_action').value,
+            responsible_person: document.getElementById('responsible_person').value
+        };
+
+        try {
+            const response = await fetch('/api/incidents', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById('incident-form').reset();
+                loadIncidents();
+            } else {
+                alert('Failed to save incident: ' + data.error);
+            }
+        } catch (err) {
+            alert('Error: ' + err.message);
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', loadIncidents);
     </script>
 
     <div class="nav-footer">
