@@ -436,8 +436,8 @@
                 return;
             }
 
-            // Perform close-out with action parameter included
-            const closeRes = await fetch('/api/incidents?action=close', {
+            // Perform close-out (fixed endpoint route matching server routing)
+            const closeRes = await fetch('/api/incidents', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
