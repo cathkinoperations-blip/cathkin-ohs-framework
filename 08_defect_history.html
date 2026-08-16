@@ -3,36 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Defect History - Cathkin Estates</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Defect History | Cathkin Estates HOA</title>
+    <!-- Force all links on this page to open in the same window -->
+    <base target="_self">
+    <!-- Link to Central External Stylesheet -->
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-light">
-    <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Resolved Defect History</h2>
-            <a href="08_checklists_inspections.html" class="btn btn-secondary btn-sm">&larr; Back to Dashboard</a>
+<body>
+    <div class="header-banner">
+        <h1>RESOLVED DEFECT HISTORY</h1>
+        <div class="subtitle">Operational Health & Safety Governance Manual | Cathkin Estates HOA</div>
+        <div class="meta-bar">
+            <span><strong>Document Ref:</strong> OHS-MOD-007-HIST</span>
+            <span><strong>Regulatory Standard:</strong> OHS Act General Machinery & Driven Machinery Regulations</span>
+            <span><strong>Digitization:</strong> Audit Trail & Historical Tracking</span>
         </div>
-        
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <table class="table table-striped align-middle" id="history-table">
-                    <thead>
-                        <tr>
-                            <th>Reported Date</th>
-                            <th>Equipment</th>
-                            <th>Operator</th>
-                            <th>Defect Description</th>
-                            <th>Severity</th>
-                            <th>Status</th>
-                            <th>Resolved Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td colspan="7" class="text-center text-muted">Loading history...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    </div>
+
+    <h2>1. Historical Defect Audit Log</h2>
+    <p>This register maintains a permanent historical record of all resolved and verified equipment defects previously logged across estate operations.</p>
+
+    <div class="card mb-4">
+        <table class="table" id="history-table">
+            <thead>
+                <tr>
+                    <th>Reported Date</th>
+                    <th>Equipment</th>
+                    <th>Operator</th>
+                    <th>Defect Description</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                    <th>Resolved Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Populated dynamically via JavaScript -->
+                <tr><td colspan="7" class="text-center text-muted">Loading history...</td></tr>
+            </tbody>
+        </table>
     </div>
 
     <script>
@@ -49,7 +57,7 @@
                             <tr>
                                 <td>${new Date(d.created_at).toLocaleDateString()}</td>
                                 <td><strong>${d.equipment_name}</strong></td>
-                               <td>${d.operator_name || 'N/A'}</td>
+                                <td>${d.operator_name || 'N/A'}</td>
                                 <td>${d.defect_description}</td>
                                 <td><span class="badge bg-secondary">${d.severity}</span></td>
                                 <td><span class="badge bg-success">${d.status}</span></td>
@@ -62,10 +70,17 @@
                 }
             } catch (err) {
                 console.error('Failed to load history:', err);
+                const tbody = document.querySelector('#history-table tbody');
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Failed to load history data.</td></tr>`;
             }
         }
 
         document.addEventListener('DOMContentLoaded', loadHistory);
     </script>
+
+    <div class="nav-footer">
+        <a href="08_checklists_inspections.html" target="_self">&larr; Back to Module 08 Checklists</a>
+        <a href="index.html" target="_self">📋 Main Index</a>
+    </div>
 </body>
 </html>
