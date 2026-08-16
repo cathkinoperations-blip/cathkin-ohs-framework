@@ -43,14 +43,43 @@
         <form id="incident-form">
             <div class="form-grid">
                 
-                <!-- Reporter Information (Restored Split Inputs) -->
+                <!-- Reporter Information -->
                 <div class="form-group">
                     <label for="reporter-name">Reporter Name <span class="required-star">*</span></label>
                     <input type="text" id="reporter-name" placeholder="Full name..." required>
                 </div>
+
                 <div class="form-group">
                     <label for="reporter-role">Reporter Role / Designation <span class="required-star">*</span></label>
-                    <input type="text" id="reporter-role" placeholder="e.g., Estate Manager, Resident, Contractor..." required>
+                    <select id="reporter-role" required>
+                        <option value="" disabled selected>Select Role / Designation...</option>
+                        <option value="Resident">Resident / Homeowner</option>
+                        <option value="Manager">Estate Manager</option>
+                        <option value="HSE">HSE / Operations Committee</option>
+                        <option value="Board">Board Member</option>
+                        <option value="Admin">Estate Admin</option>
+                        <option value="Contractor">Contractor / Service Provider</option>
+                        <option value="Tester">Tester</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="reporter-email">Reporter Email Address <span class="required-star">*</span></label>
+                    <input type="email" id="reporter-email" placeholder="e.g., resident@domain.co.za" required>
+                    <div class="file-hint">Confirmation receipts and close-out notices will be sent to this address.</div>
+                </div>
+
+                <!-- Date of Incident -->
+                <div class="form-group">
+                    <label for="incident-date">Date & Time of Incident <span class="required-star">*</span></label>
+                    <input type="datetime-local" id="incident-date" required>
+                </div>
+
+                <!-- Expected Close-Out Date (Max 30 Days Out) -->
+                <div class="form-group">
+                    <label for="expected-close-date">Expected Close-Out Date <span class="required-star">*</span></label>
+                    <input type="date" id="expected-close-date" required>
+                    <div class="file-hint">Mandatory CAPA deadline (max 30 days from today).</div>
                 </div>
 
                 <!-- Attachment Block -->
@@ -157,7 +186,7 @@
                 </div>
 
                 <div style="margin-bottom: 16px;">
-                    <button type="button" id="btn-eval-close" onclick="evaluateCloseOut()" style="background: #2b6cb0; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;">🤖 Run AI Close-Out Verification</button>
+                    <button type="button" id="btn-eval-close" onclick="evaluateCloseOut()" style="background: #2b6cb0; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;">Run Close-Out Verification</button>
                     <div id="close-eval-status" style="display: none; margin-top: 8px; font-size: 12px; padding: 8px; border-radius: 4px;"></div>
                 </div>
 
@@ -194,11 +223,25 @@
     let currentCloseAiAssessment = null;
 
     document.addEventListener('DOMContentLoaded', () => {
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        document.getElementById('incident-date').value = now.toISOString().slice(0, 16);
-        
-        loadIncidents();
+    const now = new Date();
+    
+    // Set current date/time for incident-date
+    const localNow = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
+    document.getElementById('incident-date').value = localNow.toISOString().slice(0, 16);
+
+    // Set min & max dates for expected-close-date (Today to +30 Days)
+    const todayStr = now.toISOString().split('T')[0];
+    
+    const maxDate = new Date();
+    maxDate.setDate(now.getDate() + 30);
+    const maxDateStr = maxDate.toISOString().split('T')[0];
+
+    const expInput = document.getElementById('expected-close-date');
+    expInput.min = todayStr;
+    expInput.max = maxDateStr;
+    expInput.value = maxDateStr; // Default to 30 days out
+    
+    loadIncidents();
     });
 
     async function loadIncidents() {
@@ -368,61 +411,86 @@
         }
     }
 
-    // Submit New Incident
-document.getElementById('incident-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const fileInput = document.getElementById('incident-image');
-    let filesBase64 = [];
+    // Submit New Incident Handler Update
+    document.getElementById('incident-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    if (!fileInput.files || fileInput.files.length === 0) {
-        alert('Please attach at least one photo or document.');
-        return;
-    }
+        const expectedCloseInput = document.getElementById('expected-close-date').value;
+        const selectedDate = new Date(expectedCloseInput);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-    for (let file of fileInput.files) {
-        const base64 = await toBase64(file);
-        filesBase64.push(base64);
-    }
+        const maxAllowed = new Date();
+        maxAllowed.setDate(today.getDate() + 30);
+        maxAllowed.setHours(23, 59, 59, 999);
 
-    // Capture split fields and combine for backend reported_by parameter
-    const reporterName = document.getElementById('reporter-name').value.trim();
-    const reporterRole = document.getElementById('reporter-role').value.trim();
-    const combinedReportedBy = `${reporterName} (${reporterRole})`;
-
-    const payload = {
-        action: 'create',
-        reported_by: combinedReportedBy,
-        incident_type: document.getElementById('incident-type').value,
-        severity: document.getElementById('severity').value,
-        incident_date: document.getElementById('incident-date').value,
-        location: document.getElementById('location').value,
-        description: document.getElementById('description').value,
-        corrective_action: document.getElementById('corrective-action').value,
-        responsible_person: document.getElementById('responsible-person').value,
-        incident_image_url: filesBase64.join(',')
-    };
-
-    try {
-        const res = await fetch('/api/incidents?action=create', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        const result = await res.json();
-        if (result.success) {
-            alert('Incident logged successfully!');
-            document.getElementById('incident-form').reset();
-            document.getElementById('analyze-status').style.display = 'none';
-            loadIncidents();
-        } else {
-            alert('Error logging incident: ' + (result.error || 'Unknown error'));
+        if (selectedDate > maxAllowed) {
+            alert('The Expected Close-Out Date cannot exceed 30 days from today.');
+            return;
         }
-    } catch (err) {
-        console.error('Submission error:', err);
-        alert('Failed to submit incident.');
-    }
-});
+
+        const fileInput = document.getElementById('incident-image');
+        let filesBase64 = [];
+
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert('Please attach at least one photo or document.');
+            return;
+        }
+
+        for (let file of fileInput.files) {
+            const base64 = await toBase64(file);
+            filesBase64.push(base64);
+        }
+
+        const reporterName = document.getElementById('reporter-name').value.trim();
+        const reporterRole = document.getElementById('reporter-role').value.trim();
+        const reporterEmail = document.getElementById('reporter-email').value.trim();
+
+        const payload = {
+            action: 'create',
+            reported_by: `${reporterName} (${reporterRole})`,
+            reporter_email: reporterEmail,
+            incident_date: document.getElementById('incident-date').value,
+            expected_close_date: expectedCloseInput,
+            incident_type: document.getElementById('incident-type').value,
+            severity: document.getElementById('severity').value,
+            location: document.getElementById('location').value,
+            description: document.getElementById('description').value,
+            corrective_action: document.getElementById('corrective-action').value,
+            responsible_person: document.getElementById('responsible-person').value,
+            incident_image_url: filesBase64.join(',')
+        };
+
+        try {
+            const res = await fetch('/api/incidents?action=create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await res.json();
+            if (result.success) {
+                alert('Incident logged successfully!');
+                document.getElementById('incident-form').reset();
+                document.getElementById('analyze-status').style.display = 'none';
+                
+                // Reset dates
+                const now = new Date();
+                const localNow = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
+                document.getElementById('incident-date').value = localNow.toISOString().slice(0, 16);
+                
+                const maxDate = new Date();
+                maxDate.setDate(now.getDate() + 30);
+                document.getElementById('expected-close-date').value = maxDate.toISOString().split('T')[0];
+
+                loadIncidents();
+            } else {
+                alert('Error logging incident: ' + (result.error || 'Unknown error'));
+            }
+        } catch (err) {
+            console.error('Submission error:', err);
+            alert('Failed to submit incident.');
+        }
+    });
 
     // Close Incident Submit with Manager Authentication
 document.getElementById('close-form').addEventListener('submit', async (e) => {
