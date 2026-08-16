@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Closed Incident History | Cathkin Estates HOA</title>
+    <base target="_self">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="header-banner">
+        <h1>RESOLVED INCIDENT AUDIT TRAIL</h1>
+        <div class="subtitle">Operational Health & Safety Governance Manual | Cathkin Estates HOA</div>
+        <div class="meta-bar">
+            <span><strong>Document Ref:</strong> OHS-MOD-003-HIST</span>
+            <span><strong>Regulatory Standard:</strong> GAR 9 & COIDA (Act 130 of 1993)</span>
+            <span><strong>Digitization:</strong> Historical Compliance Archive</span>
+        </div>
+    </div>
+
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Closed & Verified Incidents History</h2>
+            <a href="03_sub_gar_annexure_1_register.html" class="btn btn-secondary btn-sm">&larr; Back to Active Register</a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle" id="history-table">
+                        <thead>
+                            <tr>
+                                <th>Incident Date</th>
+                                <th>Type & Location</th>
+                                <th>Description</th>
+                                <th>Severity</th>
+                                <th>CAPA & Owner</th>
+                                <th>Status</th>
+                                <th>Close-Out Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="7" class="text-center text-muted">Loading incident history...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadHistory() {
+            try {
+                const response = await fetch('/api/get-incident-history');
+                const data = await response.json();
+                const tbody = document.querySelector('#history-table tbody');
+                tbody.innerHTML = '';
+
+                if (data.success && data.incidents && data.incidents.length > 0) {
+                    data.incidents.forEach(inc => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${new Date(inc.incident_date).toLocaleDateString()}</td>
+                                <td><strong>${inc.incident_type}</strong><br><small>${inc.location}</small></td>
+                                <td>${inc.description}</td>
+                                <td><span class="badge bg-secondary">${inc.severity}</span></td>
+                                <td><small><strong>Action:</strong> ${inc.corrective_action}<br><strong>Owner:</strong> ${inc.responsible_person}</small></td>
+                                <td><span class="badge bg-success">${inc.status}</span></td>
+                                <td>${inc.verified_at ? new Date(inc.verified_at.toLocaleDateString ? inc.verified_at : inc.verified_at).toLocaleDateString() : 'N/A'}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">No closed incidents found in history.</td></tr>`;
+                }
+            } catch (err) {
+                console.error('Failed to load history:', err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadHistory);
+    </script>
+
+    <div class="nav-footer mt-5">
+        <a href="03_sub_gar_annexure_1_register.html" target="_self">&larr; Back to Active Register</a>
+        <a href="index.html" target="_self">📋 Main Index</a>
+    </div>
+</body>
+</html>

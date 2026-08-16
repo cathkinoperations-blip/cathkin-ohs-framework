@@ -4,54 +4,203 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GAR Annexure 1 Incident Register | Cathkin Estates HOA</title>
-    <style>
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #2d3748; max-width: 950px; margin: 30px auto; padding: 20px; background-color: #f7fafc; }
-        h1 { font-size: 16pt; color: #1a365d; border-bottom: 3px solid #2b6cb0; padding-bottom: 8px; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; background: white; font-size: 8.5pt; margin-bottom: 25px; }
-        th { background-color: #1a365d; color: white; padding: 8px; text-align: left; }
-        td { padding: 8px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
-        tr:nth-child(even) { background-color: #f8fafc; }
-        .nav-link { display: inline-block; margin-bottom: 15px; color: #3182ce; text-decoration: none; font-weight: bold; font-size: 9pt; }
-        .status-badge { font-weight: bold; padding: 2px 6px; border-radius: 3px; display: inline-block; font-size: 7.5pt; }
-        .status-open { background-color: #feebc8; color: #7b341e; }
-        .status-closed { background-color: #c6f6d5; color: #22543d; }
-    </style>
+    <base target="_self">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <a href="03_incident_reporting_coida.html" class="nav-link">&larr; Back to Module 03</a>
-    <h1>Cathkin Estates HOA — GAR Annexure 1 Incident & Near-Miss Log</h1>
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 10%;">Incident ID</th>
-                <th style="width: 12%;">Date & Time</th>
-                <th style="width: 15%;">Injured Person / Item</th>
-                <th style="width: 25%;">Description of Event</th>
-                <th style="width: 18%;">Root Cause</th>
-                <th style="width: 20%;">Corrective Action Implemented</th>
-                <th style="width: 10%;">COIDA Ref / Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><strong>INC-2026-01</strong></td>
-                <td>2026-08-05 09:00</td>
-                <td>11kV Substation & Ground Transformers</td>
-                <td>Multiple ground-mounted, oil-cooled transformers across the estate were found unlocked with live 11kV high-voltage components exposed, posing an extreme electrocution risk to residents, wildlife, and staff.</td>
-                <td>DRAFT: Inadequate physical security checks, missing/broken padlocks, and lack of routine enclosure audits.</td>
-                <td>DRAFT: Immediate lockout of all exposed transformer units, replacement of heavy-duty locks, and establishment of a monthly electrical enclosure security checklist (Doc D5/D6).</td>
-                <td><span class="status-badge status-open">Near-Miss (Open)</span></td>
-            </tr>
-            <tr>
-                <td><strong>INC-2026-02</strong></td>
-                <td>2026-08-10 13:30</td>
-                <td>Village 1 Firebreak / Controlled Burn Area</td>
-                <td>Controlled burn broadcast sent to Village 1, followed by a cancellation notice due to conditions. The supervisor proceeded with the burn on two erven anyway despite the cancellation notice, leading to unauthorized burning and a breakdown in fire safety communications.</td>
-                <td>DRAFT: Communication breakdown between management and fire supervisor, lack of verbal sign-off/stand-down verification before ignition.</td>
-                <td>DRAFT: Strict radio verification protocol established: no burn may proceed without explicit, direct confirmation from the Estate Manager; mandatory briefing on cancellation procedures.</td>
-                <td><span class="status-badge status-open">Near-Miss (Open)</span></td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="header-banner">
+        <h1>GAR ANNEXURE 1 STATUTORY INCIDENT REGISTER</h1>
+        <div class="subtitle">Operational Health & Safety Governance Manual | Cathkin Estates HOA</div>
+        <div class="meta-bar">
+            <span><strong>Document Ref:</strong> OHS-MOD-003-REG</span>
+            <span><strong>Regulatory Standard:</strong> GAR 9 & COIDA (Act 130 of 1993)</span>
+            <span><strong>Digitization:</strong> Database-Driven Active Register</span>
+        </div>
+    </div>
+
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Active Incidents & Corrective Action Tracker</h2>
+            <a href="03_gar_annexure_1_history.html" class="btn btn-outline-secondary btn-sm">View Closed Incident History &rarr;</a>
+        </div>
+
+        <!-- New Incident Form Card -->
+        <div class="card shadow-sm mb-5">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Log New Incident / Injury / Near-Miss</h5>
+            </div>
+            <div class="card-body">
+                <form id="incident-form">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Incident Date & Time</label>
+                            <input type="datetime-local" class="form-control" id="incident_date" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Reported By</label>
+                            <input type="text" class="form-control" id="reported_by" placeholder="Name & Role" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Incident Type</label>
+                            <select class="form-select" id="incident_type" required>
+                                <option value="">Choose...</option>
+                                <option value="Injury">Injury</option>
+                                <option value="Occupational Illness">Occupational Illness</option>
+                                <option value="Property Damage">Property Damage</option>
+                                <option value="Near-Miss">Near-Miss</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Location on Estate</label>
+                            <input type="text" class="form-control" id="location" placeholder="e.g. Workshop, Road Series 2, Gate 1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Severity Level</label>
+                            <select class="form-select" id="severity" required>
+                                <option value="Minor">Minor</option>
+                                <option value="Moderate">Moderate</option>
+                                <option value="Severe">Severe</option>
+                                <option value="Reportable (Section 24)">Reportable (Section 24)</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Detailed Description of Incident</label>
+                            <textarea class="form-control" id="description" rows="3" placeholder="Describe what happened..." required></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Corrective / Preventative Action (CAPA)</label>
+                            <textarea class="form-control" id="corrective_action" rows="2" placeholder="Action taken or planned..." required></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Responsible Person (Appointee)</label>
+                            <input type="text" class="form-control" id="responsible_person" placeholder="Name of person accountable" required>
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-success px-4">Submit Incident Record</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Active Incidents Table -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Active / Open Incidents</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle" id="incidents-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Location</th>
+                                <th>Description</th>
+                                <th>Severity</th>
+                                <th>CAPA & Owner</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="8" class="text-center text-muted">Loading active incidents...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadIncidents() {
+            try {
+                const response = await fetch('/api/get-incidents');
+                const data = await response.json();
+                const tbody = document.querySelector('#incidents-table tbody');
+                tbody.innerHTML = '';
+
+                if (data.success && data.incidents && data.incidents.length > 0) {
+                    data.incidents.forEach(inc => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${new Date(inc.incident_date).toLocaleString()}</td>
+                                <td><strong>${inc.incident_type}</strong></td>
+                                <td>${inc.location}</td>
+                                <td>${inc.description}</td>
+                                <td><span class="badge bg-warning text-dark">${inc.severity}</span></td>
+                                <td><small><strong>Action:</strong> ${inc.corrective_action}<br><strong>Owner:</strong> ${inc.responsible_person}</small></td>
+                                <td><span class="badge bg-primary">${inc.status}</span></td>
+                                <td><button class="btn btn-sm btn-outline-danger" onclick="closeIncident('${inc.id}')">Close & Verify</button></td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">No active open incidents recorded.</td></tr>`;
+                }
+            } catch (err) {
+                console.error('Failed to load incidents:', err);
+            }
+        }
+
+        async function closeIncident(id) {
+            if (!confirm('Are you sure you want to close this incident and record the verification date?')) return;
+
+            try {
+                const response = await fetch('/api/resolve-incident', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    loadIncidents();
+                } else {
+                    alert('Failed to close incident: ' + data.error);
+                }
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+        }
+
+        document.getElementById('incident-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                incident_date: document.getElementById('incident_date').value,
+                reported_by: document.getElementById('reported_by').value,
+                incident_type: document.getElementById('incident_type').value,
+                location: document.getElementById('location').value,
+                description: document.getElementById('description').value,
+                severity: document.getElementById('severity').value,
+                corrective_action: document.getElementById('corrective_action').value,
+                responsible_person: document.getElementById('responsible_person').value
+            };
+
+            try {
+                const response = await fetch('/api/create-incident', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('incident-form').reset();
+                    loadIncidents();
+                } else {
+                    alert('Failed to save incident: ' + data.error);
+                }
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', loadIncidents);
+    </script>
+
+    <div class="nav-footer mt-5">
+        <a href="03_incident_reporting_coida.html" target="_self">&larr; Back to Module 03 Overview</a>
+        <a href="index.html" target="_self">📋 Main Index</a>
+    </div>
 </body>
 </html>
