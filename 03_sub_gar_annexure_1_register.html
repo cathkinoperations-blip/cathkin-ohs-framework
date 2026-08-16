@@ -361,6 +361,7 @@
         }
 
         const payload = {
+            action: 'create',
             reporter_name: document.getElementById('reporter-name').value,
             reporter_role: document.getElementById('reporter-role').value,
             incident_type: document.getElementById('incident-type').value,
@@ -374,7 +375,7 @@
         };
 
         try {
-            const res = await fetch('/api/incidents', {
+            const res = await fetch('/api/incidents?action=create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -393,7 +394,7 @@
         }
     });
 
-    // Handle Close-Out Verification Submission
+    // Handle Close-Out Verification Submission with Adaptive API Action Dispatch
     document.getElementById('close-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('close-incident-id').value;
@@ -436,27 +437,49 @@
                 return;
             }
 
-            // Perform close-out (fixed endpoint route matching server routing)
-            const closeRes = await fetch('/api/incidents', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'close',
-                    id,
-                    status: 'Closed - Verified',
-                    remediation_notes: notes,
-                    close_image_url: filesBase64.join(','),
-                    verified_by: authData.fullName
-                })
-            });
-            const closeResult = await closeRes.json();
+            const payloadData = {
+                id,
+                status: 'Closed - Verified',
+                remediation_notes: notes,
+                close_image_url: filesBase64.join(','),
+                verified_by: authData.fullName
+            };
 
-            if (closeResult.success) {
+            // Adaptive dispatch trying common API action parameter keys (close / update / resolve)
+            const actionsToTry = [
+                { url: '/api/incidents?action=close', method: 'PUT', actionKey: 'close' },
+                { url: '/api/incidents?action=update', method: 'PUT', actionKey: 'update' },
+                { url: '/api/incidents?action=resolve', method: 'PUT', actionKey: 'resolve' },
+                { url: '/api/incidents?action=close', method: 'POST', actionKey: 'close' }
+            ];
+
+            let closeResult = null;
+
+            for (const attempt of actionsToTry) {
+                try {
+                    const res = await fetch(attempt.url, {
+                        method: attempt.method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: attempt.actionKey, ...payloadData })
+                    });
+                    closeResult = await res.json();
+                    if (closeResult && closeResult.success) {
+                        break;
+                    }
+                    if (closeResult && closeResult.error && !closeResult.error.includes('action')) {
+                        break;
+                    }
+                } catch (err) {
+                    console.warn(`Attempt failed for ${attempt.url}`, err);
+                }
+            }
+
+            if (closeResult && closeResult.success) {
                 alert('Incident successfully verified and closed!');
                 closeModal();
                 loadIncidents();
             } else {
-                alert('Error closing incident: ' + (closeResult.error || 'Unknown error'));
+                alert('Error closing incident: ' + (closeResult ? closeResult.error || 'Unknown error' : 'Server connection error'));
             }
         } catch (err) {
             console.error('Close-out error:', err);
