@@ -291,9 +291,24 @@
     function viewIncidentPhoto(incIndex, imgIndex) {
         try {
             const inc = currentIncidents[incIndex];
+            if (!inc.incident_image_url) {
+                alert("No image data found for this incident.");
+                return;
+            }
+
             const images = inc.incident_image_url.split(',');
-            const fileData = images[imgIndex].trim();
+            // Reconstruct the full base64 data string (splitting by comma splits the data:image/jpeg;base64, header from the payload)
+            let header = images[0].trim();
+            let payload = images[1] ? images[1].trim() : '';
             
+            // If the image string doesn't have a standard data header, treat the whole thing as the source
+            let fileData = images.length > 1 ? `${header},${payload}` : header;
+            
+            // Clean up any accidental line breaks or spaces
+            fileData = fileData.replace(/\s/g, '');
+
+            console.log("Opening image source type:", fileData.substring(0, 30)); // Check console to verify format
+
             const newWindow = window.open();
             if (newWindow) {
                 newWindow.document.write(`
