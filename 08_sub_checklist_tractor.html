@@ -506,6 +506,23 @@
                 body: JSON.stringify(payload)
             });
             if (!res.ok) throw new Error('Failed to submit log');
+
+            // Automatically sync any logged defects to the active defects tracking table
+            if (defects && defects.length > 0) {
+                for (const defect of defects) {
+                    await fetch(`${API_BASE}/save-defect`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            equipment_name: 'Massey Ferguson 268 Xtra',
+                            operator_name: operator,
+                            defect_description: defect.description,
+                            severity: 'Moderate',
+                            verified_by: manager || 'Manager'
+                        })
+                    });
+                }
+            }
             
             alert(`${currentMode} inspection log successfully saved to Neon database!`);
             window.location.reload();
