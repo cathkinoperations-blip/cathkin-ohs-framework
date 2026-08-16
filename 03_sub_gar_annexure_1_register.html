@@ -7,74 +7,18 @@
     <base target="_self">
     <link rel="stylesheet" href="style.css">
     <style>
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 16px;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-        .form-group label {
-            font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 13px;
-            color: #2d3748;
-        }
-        .form-group input, 
-        .form-group select, 
-        .form-group textarea {
-            padding: 10px;
-            border: 1px solid #cbd5e0;
-            border-radius: 6px;
-            font-size: 14px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .form-group textarea {
-            resize: vertical;
-            min-height: 90px;
-        }
-        .evidence-box {
-            background: #f7fafc;
-            padding: 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-        }
-        .section-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        .section-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #1a202c;
-            border-bottom: 2px solid #edf2f7;
-            padding-bottom: 8px;
-            margin-bottom: 16px;
-        }
-        .file-hint {
-            font-size: 12px;
-            color: #718096;
-            margin-top: 6px;
-        }
-        .required-star {
-            color: #e53e3e;
-            font-weight: bold;
-        }
-        @media (max-width: 600px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group label { font-weight: 600; margin-bottom: 6px; font-size: 13px; color: #2d3748; }
+        .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; width: 100%; box-sizing: border-box; }
+        .form-group textarea { resize: vertical; min-height: 90px; }
+        .evidence-box { background: #f7fafc; padding: 16px; border: 1px solid #e2e8f0; border-radius: 6px; }
+        .section-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .section-title { font-size: 16px; font-weight: bold; color: #1a202c; border-bottom: 2px solid #edf2f7; padding-bottom: 8px; margin-bottom: 16px; }
+        .file-hint { font-size: 12px; color: #718096; margin-top: 6px; }
+        .required-star { color: #e53e3e; font-weight: bold; }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -99,7 +43,7 @@
         <form id="incident-form">
             <div class="form-grid">
                 
-                <!-- Reporter Information -->
+                <!-- Reporter Information (Restored Split Inputs) -->
                 <div class="form-group">
                     <label for="reporter-name">Reporter Name <span class="required-star">*</span></label>
                     <input type="text" id="reporter-name" placeholder="Full name..." required>
@@ -109,7 +53,7 @@
                     <input type="text" id="reporter-role" placeholder="e.g., Estate Manager, Resident, Contractor..." required>
                 </div>
 
-                <!-- Attachment Block (Positioned BEFORE Incident Type for Auto-Fill Workflow) -->
+                <!-- Attachment Block -->
                 <div class="form-group full-width evidence-box">
                     <label for="incident-image">Upload Evidence (Photos & PDFs) <span class="required-star">*</span></label>
                     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 4px;">
@@ -118,29 +62,29 @@
                             🔍 Analyse Attachments
                         </button>
                     </div>
-                    <div class="file-hint"><strong>Required:</strong> Minimum 1 attachment required (Maximum limit: 5 files). Click <em>Analyse Attachments</em> to automatically scan evidence and auto-fill details from Incident Type onwards.</div>
+                    <div class="file-hint"><strong>Required:</strong> 1 to 5 attachments. Click <em>Analyse Attachments</em> to trigger Gemini intake scanning.</div>
                     <div id="analyze-status" style="display: none; margin-top: 8px; font-size: 12px; font-weight: bold; color: #2b6cb0;"></div>
                 </div>
 
-                <!-- Incident Classification (Auto-Populated from Analysis) -->
+                <!-- Incident Classification (Values aligned with backend Gemini Schema) -->
                 <div class="form-group">
                     <label for="incident-type">Incident Type <span class="required-star">*</span></label>
                     <select id="incident-type" required>
                         <option value="">Select type...</option>
-                        <option value="Near-Miss">Near-Miss</option>
                         <option value="Injury">Injury</option>
+                        <option value="Occupational Illness">Occupational Illness</option>
                         <option value="Property Damage">Property Damage</option>
-                        <option value="Environmental">Environmental / Veld Fire Hazard</option>
-                        <option value="Security">Security Breach / Safety Hazard</option>
+                        <option value="Near-Miss">Near-Miss</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="severity">Severity Level <span class="required-star">*</span></label>
                     <select id="severity" required>
-                        <option value="Low">Low - Minor Hazard</option>
-                        <option value="Medium">Medium - Moderate Risk</option>
-                        <option value="High">High - Significant Risk</option>
-                        <option value="Severe">Severe - Immediate Stop-Work Required</option>
+                        <option value="">Select severity...</option>
+                        <option value="Minor">Minor</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="Severe">Severe</option>
+                        <option value="Reportable (Section 24)">Reportable (Section 24)</option>
                     </select>
                 </div>
 
@@ -151,7 +95,7 @@
                 </div>
                 <div class="form-group">
                     <label for="location">Exact Location on Estate <span class="required-star">*</span></label>
-                    <input type="text" id="location" placeholder="e.g., Phase 2 Roadwork, Gate 1, Clubhouse..." required>
+                    <input type="text" id="location" placeholder="e.g. Phase 2 Roadwork, Gate 1, Maintenance Workshop..." required>
                 </div>
 
                 <!-- Description & Actions -->
@@ -165,7 +109,7 @@
                 </div>
                 <div class="form-group full-width">
                     <label for="responsible-person">Responsible Person (Appointee)</label>
-                    <input type="text" id="responsible-person" placeholder="Name of person accountable...">
+                    <input type="text" id="responsible-person" placeholder="e.g. Estate Manager, Maintenance Lead">
                 </div>
 
             </div>
@@ -207,33 +151,24 @@
                 <input type="hidden" id="close-incident-id">
                 
                 <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="close-notes">Remediation Notes / Actions Performed</label>
-                    <textarea id="close-notes" placeholder="Describe how the hazard was fixed..." required></textarea>
-                </div>
-                
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="close-image">Close-Out Evidence (Photos & PDFs Required)</label>
+                    <label for="close-image">Close-Out Evidence (Photos Required)</label>
                     <input type="file" id="close-image" accept="image/*,application/pdf" multiple required>
-                    <div class="file-hint">Upload up to 5 images and/or PDF documents for verification.</div>
+                    <div class="file-hint">Upload up to 5 close-out images/documents.</div>
                 </div>
 
-                <div style="background: #f7fafc; padding: 16px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 16px;">
-                    <h4 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; color: #2d3748;">Manager Authentication Required</h4>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="mgr-username">Username</label>
-                            <input type="text" id="mgr-username" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="mgr-password">Password / PIN</label>
-                            <input type="password" id="mgr-password" required>
-                        </div>
-                    </div>
+                <div style="margin-bottom: 16px;">
+                    <button type="button" id="btn-eval-close" onclick="evaluateCloseOut()" style="background: #2b6cb0; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;">🤖 Run AI Close-Out Verification</button>
+                    <div id="close-eval-status" style="display: none; margin-top: 8px; font-size: 12px; padding: 8px; border-radius: 4px;"></div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="close-notes">Manager Remediation Notes</label>
+                    <textarea id="close-notes" placeholder="Confirm how the issue was resolved..." required></textarea>
                 </div>
 
                 <div style="display: flex; justify-content: flex-end; gap: 10px;">
                     <button type="button" onclick="closeModal()" style="background: #cbd5e0; color: #2d3748; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold;">Cancel</button>
-                    <button type="submit" style="background: #2f855a; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">Verify & Close Incident</button>
+                    <button type="submit" style="background: #2f855a; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">Confirm & Close Incident</button>
                 </div>
             </form>
         </div>
@@ -241,6 +176,7 @@
 
     <script>
     let currentIncidents = [];
+    let currentCloseAiAssessment = null;
 
     document.addEventListener('DOMContentLoaded', () => {
         const now = new Date();
@@ -275,7 +211,7 @@
                         evidenceHtml += '</div>';
                     }
 
-                    const reporterInfo = inc.reporter_name ? `<br><small style="color: #4a5568;"><strong>Reporter:</strong> ${inc.reporter_name} (${inc.reporter_role || 'Staff/Resident'})</small>` : '';
+                    const reporterInfo = inc.reported_by ? `<br><small style="color: #4a5568;"><strong>Reporter:</strong> ${inc.reported_by}</small>` : '';
 
                     tbody.innerHTML += `
                         <tr>
@@ -283,7 +219,7 @@
                             <td><strong>${inc.incident_type}</strong><br><small>${inc.location}</small>${reporterInfo}</td>
                             <td>${inc.description}</td>
                             <td><span style="background: #feebc8; color: #9c4221; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.severity}</span></td>
-                            <td><small><strong>Action:</strong> ${inc.corrective_action}<br><strong>Owner:</strong> ${inc.responsible_person}</small></td>
+                            <td><small><strong>Action:</strong> ${inc.corrective_action || 'N/A'}<br><strong>Owner:</strong> ${inc.responsible_person || 'N/A'}</small></td>
                             <td><span style="background: #ebf8ff; color: #2b6cb0; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.status}</span></td>
                             <td><button onclick="openCloseModal('${inc.id}')" style="background: #c53030; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Close & Verify</button></td>
                         </tr>
@@ -297,45 +233,47 @@
         }
     }
 
+    // AI Intake Analysis
     async function analyzeEvidence() {
         const fileInput = document.getElementById('incident-image');
         const statusDiv = document.getElementById('analyze-status');
         const btn = document.getElementById('btn-analyze');
 
         if (!fileInput.files || fileInput.files.length === 0) {
-            alert('Please select at least one image or PDF file to analyze.');
+            alert('Please select at least one file to analyze.');
             return;
         }
 
         if (fileInput.files.length > 5) {
-            alert('A maximum of 5 files is allowed. Please select fewer attachments.');
+            alert('A maximum of 5 files is allowed.');
             return;
         }
 
         statusDiv.style.display = 'block';
         statusDiv.style.color = '#2b6cb0';
-        statusDiv.innerHTML = '⌛ Analyzing evidence attachments and extracting incident details...';
+        statusDiv.innerHTML = '⌛ Gemini analyzing evidence attachments...';
         btn.disabled = true;
-        btn.style.opacity = '0.7';
 
         try {
-            const filesBase64 = [];
+            const imagesPayload = [];
             for (let file of fileInput.files) {
                 const b64 = await toBase64(file);
-                filesBase64.push(b64);
+                imagesPayload.push({
+                    imageBase64: b64,
+                    mimeType: file.type || 'image/jpeg'
+                });
             }
 
-            const response = await fetch('/api/incidents?action=analyze', {
+            const response = await fetch('/api/incidents?action=analyze-intake', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'analyze', files: filesBase64 })
+                body: JSON.stringify({ action: 'analyze-intake', images: imagesPayload })
             });
 
             const data = await response.json();
 
             if (data.success && data.analysis) {
                 const ext = data.analysis;
-                
                 if (ext.incident_type) document.getElementById('incident-type').value = ext.incident_type;
                 if (ext.severity) document.getElementById('severity').value = ext.severity;
                 if (ext.location) document.getElementById('location').value = ext.location;
@@ -344,20 +282,173 @@
                 if (ext.responsible_person) document.getElementById('responsible-person').value = ext.responsible_person;
 
                 statusDiv.style.color = '#2f855a';
-                statusDiv.innerHTML = '✅ Evidence analyzed successfully! Form fields pre-filled below.';
+                statusDiv.innerHTML = '✅ Gemini analysis completed! Fields updated below.';
             } else {
-                statusDiv.style.color = '#c53030';
-                statusDiv.innerHTML = '⚠️ Analysis complete. Could not auto-extract details—please enter manually.';
+                throw new Error(data.error || 'Invalid API response structure');
             }
         } catch (err) {
-            console.error('Analysis error:', err);
+            console.error('AI Intake analysis error:', err);
             statusDiv.style.color = '#c53030';
-            statusDiv.innerHTML = '❌ Failed to analyze attachment. Please fill in details manually.';
+            statusDiv.innerHTML = '⚠️ Analysis failed: ' + err.message;
         } finally {
             btn.disabled = false;
-            btn.style.opacity = '1';
         }
     }
+
+    // AI Close-Out Evaluation
+    async function evaluateCloseOut() {
+        const id = document.getElementById('close-incident-id').value;
+        const fileInput = document.getElementById('close-image');
+        const statusDiv = document.getElementById('close-eval-status');
+
+        const activeInc = currentIncidents.find(i => String(i.id) === String(id));
+        if (!activeInc) return alert('Incident context not found.');
+
+        if (!fileInput.files || fileInput.files.length === 0) {
+            return alert('Please upload close-out photos first.');
+        }
+
+        statusDiv.style.display = 'block';
+        statusDiv.style.background = '#ebf8ff';
+        statusDiv.style.color = '#2b6cb0';
+        statusDiv.innerHTML = '⌛ Gemini verifying close-out evidence...';
+
+        try {
+            const imagesPayload = [];
+            for (let file of fileInput.files) {
+                const b64 = await toBase64(file);
+                imagesPayload.push({ imageBase64: b64, mimeType: file.type || 'image/jpeg' });
+            }
+
+            const res = await fetch('/api/incidents?action=analyze-close', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'analyze-close',
+                    images: imagesPayload,
+                    description: activeInc.description,
+                    corrective_action: activeInc.corrective_action
+                })
+            });
+
+            const data = await res.json();
+            if (data.success && data.evaluation) {
+                currentCloseAiAssessment = JSON.stringify(data.evaluation);
+                const evalData = data.evaluation;
+                
+                statusDiv.style.background = evalData.satisfactory ? '#c6f6d5' : '#fed7d7';
+                statusDiv.style.color = evalData.satisfactory ? '#22543d' : '#742a2a';
+                statusDiv.innerHTML = `<strong>${evalData.satisfactory ? '✅ Remediation Approved' : '⚠️ Deficiencies Noted'}:</strong> ${evalData.assessment_notes}`;
+                
+                if (evalData.assessment_notes) {
+                    document.getElementById('close-notes').value = evalData.assessment_notes;
+                }
+            } else {
+                throw new Error(data.error || 'Evaluation failed');
+            }
+        } catch (err) {
+            statusDiv.style.background = '#fed7d7';
+            statusDiv.style.color = '#742a2a';
+            statusDiv.innerHTML = '❌ Verification failed: ' + err.message;
+        }
+    }
+
+    // Submit New Incident
+document.getElementById('incident-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const fileInput = document.getElementById('incident-image');
+    let filesBase64 = [];
+
+    if (!fileInput.files || fileInput.files.length === 0) {
+        alert('Please attach at least one photo or document.');
+        return;
+    }
+
+    for (let file of fileInput.files) {
+        const base64 = await toBase64(file);
+        filesBase64.push(base64);
+    }
+
+    // Capture split fields and combine for backend reported_by parameter
+    const reporterName = document.getElementById('reporter-name').value.trim();
+    const reporterRole = document.getElementById('reporter-role').value.trim();
+    const combinedReportedBy = `${reporterName} (${reporterRole})`;
+
+    const payload = {
+        action: 'create',
+        reported_by: combinedReportedBy,
+        incident_type: document.getElementById('incident-type').value,
+        severity: document.getElementById('severity').value,
+        incident_date: document.getElementById('incident-date').value,
+        location: document.getElementById('location').value,
+        description: document.getElementById('description').value,
+        corrective_action: document.getElementById('corrective-action').value,
+        responsible_person: document.getElementById('responsible-person').value,
+        incident_image_url: filesBase64.join(',')
+    };
+
+    try {
+        const res = await fetch('/api/incidents?action=create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result.success) {
+            alert('Incident logged successfully!');
+            document.getElementById('incident-form').reset();
+            document.getElementById('analyze-status').style.display = 'none';
+            loadIncidents();
+        } else {
+            alert('Error logging incident: ' + (result.error || 'Unknown error'));
+        }
+    } catch (err) {
+        console.error('Submission error:', err);
+        alert('Failed to submit incident.');
+    }
+});
+
+    // Close Incident Submit
+    document.getElementById('close-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('close-incident-id').value;
+        const notes = document.getElementById('close-notes').value;
+        const fileInput = document.getElementById('close-image');
+
+        let filesBase64 = [];
+        for (let file of fileInput.files) {
+            const base64 = await toBase64(file);
+            filesBase64.push(base64);
+        }
+
+        const payloadData = {
+            action: 'close',
+            id,
+            close_image_url: filesBase64.join(','),
+            ai_close_assessment: currentCloseAiAssessment || JSON.stringify({ notes })
+        };
+
+        try {
+            const res = await fetch('/api/incidents?action=close', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payloadData)
+            });
+            const closeResult = await res.json();
+
+            if (closeResult && closeResult.success) {
+                alert('Incident closed and verified!');
+                closeModal();
+                loadIncidents();
+            } else {
+                alert('Error closing incident: ' + (closeResult ? closeResult.error : 'Server error'));
+            }
+        } catch (err) {
+            console.error('Close-out error:', err);
+            alert('Failed to process close-out verification.');
+        }
+    });
 
     function viewIncidentFile(incIndex, type, fileIndex) {
         try {
@@ -373,38 +464,21 @@
             const newWindow = window.open();
             if (newWindow) {
                 if (targetItem.startsWith('data:application/pdf')) {
-                    newWindow.document.write(`
-                        <!DOCTYPE html>
-                        <html>
-                        <head><title>Document Viewer</title></head>
-                        <body style="margin: 0; height: 100vh;">
-                            <embed src="${targetItem}" type="application/pdf" width="100%" height="100%">
-                        </body>
-                        </html>
-                    `);
+                    newWindow.document.write(`<embed src="${targetItem}" type="application/pdf" width="100%" height="100%">`);
                 } else {
-                    newWindow.document.write(`
-                        <!DOCTYPE html>
-                        <html>
-                        <head><title>Evidence Viewer</title></head>
-                        <body style="margin: 0; display: flex; justify-content: center; align-items: center; background: #2d3748; min-height: 100vh;">
-                            <img src="${targetItem}" style="max-width: 100%; max-height: 100vh; box-shadow: 0 4px 6px rgba(0,0,0,0.3);" alt="Evidence File">
-                        </body>
-                        </html>
-                    `);
+                    newWindow.document.write(`<img src="${targetItem}" style="max-width: 100%; max-height: 100vh;" alt="Evidence File">`);
                 }
                 newWindow.document.close();
-            } else {
-                alert("Please allow pop-ups for this site to view the files.");
             }
         } catch (e) {
             console.error("Error opening file:", e);
-            alert("Could not load file.");
         }
     }
 
     function openCloseModal(id) {
         document.getElementById('close-incident-id').value = id;
+        document.getElementById('close-eval-status').style.display = 'none';
+        currentCloseAiAssessment = null;
         document.getElementById('close-modal').style.display = 'flex';
     }
 
@@ -412,142 +486,6 @@
         document.getElementById('close-modal').style.display = 'none';
         document.getElementById('close-form').reset();
     }
-
-    // Handle Form Submission for New Incident
-    document.getElementById('incident-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const fileInput = document.getElementById('incident-image');
-        let filesBase64 = [];
-
-        if (!fileInput.files || fileInput.files.length === 0) {
-            alert('Please attach at least one photo or PDF evidence document.');
-            return;
-        }
-
-        if (fileInput.files.length > 5) {
-            alert('A maximum of 5 attachments is allowed. Please remove excess files.');
-            return;
-        }
-
-        for (let file of fileInput.files) {
-            const base64 = await toBase64(file);
-            filesBase64.push(base64);
-        }
-
-        const payload = {
-            action: 'create',
-            reporter_name: document.getElementById('reporter-name').value,
-            reporter_role: document.getElementById('reporter-role').value,
-            incident_type: document.getElementById('incident-type').value,
-            severity: document.getElementById('severity').value,
-            incident_date: document.getElementById('incident-date').value,
-            location: document.getElementById('location').value,
-            description: document.getElementById('description').value,
-            corrective_action: document.getElementById('corrective-action').value,
-            responsible_person: document.getElementById('responsible-person').value,
-            incident_image_url: filesBase64.join(',')
-        };
-
-        try {
-            const res = await fetch('/api/incidents?action=create', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const result = await res.json();
-            if (result.success) {
-                alert('Incident logged successfully!');
-                document.getElementById('incident-form').reset();
-                document.getElementById('analyze-status').style.display = 'none';
-                loadIncidents();
-            } else {
-                alert('Error logging incident: ' + (result.error || 'Unknown error'));
-            }
-        } catch (err) {
-            console.error('Submission error:', err);
-            alert('Failed to submit incident.');
-        }
-    });
-
-    // Handle Close-Out Verification
-    document.getElementById('close-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('close-incident-id').value;
-        const notes = document.getElementById('close-notes').value;
-        const fileInput = document.getElementById('close-image');
-        const username = document.getElementById('mgr-username').value;
-        const password = document.getElementById('mgr-password').value;
-
-        let filesBase64 = [];
-
-        if (fileInput.files.length > 5) {
-            alert('You can upload a maximum of 5 images/documents for close-out verification.');
-            return;
-        }
-
-        for (let file of fileInput.files) {
-            const base64 = await toBase64(file);
-            filesBase64.push(base64);
-        }
-
-        try {
-            const authRes = await fetch('/api/verify-user', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, requiredRole: 'Manager' })
-            });
-            const authData = await authRes.json();
-
-            if (!authData.authorized) {
-                alert('Authorization failed: ' + (authData.message || 'Invalid manager credentials.'));
-                return;
-            }
-
-            const payloadData = {
-                id,
-                status: 'Closed - Verified',
-                remediation_notes: notes,
-                close_image_url: filesBase64.join(','),
-                verified_by: authData.fullName
-            };
-
-            const actionsToTry = [
-                { url: '/api/incidents?action=close', method: 'PUT', actionKey: 'close' },
-                { url: '/api/incidents?action=update', method: 'PUT', actionKey: 'update' },
-                { url: '/api/incidents?action=resolve', method: 'PUT', actionKey: 'resolve' },
-                { url: '/api/incidents?action=close', method: 'POST', actionKey: 'close' }
-            ];
-
-            let closeResult = null;
-
-            for (const attempt of actionsToTry) {
-                try {
-                    const res = await fetch(attempt.url, {
-                        method: attempt.method,
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: attempt.actionKey, ...payloadData })
-                    });
-                    closeResult = await res.json();
-                    if (closeResult && closeResult.success) break;
-                    if (closeResult && closeResult.error && !closeResult.error.includes('action')) break;
-                } catch (err) {
-                    console.warn(`Attempt failed for ${attempt.url}`, err);
-                }
-            }
-
-            if (closeResult && closeResult.success) {
-                alert('Incident successfully verified and closed!');
-                closeModal();
-                loadIncidents();
-            } else {
-                alert('Error closing incident: ' + (closeResult ? closeResult.error || 'Unknown error' : 'Server connection error'));
-            }
-        } catch (err) {
-            console.error('Close-out error:', err);
-            alert('Failed to process close-out verification.');
-        }
-    });
 
     function toBase64(file) {
         return new Promise((resolve, reject) => {
@@ -558,10 +496,5 @@
         });
     }
     </script>
-
-    <div class="nav-footer">
-        <a href="index.html" target="_self">📋 Main Index</a>
-        <a href="03_gar_annexure_1_history.html" target="_self">Resolved Audit Trail &rarr;</a>
-    </div>
 </body>
 </html>
