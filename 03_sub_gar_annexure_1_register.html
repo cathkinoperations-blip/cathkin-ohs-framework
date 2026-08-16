@@ -243,6 +243,8 @@
         }
     }
 
+    let currentIncidents = [];
+
     async function loadIncidents() {
         try {
             const response = await fetch('/api/incidents?action=list');
@@ -251,15 +253,16 @@
             tbody.innerHTML = '';
 
             if (data.success && data.incidents && data.incidents.length > 0) {
-                data.incidents.forEach(inc => {
+                currentIncidents = data.incidents; // Store data safely in memory
+                currentIncidents.forEach((inc, incIndex) => {
                     let photoHtml = '';
                     if (inc.incident_image_url) {
                         const images = inc.incident_image_url.split(',');
                         photoHtml = '<div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;">';
-                        images.forEach((imgSrc, index) => {
+                        images.forEach((imgSrc, imgIndex) => {
                             const trimmed = imgSrc.trim();
                             if (trimmed.startsWith('data:image') || trimmed.startsWith('http')) {
-                                photoHtml += `<button type="button" onclick="viewFile('${trimmed}')" style="background: #edf2f7; color: #2b6cb0; border: 1px solid #cbd5e0; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📷 View Photo ${index + 1}</button>`;
+                                photoHtml += `<button type="button" onclick="viewIncidentPhoto(${incIndex}, ${imgIndex})" style="background: #edf2f7; color: #2b6cb0; border: 1px solid #cbd5e0; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📷 View Photo ${imgIndex + 1}</button>`;
                             }
                         });
                         photoHtml += '</div>';
@@ -282,6 +285,35 @@
             }
         } catch (err) {
             console.error('Failed to load incidents:', err);
+        }
+    }
+
+    function viewIncidentPhoto(incIndex, imgIndex) {
+        try {
+            const inc = currentIncidents[incIndex];
+            const images = inc.incident_image_url.split(',');
+            const fileData = images[imgIndex].trim();
+            
+            const newWindow = window.open();
+            if (newWindow) {
+                newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Incident Photo</title>
+                    </head>
+                    <body style="margin: 0; display: flex; justify-content: center; align-items: center; background: #2d3748; min-height: 100vh;">
+                        <img src="${fileData}" style="max-width: 100%; max-height: 100vh; box-shadow: 0 4px 6px rgba(0,0,0,0.3);" alt="Incident Image">
+                    </body>
+                    </html>
+                `);
+                newWindow.document.close();
+            } else {
+                alert("Please allow pop-ups for this site to view the images.");
+            }
+        } catch (e) {
+            console.error("Error opening photo:", e);
+            alert("Could not load image.");
         }
     }
 
