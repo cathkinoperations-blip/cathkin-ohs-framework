@@ -3,247 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GAR Annexure 1 Incident Register | Cathkin Estates HOA</title>
+    <title>Active Incident Register | Cathkin Estates HOA</title>
     <base target="_self">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #2d3748;
+        }
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+        .section-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a202c;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+        }
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="header-banner">
-        <h1>GAR ANNEXURE 1 STATUTORY INCIDENT REGISTER - Updated</h1>
+        <h1>INCIDENT REPORTING & ACTIVE REGISTER</h1>
         <div class="subtitle">Operational Health & Safety Governance Manual | Cathkin Estates HOA</div>
         <div class="meta-bar">
             <span><strong>Document Ref:</strong> OHS-MOD-003-REG</span>
             <span><strong>Regulatory Standard:</strong> GAR 9 & COIDA (Act 130 of 1993)</span>
-            <span><strong>Digitization:</strong> AI-Powered Multimodal Incident Tracker</span>
+            <span><strong>Digitization:</strong> Live Operational Register</span>
         </div>
     </div>
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
-        <h2>1. Active Incidents & Corrective Action Tracker</h2>
-        <a href="03_gar_annexure_1_history.html" class="btn-link" target="_self">View Closed Incident History &rarr;</a>
+        <h2>Active Incident Register</h2>
+        <a href="03_sub_gar_annexure_1_history.html" class="btn-link" target="_self">View Resolved History &rarr;</a>
     </div>
 
-    <!-- Log New Incident Form Section -->
-    <div class="card mb-4" style="background: #fdfdfd; border: 1px solid #e2e8f0; padding: 20px; border-radius: 6px; margin-bottom: 30px;">
-        <h3 style="margin-top: 0; color: #1a365d;">Log New Incident / Injury / Near-Miss</h3>
-        
-        <!-- AI Photo Auto-Fill Section -->
-        <div style="background: #ebf8ff; border: 1px solid #bee3f8; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-            <label style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 5px;">🤖 AI Vision Assistant: Upload Up to 5 Incident Photos to Auto-Fill</label>
-            <input type="file" id="intake-photo-input" accept="image/*" multiple style="margin-bottom: 10px;">
-            <button type="button" onclick="analyzeIntakePhoto()" style="background-color: #3182ce; color: white; padding: 6px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px;">Analyze Photos with Gemini AI</button>
-            <span id="ai-loading" style="margin-left: 10px; font-style: italic; color: #4a5568; display: none;">Analyzing images and extracting details...</span>
-        </div>
-
+    <!-- Log New Incident Section -->
+    <div class="section-card">
+        <div class="section-title">📋 Log New Incident / Near-Miss</div>
         <form id="incident-form">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 15px;">
-                <div>
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Incident Date & Time</label>
-                    <input type="datetime-local" id="incident_date" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required>
+            <div class="form-grid">
+                
+                <!-- Reporter Information -->
+                <div class="form-group">
+                    <label for="reporter-name">Reporter Name</label>
+                    <input type="text" id="reporter-name" placeholder="Full name..." required>
                 </div>
-                <div>
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Reported By</label>
-                    <input type="text" id="reported_by" placeholder="Name & Role" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required>
+                <div class="form-group">
+                    <label for="reporter-role">Reporter Role / Designation</label>
+                    <input type="text" id="reporter-role" placeholder="e.g., Estate Manager, Resident, Contractor..." required>
                 </div>
-                <div>
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Incident Type</label>
-                    <select id="incident_type" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required>
-                        <option value="">Choose...</option>
-                        <option value="Injury">Injury</option>
-                        <option value="Occupational Illness">Occupational Illness</option>
-                        <option value="Property Damage">Property Damage</option>
+
+                <!-- Incident Classification -->
+                <div class="form-group">
+                    <label for="incident-type">Incident Type</label>
+                    <select id="incident-type" required>
+                        <option value="">Select type...</option>
                         <option value="Near-Miss">Near-Miss</option>
+                        <option value="Injury">Injury</option>
+                        <option value="Property Damage">Property Damage</option>
+                        <option value="Environmental">Environmental / Veld Fire Hazard</option>
+                        <option value="Security">Security Breach / Safety Hazard</option>
                     </select>
                 </div>
-                <div>
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Location on Estate</label>
-                    <input type="text" id="location" placeholder="e.g. Workshop, Road Series 2" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required>
-                </div>
-                <div>
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Severity Level</label>
-                    <select id="severity" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required>
-                        <option value="Minor">Minor</option>
-                        <option value="Moderate">Moderate</option>
-                        <option value="Severe">Severe</option>
-                        <option value="Reportable (Section 24)">Reportable (Section 24)</option>
+                <div class="form-group">
+                    <label for="severity">Severity Level</label>
+                    <select id="severity" required>
+                        <option value="Low">Low - Minor Hazard</option>
+                        <option value="Medium">Medium - Moderate Risk</option>
+                        <option value="High">High - Significant Risk</option>
+                        <option value="Severe">Severe - Immediate Stop-Work Required</option>
                     </select>
                 </div>
-            </div>
 
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Detailed Description of Incident</label>
-                <textarea id="description" rows="3" placeholder="Describe what happened..." style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required></textarea>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px;">
-                <div>
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Corrective / Preventative Action (CAPA)</label>
-                    <textarea id="corrective_action" rows="2" placeholder="Action taken or planned..." style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required></textarea>
+                <!-- Date & Location -->
+                <div class="form-group">
+                    <label for="incident-date">Date & Time of Incident</label>
+                    <input type="datetime-local" id="incident-date" required>
                 </div>
-                <div>
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Responsible Person (Appointee)</label>
-                    <input type="text" id="responsible_person" placeholder="Name of person accountable" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required>
+                <div class="form-group">
+                    <label for="location">Exact Location on Estate</label>
+                    <input type="text" id="location" placeholder="e.g., Phase 2 Roadwork, Gate 1, Clubhouse..." required>
                 </div>
-            </div>
-            
-            <input type="hidden" id="incident_image_url" value="">
 
-            <div style="text-align: right;">
-                <button type="submit" style="background-color: #2f855a; color: white; padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Submit Incident Record</button>
+                <!-- Description & Actions -->
+                <div class="form-group full-width">
+                    <label for="description">Detailed Description of Incident</label>
+                    <textarea id="description" placeholder="Describe what happened clearly..."></textarea>
+                </div>
+                <div class="form-group full-width">
+                    <label for="corrective-action">Corrective / Preventative Action (CAPA)</label>
+                    <textarea id="corrective-action" placeholder="Action taken or planned..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="responsible-person">Responsible Person (Appointee)</label>
+                    <input type="text" id="responsible-person" placeholder="Name of person accountable...">
+                </div>
+                <div class="form-group">
+                    <label for="incident-image">Upload Photo / Evidence</label>
+                    <input type="file" id="incident-image" accept="image/*" multiple>
+                </div>
+
+            </div>
+
+            <div style="margin-top: 20px; text-align: right;">
+                <button type="submit" style="background: #2f855a; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: bold; width: 100%;">Submit Incident Record</button>
             </div>
         </form>
     </div>
 
-    <h2>2. Active / Open Incidents Table</h2>
-    <div class="card">
-        <table class="table" id="incidents-table">
-            <thead>
-                <tr>
-                    <th>Date & Photo</th>
-                    <th>Type & Location</th>
-                    <th>Description</th>
-                    <th>Severity</th>
-                    <th>CAPA & Owner</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">Loading active incidents...</td></tr>
-            </tbody>
-        </table>
+    <!-- Active Open Incidents Table Section -->
+    <div class="section-card">
+        <div class="section-title">⚡ Active / Open Incidents Table</div>
+        <div style="overflow-x: auto;">
+            <table class="table" id="incidents-table">
+                <thead>
+                    <tr>
+                        <th>Date & Photo</th>
+                        <th>Type & Location</th>
+                        <th>Description</th>
+                        <th>Severity</th>
+                        <th>CAPA & Owner</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">Loading active incidents...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <!-- Close-Out Form Modal -->
-    <div id="closeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
-        <div style="background: white; padding: 25px; border-radius: 8px; width: 600px; max-width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-            <h3 style="margin-top: 0; color: #1a365d;">Incident Close-Out & Remediation Evidence</h3>
-            <p style="font-size: 13px; color: #4a5568;">Provide detailed close-out text notes, verification photos, and compliance documents (PDF) for AI audit verification.</p>
-            
-            <input type="hidden" id="closeIncidentId">
+    <!-- Close & Verify Modal -->
+    <div id="close-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 15px;">
+        <div style="background: white; padding: 24px; border-radius: 8px; max-width: 600px; width: 100%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto;">
+            <h3 style="margin-top: 0; color: #1a202c; border-bottom: 2px solid #edf2f7; padding-bottom: 10px;">Close-Out Verification</h3>
+            <form id="close-form">
+                <input type="hidden" id="close-incident-id">
+                
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="close-notes">Remediation Notes / Actions Performed</label>
+                    <textarea id="close-notes" placeholder="Describe how the hazard was fixed..." required></textarea>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label for="close-image">Close-Out Photo / Evidence (Required for Verification)</label>
+                    <input type="file" id="close-image" accept="image/*,application/pdf" required>
+                </div>
 
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px;">Remediation Summary / Action Taken *</label>
-                <textarea id="closeNotes" rows="4" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" placeholder="Describe how the corrective action was fully implemented..."></textarea>
-            </div>
+                <!-- Manager Authentication inside Modal -->
+                <div style="background: #f7fafc; padding: 16px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 16px;">
+                    <h4 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; color: #2d3748;">Manager Authentication Required</h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="mgr-username">Username</label>
+                            <input type="text" id="mgr-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mgr-password">Password / PIN</label>
+                            <input type="password" id="mgr-password" required>
+                        </div>
+                    </div>
+                </div>
 
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px;">Close-Out Photos (Max 5)</label>
-                <input type="file" id="closePhotosInput" accept="image/*" multiple style="width: 100%; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px;">Compliance / Inspection Certificate (PDF)</label>
-                <input type="file" id="closePdfInput" accept="application/pdf" style="width: 100%; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px;">
-            </div>
-
-            <div id="closeLoading" style="display: none; text-align: center; color: #2b6cb0; font-weight: bold; margin-bottom: 15px;">
-                🤖 Running AI Compliance Audit on Evidence... Please wait.
-            </div>
-
-            <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                <button type="button" onclick="closeCloseModal()" style="background: #e2e8f0; color: #2d3748; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">Cancel</button>
-                <button type="button" onclick="submitCloseOut()" style="background: #2b6cb0; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">Submit & Verify with AI</button>
-            </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" onclick="closeModal()" style="background: #cbd5e0; color: #2d3748; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: bold;">Cancel</button>
+                    <button type="submit" style="background: #2f855a; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">Verify & Close Incident</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <script>
-    function viewFile(base64Str) {
-        const win = window.open();
-        win.document.write(`<iframe src="${base64Str}" frameborder="0" style="border:0; top:0; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>`);
-    }
-
-    async function fileToBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = event => {
-                const img = new Image();
-                img.src = event.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1200;
-                    const MAX_HEIGHT = 1200;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                    resolve(dataUrl);
-                };
-                img.onerror = error => reject(error);
-            };
-            reader.onerror = error => reject(error);
-        });
-    }
-
-    async function analyzeIntakePhoto() {
-        const fileInput = document.getElementById('intake-photo-input');
-        if (!fileInput.files || fileInput.files.length === 0) {
-            alert('Please select at least one image file first.');
-            return;
-        }
-
-        if (fileInput.files.length > 5) {
-            alert('You can upload a maximum of 5 photos.');
-            return;
-        }
-
-        const files = Array.from(fileInput.files);
-        document.getElementById('ai-loading').style.display = 'inline';
-
-        try {
-            const imagesPayload = await Promise.all(files.map(async (file) => ({
-                imageBase64: await fileToBase64(file),
-                mimeType: file.type
-            })));
-
-            const response = await fetch('/api/incidents', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'analyze-intake', images: imagesPayload })
-            });
-            const data = await response.json();
-
-            if (data.success && data.analysis) {
-                const res = data.analysis;
-                if (res.incident_type) document.getElementById('incident_type').value = res.incident_type;
-                if (res.location) document.getElementById('location').value = res.location;
-                if (res.description) document.getElementById('description').value = res.description;
-                if (res.severity) document.getElementById('severity').value = res.severity;
-                if (res.corrective_action) document.getElementById('corrective_action').value = res.corrective_action;
-                
-                const allImageUrls = imagesPayload.map(img => img.imageBase64).join(',');
-                document.getElementById('incident_image_url').value = allImageUrls;
-                alert('AI successfully analyzed the photos and auto-filled the form fields! Review and submit.');
-            } else {
-                alert('AI analysis failed.');
-            }
-        } catch (err) {
-            alert('Error during AI analysis: ' + err.message);
-        } finally {
-            document.getElementById('ai-loading').style.display = 'none';
-        }
-    }
-
     let currentIncidents = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Set default datetime to now
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById('incident-date').value = now.toISOString().slice(0, 16);
+        
+        loadIncidents();
+    });
 
     async function loadIncidents() {
         try {
@@ -253,7 +235,7 @@
             tbody.innerHTML = '';
 
             if (data.success && data.incidents && data.incidents.length > 0) {
-                currentIncidents = data.incidents; // Store data safely in memory
+                currentIncidents = data.incidents;
                 currentIncidents.forEach((inc, incIndex) => {
                     let photoHtml = '';
                     if (inc.incident_image_url) {
@@ -268,15 +250,17 @@
                         photoHtml += '</div>';
                     }
 
+                    const reporterInfo = inc.reporter_name ? `<br><small style="color: #4a5568;"><strong>Reporter:</strong> ${inc.reporter_name} (${inc.reporter_role || 'Staff/Resident'})</small>` : '';
+
                     tbody.innerHTML += `
                         <tr>
                             <td>${new Date(inc.incident_date).toLocaleString()}${photoHtml}</td>
-                            <td><strong>${inc.incident_type}</strong><br><small>${inc.location}</small></td>
+                            <td><strong>${inc.incident_type}</strong><br><small>${inc.location}</small>${reporterInfo}</td>
                             <td>${inc.description}</td>
                             <td><span style="background: #feebc8; color: #9c4221; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.severity}</span></td>
                             <td><small><strong>Action:</strong> ${inc.corrective_action}<br><strong>Owner:</strong> ${inc.responsible_person}</small></td>
                             <td><span style="background: #ebf8ff; color: #2b6cb0; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.status}</span></td>
-                            <td><button onclick="openCloseModal('${inc.id}')" style="background: #e53e3e; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px;">Close & Verify</button></td>
+                            <td><button onclick="openCloseModal('${inc.id}')" style="background: #c53030; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Close & Verify</button></td>
                         </tr>
                     `;
                 });
@@ -291,32 +275,18 @@
     function viewIncidentPhoto(incIndex, imgIndex) {
         try {
             const inc = currentIncidents[incIndex];
-            if (!inc.incident_image_url) {
-                alert("No image data found for this incident.");
-                return;
-            }
-
             const images = inc.incident_image_url.split(',');
-            // Reconstruct the full base64 data string (splitting by comma splits the data:image/jpeg;base64, header from the payload)
             let header = images[0].trim();
             let payload = images[1] ? images[1].trim() : '';
-            
-            // If the image string doesn't have a standard data header, treat the whole thing as the source
             let fileData = images.length > 1 ? `${header},${payload}` : header;
-            
-            // Clean up any accidental line breaks or spaces
             fileData = fileData.replace(/\s/g, '');
-
-            console.log("Opening image source type:", fileData.substring(0, 30)); // Check console to verify format
 
             const newWindow = window.open();
             if (newWindow) {
                 newWindow.document.write(`
                     <!DOCTYPE html>
                     <html>
-                    <head>
-                        <title>Incident Photo</title>
-                    </head>
+                    <head><title>Incident Photo</title></head>
                     <body style="margin: 0; display: flex; justify-content: center; align-items: center; background: #2d3748; min-height: 100vh;">
                         <img src="${fileData}" style="max-width: 100%; max-height: 100vh; box-shadow: 0 4px 6px rgba(0,0,0,0.3);" alt="Incident Image">
                     </body>
@@ -332,167 +302,131 @@
         }
     }
 
-    function viewFile(fileData) {
-        // Create a new blank window/tab
-        const newWindow = window.open();
-        
-        if (newWindow) {
-            // Write an HTML page into the new tab that displays the image or file safely
-            newWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Incident Photo</title>
-                </head>
-                <body style="margin: 0; display: flex; justify-content: center; align-items: center; background: #2d3748; min-height: 100vh;">
-                    <img src="${fileData}" style="max-width: 100%; max-height: 100vh; box-shadow: 0 4px 6px rgba(0,0,0,0.3);" alt="Incident Image">
-                </body>
-                </html>
-            `);
-            newWindow.document.close();
-        } else {
-            alert("Please allow pop-ups for this site to view the images.");
-        }
-    }
-
     function openCloseModal(id) {
-        document.getElementById('closeIncidentId').value = id;
-        document.getElementById('closeNotes').value = '';
-        document.getElementById('closePhotosInput').value = '';
-        document.getElementById('closePdfInput').value = '';
-        document.getElementById('closeModal').style.display = 'flex';
+        document.getElementById('close-incident-id').value = id;
+        document.getElementById('close-modal').style.display = 'flex';
     }
 
-    function closeCloseModal() {
-        document.getElementById('closeModal').style.display = 'none';
+    function closeModal() {
+        document.getElementById('close-modal').style.display = 'none';
+        document.getElementById('close-form').reset();
     }
 
-    async function submitCloseOut() {
-        const id = document.getElementById('closeIncidentId').value;
-        const notes = document.getElementById('closeNotes').value.trim();
-        if (!notes) {
-            alert('Please provide remediation summary notes.');
-            return;
-        }
-
-        document.getElementById('closeLoading').style.display = 'block';
-
-        try {
-            const photoFiles = document.getElementById('closePhotosInput').files;
-            let imagesArray = [];
-            for (let i = 0; i < Math.min(photoFiles.length, 5); i++) {
-                const base64 = await fileToBase64(photoFiles[i]);
-                imagesArray.push({ imageBase64: base64, mimeType: photoFiles[i].type || 'image/jpeg' });
-            }
-
-            const pdfFile = document.getElementById('closePdfInput').files[0];
-            let pdfDataUrl = null;
-            if (pdfFile) {
-                pdfDataUrl = await fileToBase64(pdfFile);
-            }
-
-            const evalRes = await fetch('/api/incidents', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'analyze-close',
-                    id: id,
-                    images: imagesArray,
-                    description: notes,
-                    corrective_action: "Remediation evidence submitted via close-out form."
-                })
-            });
-            const evalData = await evalRes.json();
-
-            if (!evalData.success) {
-                throw new Error(evalData.error || 'AI analysis failed');
-            }
-
-            const evalResult = evalData.evaluation;
-            // Explicitly set status based on AI satisfaction check
-            let finalStatus = evalResult.satisfactory ? "Closed - Verified" : "Closed - Audit Failed";
-
-            if (!evalResult.satisfactory) {
-                if (!confirm('AI Warning: Remediation may be unsatisfactory. Assessment notes: ' + evalResult.assessment_notes + '\n\nDo you still wish to force close under Audit Failed status?')) {
-                    document.getElementById('closeLoading').style.display = 'none';
-                    return;
-                }
-            } else {
-                alert('AI Verification Passed! Remediation is satisfactory.');
-            }
-
-            const allImageStrings = imagesArray.map(img => img.imageBase64).join(',');
-            const finalCloseData = pdfDataUrl ? `${allImageStrings},${pdfDataUrl}` : allImageStrings;
-
-            const assessmentText = `Satisfactory: ${evalResult.satisfactory}. Notes: ${evalResult.assessment_notes} (Remediation Notes: ${notes})`;
-
-            const closeRes = await fetch('/api/incidents', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'close',
-                    id: id,
-                    status: finalStatus,
-                    close_image_url: finalCloseData,
-                    ai_close_assessment: assessmentText
-                })
-            });
-
-            const closeData = await closeRes.json();
-            if (closeData.success) {
-                alert('Incident record updated successfully!');
-                closeCloseModal();
-                loadIncidents();
-            } else {
-                alert('Failed to close incident: ' + closeData.error);
-            }
-        } catch (err) {
-            alert('Error during close-out submission: ' + err.message);
-        } finally {
-            document.getElementById('closeLoading').style.display = 'none';
-        }
-    }
-
+    // Handle Form Submission for New Incident
     document.getElementById('incident-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        
+        const fileInput = document.getElementById('incident-image');
+        let imagesBase64 = [];
+
+        if (fileInput.files.length > 0) {
+            for (let file of fileInput.files) {
+                const base64 = await toBase64(file);
+                imagesBase64.push(base64);
+            }
+        }
+
         const payload = {
-            action: 'create',
-            incident_date: document.getElementById('incident_date').value,
-            reported_by: document.getElementById('reported_by').value,
-            incident_type: document.getElementById('incident_type').value,
+            reporter_name: document.getElementById('reporter-name').value,
+            reporter_role: document.getElementById('reporter-role').value,
+            incident_type: document.getElementById('incident-type').value,
+            severity: document.getElementById('severity').value,
+            incident_date: document.getElementById('incident-date').value,
             location: document.getElementById('location').value,
             description: document.getElementById('description').value,
-            severity: document.getElementById('severity').value,
-            corrective_action: document.getElementById('corrective_action').value,
-            responsible_person: document.getElementById('responsible_person').value,
-            incident_image_url: document.getElementById('incident_image_url').value
+            corrective_action: document.getElementById('corrective-action').value,
+            responsible_person: document.getElementById('responsible-person').value,
+            incident_image_url: imagesBase64.join(',')
         };
 
         try {
-            const response = await fetch('/api/incidents', {
+            const res = await fetch('/api/incidents', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            const data = await response.json();
-            if (data.success) {
+            const result = await res.json();
+            if (result.success) {
+                alert('Incident logged successfully!');
                 document.getElementById('incident-form').reset();
-                document.getElementById('incident_image_url').value = '';
                 loadIncidents();
             } else {
-                alert('Failed to save incident: ' + data.error);
+                alert('Error logging incident: ' + (result.error || 'Unknown error'));
             }
         } catch (err) {
-            alert('Error: ' + err.message);
+            console.error('Submission error:', err);
+            alert('Failed to submit incident.');
         }
     });
 
-    document.addEventListener('DOMContentLoaded', loadIncidents);
+    // Handle Close-Out Verification Submission
+    document.getElementById('close-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('close-incident-id').value;
+        const notes = document.getElementById('close-notes').value;
+        const fileInput = document.getElementById('close-image');
+        const username = document.getElementById('mgr-username').value;
+        const password = document.getElementById('mgr-password').value;
+
+        let closeImageBase64 = '';
+        if (fileInput.files.length > 0) {
+            closeImageBase64 = await toBase64(fileInput.files[0]);
+        }
+
+        try {
+            // First verify manager credentials
+            const authRes = await fetch('/api/verify-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, requiredRole: 'Manager' })
+            });
+            const authData = await authRes.json();
+
+            if (!authData.authorized) {
+                alert('Authorization failed: ' + (authData.message || 'Invalid manager credentials.'));
+                return;
+            }
+
+            // Perform close-out
+            const closeRes = await fetch('/api/incidents', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id,
+                    status: 'Closed - Verified',
+                    remediation_notes: notes,
+                    close_image_url: closeImageBase64,
+                    verified_by: authData.fullName
+                })
+            });
+            const closeResult = await closeRes.json();
+
+            if (closeResult.success) {
+                alert('Incident successfully verified and closed!');
+                closeModal();
+                loadIncidents();
+            } else {
+                alert('Error closing incident: ' + (closeResult.error || 'Unknown error'));
+            }
+        } catch (err) {
+            console.error('Close-out error:', err);
+            alert('Failed to process close-out verification.');
+        }
+    });
+
+    function toBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
     </script>
 
     <div class="nav-footer">
-        <a href="03_incident_reporting_coida.html" target="_self">&larr; Back to Module 03 Overview</a>
         <a href="index.html" target="_self">📋 Main Index</a>
+        <a href="03_sub_gar_annexure_1_history.html" target="_self">Resolved Audit Trail &rarr;</a>
     </div>
 </body>
 </html>
