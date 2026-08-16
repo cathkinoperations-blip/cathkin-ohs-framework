@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Defect History - Cathkin Estates</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Resolved Defect History</h2>
+            <a href="08_checklists_inspections.html" class="btn btn-secondary btn-sm">&larr; Back to Dashboard</a>
+        </div>
+        
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <table class="table table-striped align-middle" id="history-table">
+                    <thead>
+                        <tr>
+                            <th>Reported Date</th>
+                            <th>Equipment</th>
+                            <th>Operator</th>
+                            <th>Defect Description</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                            <th>Resolved Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="7" class="text-center text-muted">Loading history...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadHistory() {
+            try {
+                const response = await fetch('/api/get-history');
+                const data = await response.json();
+                const tbody = document.querySelector('#history-table tbody');
+                tbody.innerHTML = '';
+
+                if (data.success && data.defects && data.defects.length > 0) {
+                    data.defects.forEach(d => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td>${new Date(d.created_at).toLocaleDateString()}</td>
+                                <td><strong>${d.equipment_name}</strong></td>
+                               <td>${d.operator_name || 'N/A'}</td>
+                                <td>${d.defect_description}</td>
+                                <td><span class="badge bg-secondary">${d.severity}</span></td>
+                                <td><span class="badge bg-success">${d.status}</span></td>
+                                <td>${d.verified_at ? new Date(d.verified_at).toLocaleDateString() : 'N/A'}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">No resolved defects found in history.</td></tr>`;
+                }
+            } catch (err) {
+                console.error('Failed to load history:', err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadHistory);
+    </script>
+</body>
+</html>
