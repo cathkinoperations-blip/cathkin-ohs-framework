@@ -55,6 +55,11 @@
             padding-bottom: 8px;
             margin-bottom: 16px;
         }
+        .file-hint {
+            font-size: 11px;
+            color: #718096;
+            margin-top: 4px;
+        }
         @media (max-width: 600px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -140,8 +145,9 @@
                     <input type="text" id="responsible-person" placeholder="Name of person accountable...">
                 </div>
                 <div class="form-group">
-                    <label for="incident-image">Upload Photo / Evidence</label>
-                    <input type="file" id="incident-image" accept="image/*" multiple>
+                    <label for="incident-image">Upload Evidence (Photos & PDFs)</label>
+                    <input type="file" id="incident-image" accept="image/*,application/pdf" multiple>
+                    <div class="file-hint">You can upload up to 5 images and/or PDF documents.</div>
                 </div>
 
             </div>
@@ -159,7 +165,7 @@
             <table class="table" id="incidents-table">
                 <thead>
                     <tr>
-                        <th>Date & Photo</th>
+                        <th>Date & Evidence</th>
                         <th>Type & Location</th>
                         <th>Description</th>
                         <th>Severity</th>
@@ -188,8 +194,9 @@
                 </div>
                 
                 <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="close-image">Close-Out Photo / Evidence (Required for Verification)</label>
-                    <input type="file" id="close-image" accept="image/*,application/pdf" required>
+                    <label for="close-image">Close-Out Evidence (Photos & PDFs Required)</label>
+                    <input type="file" id="close-image" accept="image/*,application/pdf" multiple required>
+                    <div class="file-hint">Upload up to 5 images and/or PDF documents for verification.</div>
                 </div>
 
                 <!-- Manager Authentication inside Modal -->
@@ -237,24 +244,26 @@
             if (data.success && data.incidents && data.incidents.length > 0) {
                 currentIncidents = data.incidents;
                 currentIncidents.forEach((inc, incIndex) => {
-                    let photoHtml = '';
+                    let evidenceHtml = '';
                     if (inc.incident_image_url) {
-                        const images = inc.incident_image_url.split(',');
-                        photoHtml = '<div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;">';
-                        images.forEach((imgSrc, imgIndex) => {
-                            const trimmed = imgSrc.trim();
+                        const items = inc.incident_image_url.split(',');
+                        evidenceHtml = '<div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;">';
+                        items.forEach((itemSrc, itemIndex) => {
+                            const trimmed = itemSrc.trim();
                             if (trimmed.startsWith('data:image') || trimmed.startsWith('http')) {
-                                photoHtml += `<button type="button" onclick="viewIncidentPhoto(${incIndex}, ${imgIndex})" style="background: #edf2f7; color: #2b6cb0; border: 1px solid #cbd5e0; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📷 View Photo ${imgIndex + 1}</button>`;
+                                evidenceHtml += `<button type="button" onclick="viewIncidentFile(${incIndex}, 'incident', ${itemIndex})" style="background: #edf2f7; color: #2b6cb0; border: 1px solid #cbd5e0; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📷 Photo ${itemIndex + 1}</button>`;
+                            } else if (trimmed.startsWith('data:application/pdf')) {
+                                evidenceHtml += `<button type="button" onclick="viewIncidentFile(${incIndex}, 'incident', ${itemIndex})" style="background: #2b6cb0; color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📄 PDF Doc</button>`;
                             }
                         });
-                        photoHtml += '</div>';
+                        evidenceHtml += '</div>';
                     }
 
                     const reporterInfo = inc.reporter_name ? `<br><small style="color: #4a5568;"><strong>Reporter:</strong> ${inc.reporter_name} (${inc.reporter_role || 'Staff/Resident'})</small>` : '';
 
                     tbody.innerHTML += `
                         <tr>
-                            <td>${new Date(inc.incident_date).toLocaleString()}${photoHtml}</td>
+                            <td>${new Date(inc.incident_date).toLocaleString()}${evidenceHtml}</td>
                             <td><strong>${inc.incident_type}</strong><br><small>${inc.location}</small>${reporterInfo}</td>
                             <td>${inc.description}</td>
                             <td><span style="background: #feebc8; color: #9c4221; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.severity}</span></td>
@@ -272,33 +281,48 @@
         }
     }
 
-    function viewIncidentPhoto(incIndex, imgIndex) {
+    function viewIncidentFile(incIndex, type, fileIndex) {
         try {
             const inc = currentIncidents[incIndex];
-            const images = inc.incident_image_url.split(',');
-            let header = images[0].trim();
-            let payload = images[1] ? images[1].trim() : '';
-            let fileData = images.length > 1 ? `${header},${payload}` : header;
-            fileData = fileData.replace(/\s/g, '');
+            const rawUrl = type === 'incident' ? inc.incident_image_url : inc.close_image_url;
+            const items = rawUrl.split(',');
+            
+            // Handle chunked base64 or single strings safely
+            let targetItem = items[fileIndex].trim();
+            if (targetItem.startsWith('data:image') && items[fileIndex + 1] && !items[fileIndex + 1].includes('data:')) {
+                targetItem += ',' + items[fileIndex + 1].trim();
+            }
 
             const newWindow = window.open();
             if (newWindow) {
-                newWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head><title>Incident Photo</title></head>
-                    <body style="margin: 0; display: flex; justify-content: center; align-items: center; background: #2d3748; min-height: 100vh;">
-                        <img src="${fileData}" style="max-width: 100%; max-height: 100vh; box-shadow: 0 4px 6px rgba(0,0,0,0.3);" alt="Incident Image">
-                    </body>
-                    </html>
-                `);
+                if (targetItem.startsWith('data:application/pdf')) {
+                    newWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head><title>Document Viewer</title></head>
+                        <body style="margin: 0; height: 100vh;">
+                            <embed src="${targetItem}" type="application/pdf" width="100%" height="100%">
+                        </body>
+                        </html>
+                    `);
+                } else {
+                    newWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head><title>Evidence Viewer</title></head>
+                        <body style="margin: 0; display: flex; justify-content: center; align-items: center; background: #2d3748; min-height: 100vh;">
+                            <img src="${targetItem}" style="max-width: 100%; max-height: 100vh; box-shadow: 0 4px 6px rgba(0,0,0,0.3);" alt="Evidence File">
+                        </body>
+                        </html>
+                    `);
+                }
                 newWindow.document.close();
             } else {
-                alert("Please allow pop-ups for this site to view the images.");
+                alert("Please allow pop-ups for this site to view the files.");
             }
         } catch (e) {
-            console.error("Error opening photo:", e);
-            alert("Could not load image.");
+            console.error("Error opening file:", e);
+            alert("Could not load file.");
         }
     }
 
@@ -317,12 +341,23 @@
         e.preventDefault();
         
         const fileInput = document.getElementById('incident-image');
-        let imagesBase64 = [];
+        let imageCount = 0;
+        let filesBase64 = [];
 
         if (fileInput.files.length > 0) {
             for (let file of fileInput.files) {
+                if (file.type.startsWith('image/')) {
+                    imageCount++;
+                }
+            }
+            if (imageCount > 5) {
+                alert('You can upload a maximum of 5 images. Please select fewer images.');
+                return;
+            }
+
+            for (let file of fileInput.files) {
                 const base64 = await toBase64(file);
-                imagesBase64.push(base64);
+                filesBase64.push(base64);
             }
         }
 
@@ -336,7 +371,7 @@
             description: document.getElementById('description').value,
             corrective_action: document.getElementById('corrective-action').value,
             responsible_person: document.getElementById('responsible-person').value,
-            incident_image_url: imagesBase64.join(',')
+            incident_image_url: filesBase64.join(',')
         };
 
         try {
@@ -368,9 +403,24 @@
         const username = document.getElementById('mgr-username').value;
         const password = document.getElementById('mgr-password').value;
 
-        let closeImageBase64 = '';
+        let imageCount = 0;
+        let filesBase64 = [];
+
         if (fileInput.files.length > 0) {
-            closeImageBase64 = await toBase64(fileInput.files[0]);
+            for (let file of fileInput.files) {
+                if (file.type.startsWith('image/')) {
+                    imageCount++;
+                }
+            }
+            if (imageCount > 5) {
+                alert('You can upload a maximum of 5 images for close-out verification.');
+                return;
+            }
+
+            for (let file of fileInput.files) {
+                const base64 = await toBase64(file);
+                filesBase64.push(base64);
+            }
         }
 
         try {
@@ -395,7 +445,7 @@
                     id,
                     status: 'Closed - Verified',
                     remediation_notes: notes,
-                    close_image_url: closeImageBase64,
+                    close_image_url: filesBase64.join(','),
                     verified_by: authData.fullName
                 })
             });
