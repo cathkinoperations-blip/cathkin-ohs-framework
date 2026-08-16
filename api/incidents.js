@@ -294,6 +294,25 @@ export default async function handler(req, res) {
 
             const closedInc = result.rows[0];
 
+            // Extract and format AI findings for email body
+            let aiFindingsText = 'No detailed AI notes provided.';
+            let aiStatusBadge = '';
+
+            if (ai_close_assessment) {
+                try {
+                    const parsedAi = typeof ai_close_assessment === 'string' 
+                        ? JSON.parse(ai_close_assessment) 
+                        : ai_close_assessment;
+
+                    aiFindingsText = parsedAi.assessment_notes || aiFindingsText;
+                    aiStatusBadge = parsedAi.satisfactory 
+                        ? '<span style="background: #c6f6d5; color: #22543d; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; display: inline-block; margin-bottom: 6px;">✅ Verification Approved</span>'
+                        : '<span style="background: #fed7d7; color: #742a2a; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; display: inline-block; margin-bottom: 6px;">⚠️ Deficiencies Flagged</span>';
+                } catch (e) {
+                    aiFindingsText = ai_close_assessment;
+                }
+            }
+
             // Recipients: Reporter + HSE, Board, Tester roles
             const roleEmails = await getEmailsByRoles(['HSE', 'Board', 'Tester']);
             const recipients = [...new Set([closedInc.reporter_email, ...roleEmails])].filter(Boolean);
@@ -307,6 +326,13 @@ export default async function handler(req, res) {
                     <p><strong>Incident Ref:</strong> #${closedInc.id}</p>
                     <p><strong>Location:</strong> ${closedInc.location}</p>
                     <p><strong>Verified By:</strong> ${verified_by || 'Estate Management'}</p>
+                    
+                    <div style="background: #f7fafc; border-left: 4px solid #2b6cb0; padding: 12px; margin: 16px 0; border-radius: 4px;">
+                        <strong style="color: #2b6cb0; display: block; margin-bottom: 6px;">🤖 AI Close-Out Verification Findings:</strong>
+                        <div>${aiStatusBadge}</div>
+                        <p style="margin: 0; font-size: 13px; color: #2d3748;">${aiFindingsText}</p>
+                    </div>
+
                     <p><strong>Description:</strong> ${closedInc.description}</p>
                 `
             });
