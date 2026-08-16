@@ -3,9 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Closed Incident History | Cathkin Estates HOA</title>
+    <title>Resolved Incident History | Cathkin Estates HOA</title>
     <base target="_self">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .section-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a202c;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+        }
+        .badge-closed {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <div class="header-banner">
@@ -14,198 +40,172 @@
         <div class="meta-bar">
             <span><strong>Document Ref:</strong> OHS-MOD-003-HIST</span>
             <span><strong>Regulatory Standard:</strong> GAR 9 & COIDA (Act 130 of 1993)</span>
-            <span><strong>Digitization:</strong> Historical Compliance Archive</span>
+            <span><strong>Digitization:</strong> Archived Audit Records</span>
         </div>
     </div>
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
-        <h2>Closed & Verified Incidents History</h2>
+        <h2>Archived / Closed Incident Records</h2>
         <a href="03_sub_gar_annexure_1_register.html" class="btn-link" target="_self">&larr; Back to Active Register</a>
     </div>
 
-    <div class="card">
-        <table class="table" id="history-table">
-            <thead>
-                <tr>
-                    <th>Incident Date & Opening Photos</th>
-                    <th>Type & Location</th>
-                    <th>Description</th>
-                    <th>Severity</th>
-                    <th>CAPA & Owner</th>
-                    <th>Status</th>
-                    <th>Close-Out Date & Evidence</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">Loading incident history...</td></tr>
-            </tbody>
-        </table>
+    <div class="section-card">
+        <div class="section-title">📂 Closed Incident & Close-Out Verification Log</div>
+        <div style="overflow-x: auto;">
+            <table class="table" id="history-table">
+                <thead>
+                    <tr>
+                        <th>Date & Initial Evidence</th>
+                        <th>Type & Location</th>
+                        <th>Description & Reporter</th>
+                        <th>Severity</th>
+                        <th>CAPA & Owner</th>
+                        <th>Close-Out Verification & Evidence</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">Loading resolved history...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-    let currentHistoryIncidents = [];
+    let currentHistory = [];
 
-    function viewHistoryPhoto(incIndex, type, imgIndex) {
-        try {
-            const inc = currentHistoryIncidents[incIndex];
-            const rawUrl = type === 'opening' ? inc.incident_image_url : inc.close_image_url;
-            if (!rawUrl) {
-                alert("No image data found.");
-                return;
-            }
-
-            const images = rawUrl.split(',');
-            let header = images[0].trim();
-            let payload = images[1] ? images[1].trim() : '';
-            let fileData = images.length > 1 ? `${header},${payload}` : header;
-            fileData = fileData.replace(/\s/g, '');
-
-            const newWindow = window.open();
-            if (newWindow) {
-                newWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Incident Evidence</title>
-                    </head>
-                    <body style="margin: 0; display: flex; justify-content: center; align-items: center; background: #2d3748; min-height: 100vh;">
-                        <img src="${fileData}" style="max-width: 100%; max-height: 100vh; box-shadow: 0 4px 6px rgba(0,0,0,0.3);" alt="Incident Evidence">
-                    </body>
-                    </html>
-                `);
-                newWindow.document.close();
-            } else {
-                alert("Please allow pop-ups for this site to view the images.");
-            }
-        } catch (e) {
-            console.error("Error opening history photo:", e);
-            alert("Could not load image.");
-        }
-    }
-
-    function viewAuditNotes(incIndex) {
-        try {
-            const inc = currentHistoryIncidents[incIndex];
-            const notes = inc.ai_close_assessment || 'No audit notes available.';
-            
-            const newWindow = window.open();
-            if (newWindow) {
-                newWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>AI Audit Assessment Details</title>
-                    </head>
-                    <body style="font-family: Arial, sans-serif; margin: 0; padding: 30px; background: #f7fafc; color: #2d3748;">
-                        <div style="max-width: 700px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                            <h2 style="margin-top: 0; color: #1a202c; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">AI Audit Assessment Details</h2>
-                            <p style="white-space: pre-wrap; line-height: 1.6; font-size: 14px;">${notes}</p>
-                            <div style="margin-top: 30px; text-align: right;">
-                                <button onclick="window.close()" style="background: #4a5568; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">Close Window</button>
-                            </div>
-                        </div>
-                    </body>
-                    </html>
-                `);
-                newWindow.document.close();
-            } else {
-                alert("Please allow pop-ups for this site to view the full notes.");
-            }
-        } catch (e) {
-            console.error("Error opening audit notes:", e);
-            alert("Could not load audit notes.");
-        }
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+        loadHistory();
+    });
 
     async function loadHistory() {
+        const tbody = document.querySelector('#history-table tbody');
         try {
-            const response = await fetch('/api/incidents?action=history');
-            const data = await response.json();
-            const tbody = document.querySelector('#history-table tbody');
+            let incidents = [];
+            
+            // Try fetching incidents from the API
+            const responses = await Promise.allSettled([
+                fetch('/api/incidents?action=history'),
+                fetch('/api/incidents?status=closed'),
+                fetch('/api/incidents?action=list')
+            ]);
+
+            for (const res of responses) {
+                if (res.status === 'fulfilled' && res.value.ok) {
+                    const data = await res.value.json();
+                    if (data.success && data.incidents) {
+                        incidents = data.incidents;
+                        break;
+                    }
+                }
+            }
+
+            // Filter out active ones to show only verified/closed incidents
+            const closedIncidents = incidents.filter(inc => 
+                inc.status && (
+                    inc.status.toLowerCase().includes('closed') || 
+                    inc.status.toLowerCase().includes('verified') || 
+                    inc.status.toLowerCase().includes('resolved')
+                )
+            );
+
             tbody.innerHTML = '';
 
-            if (data.success && data.incidents && data.incidents.length > 0) {
-                currentHistoryIncidents = data.incidents;
+            if (closedIncidents.length > 0) {
+                currentHistory = closedIncidents;
+                closedIncidents.forEach((inc, incIndex) => {
+                    let initialEvidenceHtml = renderEvidenceButtons(inc.incident_image_url, incIndex, 'incident');
+                    let closeEvidenceHtml = renderEvidenceButtons(inc.close_image_url, incIndex, 'close');
 
-                currentHistoryIncidents.forEach((inc, incIndex) => {
-                    // Render Opening Photos safely using buttons
-                    let openPhotosHtml = '';
-                    if (inc.incident_image_url) {
-                        const images = inc.incident_image_url.split(',');
-                        openPhotosHtml = '<div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;">';
-                        images.forEach((imgSrc, imgIdx) => {
-                            const trimmed = imgSrc.trim();
-                            if (trimmed.startsWith('data:image') || trimmed.startsWith('http')) {
-                                openPhotosHtml += `<button type="button" onclick="viewHistoryPhoto(${incIndex}, 'opening', ${imgIdx})" style="background: #edf2f7; color: #2b6cb0; border: 1px solid #cbd5e0; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📷 View Photo ${imgIdx + 1}</button>`;
-                            }
-                        });
-                        openPhotosHtml += '</div>';
-                    }
-
-                    // Render Close-Out Evidence (Photos or PDFs) safely
-                    let closeEvidenceHtml = '';
-                    if (inc.close_image_url) {
-                        const items = inc.close_image_url.split(',');
-                        closeEvidenceHtml = '<div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; align-items: center;">';
-                        items.forEach((itemSrc, itemIdx) => {
-                            const trimmed = itemSrc.trim();
-                            if (trimmed.startsWith('data:image') || trimmed.startsWith('http')) {
-                                closeEvidenceHtml += `<button type="button" onclick="viewHistoryPhoto(${incIndex}, 'close', ${itemIdx})" style="background: #edf2f7; color: #2b6cb0; border: 1px solid #cbd5e0; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📷 Close Photo ${itemIdx + 1}</button>`;
-                            } else if (trimmed.startsWith('data:application/pdf')) {
-                                closeEvidenceHtml += `<button type="button" onclick="viewHistoryPhoto(${incIndex}, 'close', ${itemIdx})" style="background: #2b6cb0; color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📄 View PDF</button>`;
-                            }
-                        });
-                        closeEvidenceHtml += '</div>';
-                    }
-
-                    // Truncate audit notes for compact view and add a button to view full notes
-                    let assessmentSnippet = '';
-                    if (inc.ai_close_assessment) {
-                        const cleanNotes = inc.ai_close_assessment.replace(/<\/?[^>]+(>|$)/g, ""); // strip tags if any
-                        const shortNotes = cleanNotes.length > 90 ? cleanNotes.substring(0, 90) + '...' : cleanNotes;
-                        assessmentSnippet = `<br><div style="margin-top: 6px;"><small style="color: #4a5568;"><strong>AI Audit:</strong> ${shortNotes}</small><br><button type="button" onclick="viewAuditNotes(${incIndex})" style="margin-top: 4px; background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">📄 Read Full Audit Notes</button></div>`;
-                    }
-                    
-                    // Determine AI Audit True/False status from assessment notes or flags
-                    let auditPassed = false;
-                    const assessmentStr = (inc.ai_close_assessment || '').toLowerCase();
-                    if (assessmentStr.includes('true') || assessmentStr.includes('satisfactory: true') || assessmentStr.includes('passed: true')) {
-                        auditPassed = true;
-                    } else if (!assessmentStr.includes('false') && !assessmentStr.includes('fail') && !assessmentStr.includes('non-compliant')) {
-                        auditPassed = assessmentStr.includes('satisfactory') || assessmentStr.includes('compliant');
-                    }
-
-                    const statusText = auditPassed ? 'Closed - Verified (True)' : 'Closed - Verified (False)';
-                    const statusBadge = auditPassed 
-                        ? `<span style="background: #c6f6d5; color: #22543d; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">${statusText}</span>`
-                        : `<span style="background: #fed7d7; color: #742a2a; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">${statusText}</span>`;
+                    const reporterInfo = inc.reporter_name ? `<br><small style="color: #4a5568;"><strong>Reporter:</strong> ${inc.reporter_name} (${inc.reporter_role || 'Staff/Resident'})</small>` : '';
+                    const closeInfo = inc.remediation_notes ? `<strong>Remediation:</strong> ${inc.remediation_notes}<br>` : '';
+                    const verifiedBy = inc.verified_by ? `<small style="color: #2b6cb0;"><strong>Verified By:</strong> ${inc.verified_by}</small>` : '';
 
                     tbody.innerHTML += `
                         <tr>
-                            <td>${new Date(inc.incident_date).toLocaleDateString()}${openPhotosHtml}</td>
+                            <td>${new Date(inc.incident_date).toLocaleString()}${initialEvidenceHtml}</td>
                             <td><strong>${inc.incident_type}</strong><br><small>${inc.location}</small></td>
-                            <td>${inc.description}</td>
+                            <td>${inc.description}${reporterInfo}</td>
                             <td><span style="background: #edf2f7; color: #4a5568; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.severity}</span></td>
                             <td><small><strong>Action:</strong> ${inc.corrective_action}<br><strong>Owner:</strong> ${inc.responsible_person}</small></td>
-                            <td style="text-align: center; vertical-align: middle;">${statusBadge}</td>
-                            <td><small><strong>Closed:</strong> ${inc.verified_at ? new Date(inc.verified_at).toLocaleDateString() : 'N/A'}</small>${closeEvidenceHtml}${assessmentSnippet}</td>
+                            <td><small>${closeInfo}${verifiedBy}</small>${closeEvidenceHtml}</td>
+                            <td><span class="badge-closed">${inc.status}</span></td>
                         </tr>
                     `;
                 });
             } else {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">No closed incidents found in history.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">No resolved/closed incident records found.</td></tr>`;
             }
         } catch (err) {
             console.error('Failed to load history:', err);
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #e53e3e; padding: 20px;">Error loading resolved history records.</td></tr>`;
         }
     }
 
-    document.addEventListener('DOMContentLoaded', loadHistory);
+    function renderEvidenceButtons(rawUrl, incIndex, type) {
+        if (!rawUrl) return '';
+        const items = rawUrl.split(',');
+        let evidenceHtml = '<div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;">';
+        items.forEach((itemSrc, itemIndex) => {
+            const trimmed = itemSrc.trim();
+            if (trimmed.startsWith('data:image') || trimmed.startsWith('http')) {
+                evidenceHtml += `<button type="button" onclick="viewHistoryFile(${incIndex}, '${type}', ${itemIndex})" style="background: #edf2f7; color: #2b6cb0; border: 1px solid #cbd5e0; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📷 Photo ${itemIndex + 1}</button>`;
+            } else if (trimmed.startsWith('data:application/pdf')) {
+                evidenceHtml += `<button type="button" onclick="viewHistoryFile(${incIndex}, '${type}', ${itemIndex})" style="background: #2b6cb0; color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📄 PDF Doc</button>`;
+            }
+        });
+        evidenceHtml += '</div>';
+        return evidenceHtml;
+    }
+
+    function viewHistoryFile(incIndex, type, fileIndex) {
+        try {
+            const inc = currentHistory[incIndex];
+            const rawUrl = type === 'incident' ? inc.incident_image_url : inc.close_image_url;
+            const items = rawUrl.split(',');
+            
+            let targetItem = items[fileIndex].trim();
+            if (targetItem.startsWith('data:image') && items[fileIndex + 1] && !items[fileIndex + 1].includes('data:')) {
+                targetItem += ',' + items[fileIndex + 1].trim();
+            }
+
+            const newWindow = window.open();
+            if (newWindow) {
+                if (targetItem.startsWith('data:application/pdf')) {
+                    newWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head><title>Document Viewer</title></head>
+                        <body style="margin: 0; height: 100vh;">
+                            <embed src="${targetItem}" type="application/pdf" width="100%" height="100%">
+                        </body>
+                        </html>
+                    `);
+                } else {
+                    newWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head><title>Evidence Viewer</title></head>
+                        <body style="margin: 0; display: flex; justify-content: center; align-items: center; background: #2d3748; min-height: 100vh;">
+                            <img src="${targetItem}" style="max-width: 100%; max-height: 100vh; box-shadow: 0 4px 6px rgba(0,0,0,0.3);" alt="Evidence File">
+                        </body>
+                        </html>
+                    `);
+                }
+                newWindow.document.close();
+            } else {
+                alert("Please allow pop-ups for this site to view the files.");
+            }
+        } catch (e) {
+            console.error("Error opening file:", e);
+            alert("Could not load file.");
+        }
+    }
     </script>
 
     <div class="nav-footer">
-        <a href="03_sub_gar_annexure_1_register.html" target="_self">&larr; Back to Active Register</a>
         <a href="index.html" target="_self">📋 Main Index</a>
+        <a href="03_sub_gar_annexure_1_register.html" target="_self">&larr; Back to Active Register</a>
     </div>
 </body>
 </html>
