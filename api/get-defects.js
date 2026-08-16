@@ -5,6 +5,12 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false }
 });
 
+const query = `
+    SELECT * FROM equipment_defects 
+    WHERE status != 'Closed' 
+    ORDER BY created_at DESC;
+`;
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
