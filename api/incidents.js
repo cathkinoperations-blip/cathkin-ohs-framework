@@ -251,7 +251,7 @@ export default async function handler(req, res) {
                     incident_date, expected_close_date, reported_by, reporter_email, 
                     incident_type, location, description, severity, corrective_action, 
                     responsible_person, status, incident_image_url
-                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'Open', $10) RETURNING *;
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'Open', $11) RETURNING *;
             `;
 
             const result = await pool.query(query, [
