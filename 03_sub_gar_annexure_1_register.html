@@ -258,6 +258,7 @@
                         photoHtml = '<div style="display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap;">';
                         images.forEach((imgSrc) => {
                             const trimmed = imgSrc.trim();
+                            // Only render if it's a valid data URL or http URL, avoiding plain file names
                             if (trimmed.startsWith('data:image') || trimmed.startsWith('http')) {
                                 photoHtml += `<img src="${trimmed}" onclick="viewFile('${trimmed}')" style="width: 35px; height: 35px; object-fit: cover; border-radius: 3px; border: 1px solid #cbd5e0; cursor: pointer;" title="View photo">`;
                             }
@@ -339,6 +340,7 @@
             }
 
             const evalResult = evalData.evaluation;
+            // Explicitly set status based on AI satisfaction check
             let finalStatus = evalResult.satisfactory ? "Closed - Verified" : "Closed - Audit Failed";
 
             if (!evalResult.satisfactory) {

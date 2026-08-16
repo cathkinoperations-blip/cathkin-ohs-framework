@@ -57,7 +57,7 @@
 
             if (data.success && data.incidents && data.incidents.length > 0) {
                 data.incidents.forEach(inc => {
-                    // Render Opening Photos
+                    // Render Opening Photos safely
                     let openPhotosHtml = '';
                     if (inc.incident_image_url) {
                         const images = inc.incident_image_url.split(',');
@@ -71,7 +71,7 @@
                         openPhotosHtml += '</div>';
                     }
 
-                    // Render Close-Out Evidence (Photos or PDFs)
+                    // Render Close-Out Evidence (Photos or PDFs) safely
                     let closeEvidenceHtml = '';
                     if (inc.close_image_url) {
                         const items = inc.close_image_url.split(',');
@@ -91,10 +91,10 @@
                     
                     // Format Status Badge based on audit outcome
                     let statusLabel = inc.status || 'Closed - Verified';
-                    let statusBadgeStyle = 'background: #c6f6d5; color: #22543d;'; // Default green for verified
+                    let statusBadgeStyle = 'background: #c6f6d5; color: #22543d;'; // Green for verified
                     
                     if (statusLabel.includes('Failed')) {
-                        statusBadgeStyle = 'background: #fed7d7; color: #9b2c2c;'; // Red for failed audit
+                        statusBadgeStyle = 'background: #fed7d7; color: #9b2c2c;'; // Red/Orange for failed audit
                     }
 
                     tbody.innerHTML += `
