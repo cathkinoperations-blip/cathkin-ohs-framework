@@ -83,6 +83,40 @@
         }
     }
 
+    function viewAuditNotes(incIndex) {
+        try {
+            const inc = currentHistoryIncidents[incIndex];
+            const notes = inc.ai_close_assessment || 'No audit notes available.';
+            
+            const newWindow = window.open();
+            if (newWindow) {
+                newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>AI Audit Assessment Details</title>
+                    </head>
+                    <body style="font-family: Arial, sans-serif; margin: 0; padding: 30px; background: #f7fafc; color: #2d3748;">
+                        <div style="max-width: 700px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <h2 style="margin-top: 0; color: #1a202c; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">AI Audit Assessment Details</h2>
+                            <p style="white-space: pre-wrap; line-height: 1.6; font-size: 14px;">${notes}</p>
+                            <div style="margin-top: 30px; text-align: right;">
+                                <button onclick="window.close()" style="background: #4a5568; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">Close Window</button>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                newWindow.document.close();
+            } else {
+                alert("Please allow pop-ups for this site to view the full notes.");
+            }
+        } catch (e) {
+            console.error("Error opening audit notes:", e);
+            alert("Could not load audit notes.");
+        }
+    }
+
     async function loadHistory() {
         try {
             const response = await fetch('/api/incidents?action=history');
@@ -124,7 +158,13 @@
                         closeEvidenceHtml += '</div>';
                     }
 
-                    const assessmentNote = inc.ai_close_assessment ? `<br><small style="color: #4a5568;"><strong>AI Audit Notes:</strong> ${inc.ai_close_assessment}</small>` : '';
+                    // Truncate audit notes for compact view and add a button to view full notes
+                    let assessmentSnippet = '';
+                    if (inc.ai_close_assessment) {
+                        const cleanNotes = inc.ai_close_assessment.replace(/<\/?[^>]+(>|$)/g, ""); // strip tags if any
+                        const shortNotes = cleanNotes.length > 90 ? cleanNotes.substring(0, 90) + '...' : cleanNotes;
+                        assessmentSnippet = `<br><div style="margin-top: 6px;"><small style="color: #4a5568;"><strong>AI Audit:</strong> ${shortNotes}</small><br><button type="button" onclick="viewAuditNotes(${incIndex})" style="margin-top: 4px; background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; padding: 2px 6px; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold;">📄 Read Full Audit Notes</button></div>`;
+                    }
                     
                     // Determine AI Audit True/False status from assessment notes or flags
                     let auditPassed = false;
@@ -148,7 +188,7 @@
                             <td><span style="background: #edf2f7; color: #4a5568; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.severity}</span></td>
                             <td><small><strong>Action:</strong> ${inc.corrective_action}<br><strong>Owner:</strong> ${inc.responsible_person}</small></td>
                             <td style="text-align: center; vertical-align: middle;">${statusBadge}</td>
-                            <td><small><strong>Closed:</strong> ${inc.verified_at ? new Date(inc.verified_at).toLocaleDateString() : 'N/A'}</small>${closeEvidenceHtml}${assessmentNote}</td>
+                            <td><small><strong>Closed:</strong> ${inc.verified_at ? new Date(inc.verified_at).toLocaleDateString() : 'N/A'}</small>${closeEvidenceHtml}${assessmentSnippet}</td>
                         </tr>
                     `;
                 });
