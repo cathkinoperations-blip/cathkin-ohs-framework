@@ -6,8 +6,6 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false }
 });
 
-const ai = new GoogleGenAI();
-
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -19,6 +17,15 @@ export default async function handler(req, res) {
     const action = req.query.action || req.body.action;
 
     try {
+        if (!process.env.GEMINI_API_KEY) {
+            return res.status(500).json({ 
+                success: false, 
+                error: "GEMINI_API_KEY is missing from Vercel Environment Variables. Please add it in your Vercel Project Settings." 
+            });
+        }
+
+        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
         if (req.method === 'GET' && action === 'list') {
             const result = await pool.query(`SELECT * FROM incident_register WHERE status != 'Closed' ORDER BY incident_date DESC;`);
             return res.status(200).json({ success: true, incidents: result.rows });
@@ -99,6 +106,7 @@ export default async function handler(req, res) {
 
         return res.status(400).json({ success: false, error: 'Invalid action parameter' });
     } catch (err) {
+        console.error('API Error:', err);
         return res.status(500).json({ success: false, error: err.message });
     }
 }
