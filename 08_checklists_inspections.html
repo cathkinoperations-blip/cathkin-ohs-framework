@@ -121,36 +121,38 @@
     const API_BASE_DEFECTS = 'https://cathkin-ohs-framework.vercel.app/api';
 
     async function loadActiveDefects() {
-        try {
-            const response = await fetch(`${API_BASE_DEFECTS}/get-defects`);
-            const data = await response.json();
-            const tbody = document.querySelector('#defects-table tbody');
-            if (!tbody) return;
-            
-            tbody.innerHTML = '';
+    try {
+        const response = await fetch('/api/get-defects'); // points to your updated API
+        const data = await response.json();
+        
+        const tbody = document.querySelector('#defects-table-body'); // adjust selector to match your table
+        if (!tbody) return;
+        tbody.innerHTML = '';
 
-            if (data.success && data.defects && data.defects.length > 0) {
-                data.defects.forEach(d => {
-                    const badgeClass = d.severity === 'Critical' ? 'bg-danger' : 'bg-warning text-dark';
+        if (data.success && data.defects && data.defects.length > 0) {
+            data.defects.forEach(d => {
+                // Double safety filter on the frontend as well
+                if (d.status !== 'Closed' && d.status !== 'Verified & Closed') {
                     tbody.innerHTML += `
                         <tr>
                             <td>${new Date(d.created_at).toLocaleDateString()}</td>
                             <td><strong>${d.equipment_name}</strong></td>
                             <td>${d.operator_name || 'N/A'}</td>
                             <td>${d.defect_description}</td>
-                            <td><span class="badge ${badgeClass}">${d.severity}</span></td>
-                            <td><span class="badge bg-secondary">${d.status}</span></td>
-                            <td><button class="btn btn-sm btn-success" onclick="resolveDefect(${d.id})">Close</button></td>
+                            <td><span class="badge bg-warning text-dark">${d.severity}</span></td>
+                            <td>${d.status}</td>
+                            <td><button class="btn btn-sm btn-outline-danger" onclick="resolveDefect('${d.id}')">Close</button></td>
                         </tr>
                     `;
-                });
-            } else {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 15px;">No active defects reported. Excellent!</td></tr>`;
-            }
-        } catch (err) {
-            console.error('Failed to load defects:', err);
+                }
+            });
+        } else {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">No active defects found.</td></tr>`;
         }
+    } catch (err) {
+        console.error('Failed to load active defects:', err);
     }
+}
 
     async function resolveDefect(id) {
     if (!confirm('Are you sure you want to close this defect? It will be moved to history.')) return;
