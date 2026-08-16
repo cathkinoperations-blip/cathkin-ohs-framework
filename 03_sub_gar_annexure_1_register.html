@@ -255,12 +255,11 @@
                     let photoHtml = '';
                     if (inc.incident_image_url) {
                         const images = inc.incident_image_url.split(',');
-                        photoHtml = '<div style="display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap;">';
-                        images.forEach((imgSrc) => {
+                        photoHtml = '<div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;">';
+                        images.forEach((imgSrc, index) => {
                             const trimmed = imgSrc.trim();
-                            // Only render if it's a valid data URL or http URL, avoiding plain file names
                             if (trimmed.startsWith('data:image') || trimmed.startsWith('http')) {
-                                photoHtml += `<img src="${trimmed}" onclick="viewFile('${trimmed}')" style="width: 35px; height: 35px; object-fit: cover; border-radius: 3px; border: 1px solid #cbd5e0; cursor: pointer;" title="View photo">`;
+                                photoHtml += `<button type="button" onclick="viewFile('${trimmed}')" style="background: #edf2f7; color: #2b6cb0; border: 1px solid #cbd5e0; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📷 View Photo ${index + 1}</button>`;
                             }
                         });
                         photoHtml += '</div>';
