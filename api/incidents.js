@@ -41,12 +41,19 @@ export default async function handler(req, res) {
         if (req.method === 'POST' && action === 'analyze-intake') {
             const { images } = req.body; // Expects an array of { imageBase64, mimeType } objects
             
-            const imageParts = (images || []).map(img => ({
-                inlineData: {
-                    data: img.imageBase64,
-                    mimeType: img.mimeType || 'image/jpeg'
+            const imageParts = (images || []).map(img => {
+                // Strip the data URL prefix if it was included (e.g., "data:image/jpeg;base64,...")
+                let base64Data = img.imageBase64;
+                if (base64Data.includes(',')) {
+                    base64Data = base64Data.split(',')[1];
                 }
-            }));
+                return {
+                    inlineData: {
+                        data: base64Data,
+                        mimeType: img.mimeType || 'image/jpeg'
+                    }
+                };
+            });
 
             const response = await ai.models.generateContent({
                 model: 'gemini-3.6-flash',
@@ -72,12 +79,18 @@ export default async function handler(req, res) {
         if (req.method === 'POST' && action === 'analyze-close') {
             const { images, description, corrective_action } = req.body;
 
-            const imageParts = (images || []).map(img => ({
-                inlineData: {
-                    data: img.imageBase64,
-                    mimeType: img.mimeType || 'image/jpeg'
+            const imageParts = (images || []).map(img => {
+                let base64Data = img.imageBase64;
+                if (base64Data.includes(',')) {
+                    base64Data = base64Data.split(',')[1];
                 }
-            }));
+                return {
+                    inlineData: {
+                        data: base64Data,
+                        mimeType: img.mimeType || 'image/jpeg'
+                    }
+                };
+            });
 
             const response = await ai.models.generateContent({
                 model: 'gemini-3.6-flash',
@@ -109,7 +122,7 @@ export default async function handler(req, res) {
             const { id, close_image_url, ai_close_assessment } = req.body;
             const result = await pool.query(`UPDATE incident_register SET status = 'Closed', verified_at = NOW(), close_image_url = $2, ai_close_assessment = $3 WHERE id = $1 RETURNING *;`, [id, close_image_url, ai_close_assessment]);
             return res.status(200).json({ success: true, incident: result.rows[0] });
-}
+        }
 
         return res.status(400).json({ success: false, error: 'Invalid action parameter' });
     } catch (err) {
