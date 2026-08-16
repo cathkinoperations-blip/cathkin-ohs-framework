@@ -14,7 +14,7 @@
         <div class="meta-bar">
             <span><strong>Document Ref:</strong> OHS-MOD-003-REG</span>
             <span><strong>Regulatory Standard:</strong> GAR 9 & COIDA (Act 130 of 1993)</span>
-            <span><strong>Digitization:</strong> Database-Driven Active Register</span>
+            <span><strong>Digitization:</strong> AI-Powered Multimodal Incident Tracker</span>
         </div>
     </div>
 
@@ -26,6 +26,15 @@
     <!-- Log New Incident Form Section -->
     <div class="card mb-4" style="background: #fdfdfd; border: 1px solid #e2e8f0; padding: 20px; border-radius: 6px; margin-bottom: 30px;">
         <h3 style="margin-top: 0; color: #1a365d;">Log New Incident / Injury / Near-Miss</h3>
+        
+        <!-- AI Photo Auto-Fill Section -->
+        <div style="background: #ebf8ff; border: 1px solid #bee3f8; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+            <label style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 5px;">🤖 AI Vision Assistant: Upload Incident Photo to Auto-Fill</label>
+            <input type="file" id="intake-photo-input" accept="image/*" style="margin-bottom: 10px;">
+            <button type="button" onclick="analyzeIntakePhoto()" style="background-color: #3182ce; color: white; padding: 6px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px;">Analyze Photo with Gemini AI</button>
+            <span id="ai-loading" style="margin-left: 10px; font-style: italic; color: #4a5568; display: none;">Analyzing image and extracting details...</span>
+        </div>
+
         <form id="incident-form">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 15px;">
                 <div>
@@ -76,6 +85,8 @@
                     <input type="text" id="responsible_person" placeholder="Name of person accountable" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required>
                 </div>
             </div>
+            
+            <input type="hidden" id="incident_image_url" value="">
 
             <div style="text-align: right;">
                 <button type="submit" style="background-color: #2f855a; color: white; padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Submit Incident Record</button>
@@ -88,9 +99,8 @@
         <table class="table" id="incidents-table">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Location</th>
+                    <th>Date & Photo</th>
+                    <th>Type & Location</th>
                     <th>Description</th>
                     <th>Severity</th>
                     <th>CAPA & Owner</th>
@@ -99,12 +109,61 @@
                 </tr>
             </thead>
             <tbody>
-                <tr><td colspan="8" style="text-align: center; color: #718096; padding: 20px;">Loading active incidents...</td></tr>
+                <tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">Loading active incidents...</td></tr>
             </tbody>
         </table>
     </div>
 
     <script>
+    async function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    async function analyzeIntakePhoto() {
+        const fileInput = document.getElementById('intake-photo-input');
+        if (!fileInput.files[0]) {
+            alert('Please select an image file first.');
+            return;
+        }
+
+        const file = fileInput.files[0];
+        document.getElementById('ai-loading').style.display = 'inline';
+
+        try {
+            const base64 = await fileToBase64(file);
+            const response = await fetch('/api/incidents', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'analyze-intake', imageBase64: base64, mimeType: file.type })
+            });
+            const data = await response.json();
+
+            if (data.success && data.analysis) {
+                const res = data.analysis;
+                if (res.incident_type) document.getElementById('incident_type').value = res.incident_type;
+                if (res.location) document.getElementById('location').value = res.location;
+                if (res.description) document.getElementById('description').value = res.description;
+                if (res.severity) document.getElementById('severity').value = res.severity;
+                if (res.corrective_action) document.getElementById('corrective_action').value = res.corrective_action;
+                
+                // Store simulated image URL reference
+                document.getElementById('incident_image_url').value = file.name;
+                alert('AI successfully analyzed the photo and auto-filled the form fields! Review and submit.');
+            } else {
+                alert('AI analysis failed.');
+            }
+        } catch (err) {
+            alert('Error during AI analysis: ' + err.message);
+        } finally {
+            document.getElementById('ai-loading').style.display = 'none';
+        }
+    }
+
     async function loadIncidents() {
         try {
             const response = await fetch('/api/incidents?action=list');
@@ -114,45 +173,73 @@
 
             if (data.success && data.incidents && data.incidents.length > 0) {
                 data.incidents.forEach(inc => {
+                    const photoBadge = inc.incident_image_url ? `<br><small style="color: #3182ce;">📷 ${inc.incident_image_url}</small>` : '';
                     tbody.innerHTML += `
                         <tr>
-                            <td>${new Date(inc.incident_date).toLocaleString()}</td>
-                            <td><strong>${inc.incident_type}</strong></td>
-                            <td>${inc.location}</td>
+                            <td>${new Date(inc.incident_date).toLocaleString()}${photoBadge}</td>
+                            <td><strong>${inc.incident_type}</strong><br><small>${inc.location}</small></td>
                             <td>${inc.description}</td>
                             <td><span style="background: #feebc8; color: #9c4221; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.severity}</span></td>
                             <td><small><strong>Action:</strong> ${inc.corrective_action}<br><strong>Owner:</strong> ${inc.responsible_person}</small></td>
                             <td><span style="background: #ebf8ff; color: #2b6cb0; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.status}</span></td>
-                            <td><button onclick="closeIncident('${inc.id}')" style="background: #e53e3e; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px;">Close & Verify</button></td>
+                            <td><button onclick="promptClose('${inc.id}', \`${inc.description}\`, \`${inc.corrective_action}\`)" style="background: #e53e3e; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px;">Close & Verify</button></td>
                         </tr>
                     `;
                 });
             } else {
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #718096; padding: 20px;">No active open incidents recorded.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">No active open incidents recorded.</td></tr>`;
             }
         } catch (err) {
             console.error('Failed to load incidents:', err);
         }
     }
 
-    async function closeIncident(id) {
-        if (!confirm('Are you sure you want to close this incident and record the verification date?')) return;
+    async function promptClose(id, description, corrective_action) {
+        const input = prompt('Upload / provide close-out verification photo file name or description for AI evaluation:');
+        if (!input) return;
 
-        try {
-            const response = await fetch('/api/incidents', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'close', id })
-            });
-            const data = await response.json();
-            if (data.success) {
-                loadIncidents();
-            } else {
-                alert('Failed to close incident: ' + data.error);
+        const fakeInput = document.createElement('input');
+        fakeInput.type = 'file';
+        fakeInput.accept = 'image/*';
+        fakeInput.onchange = async e => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            alert('Running AI Close-Out Audit on remediation photo...');
+            try {
+                const base64 = await fileToBase64(file);
+                const response = await fetch('/api/incidents', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'analyze-close', imageBase64: base64, mimeType: file.type, description, corrective_action })
+                });
+                const data = await response.json();
+
+                if (data.success && data.evaluation) {
+                    const evalResult = data.evaluation;
+                    const assessmentText = `Satisfactory: ${evalResult.satisfactory}. Notes: ${evalResult.assessment_notes}`;
+                    
+                    if (!evalResult.satisfactory) {
+                        if (!confirm('AI Warning: Remediation may be unsatisfactory. Assessment notes: ' + evalResult.assessment_notes + '\n\nDo you still wish to force close?')) {
+                            return;
+                        }
+                    } else {
+                        alert('AI Verification Passed! Remediation is satisfactory.');
+                    }
+
+                    const closeRes = await fetch('/api/incidents', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'close', id, close_image_url: file.name, ai_close_assessment: assessmentText })
+                    });
+                    const closeData = await closeRes.json();
+                    if (closeData.success) loadIncidents();
+                }
+            } catch (err) {
+                alert('Error during close-out verification: ' + err.message);
             }
-        } catch (err) {
-            alert('Error: ' + err.message);
-        }
+        };
+        fakeInput.click();
     }
 
     document.getElementById('incident-form').addEventListener('submit', async (e) => {
@@ -166,7 +253,8 @@
             description: document.getElementById('description').value,
             severity: document.getElementById('severity').value,
             corrective_action: document.getElementById('corrective_action').value,
-            responsible_person: document.getElementById('responsible_person').value
+            responsible_person: document.getElementById('responsible_person').value,
+            incident_image_url: document.getElementById('incident_image_url').value
         };
 
         try {
@@ -178,6 +266,7 @@
             const data = await response.json();
             if (data.success) {
                 document.getElementById('incident-form').reset();
+                document.getElementById('incident_image_url').value = '';
                 loadIncidents();
             } else {
                 alert('Failed to save incident: ' + data.error);

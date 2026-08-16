@@ -1,9 +1,12 @@
 import { Pool } from 'pg';
+import { GoogleGenAI } from '@google/genai';
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
+
+const ai = new GoogleGenAI();
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -26,16 +29,71 @@ export default async function handler(req, res) {
             return res.status(200).json({ success: true, incidents: result.rows });
         }
 
+        // AI Intake Analysis from Photo
+        if (req.method === 'POST' && action === 'analyze-intake') {
+            const { imageBase64, mimeType } = req.body;
+            
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: [
+                    {
+                        inlineData: {
+                            data: imageBase64,
+                            mimeType: mimeType || 'image/jpeg'
+                        }
+                    },
+                    {
+                        text: `Analyze this incident or hazard photo for an OHS estate register. Return strict JSON with keys: 
+                        "incident_type" (choose strictly from: Injury, Occupational Illness, Property Damage, Near-Miss), 
+                        "location" (suggest estate area if visible, else general), 
+                        "description" (detailed professional safety description), 
+                        "severity" (choose strictly from: Minor, Moderate, Severe, Reportable (Section 24)), 
+                        "corrective_action" (suggested CAPA), 
+                        "responsible_person" (suggest role like Estate Manager or Maintenance Lead).`
+                    }
+                ],
+                config: { responseMimeType: 'application/json' }
+            });
+
+            return res.status(200).json({ success: true, analysis: JSON.parse(response.text) });
+        }
+
+        // AI Close-Out Verification Assessment from Photo
+        if (req.method === 'POST' && action === 'analyze-close') {
+            const { imageBase64, mimeType, description, corrective_action } = req.body;
+
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: [
+                    {
+                        inlineData: {
+                            data: imageBase64,
+                            mimeType: mimeType || 'image/jpeg'
+                        }
+                    },
+                    {
+                        text: `You are an OHS compliance auditor. Evaluate this remediation/close-out photo against the original incident description: "${description}" and planned corrective action: "${corrective_action}". 
+                        Return strict JSON with keys: 
+                        "satisfactory" (boolean true or false), 
+                        "assessment_notes" (detailed justification explaining why the fix is satisfactory or what deficiencies remain).`
+                    }
+                ],
+                config: { responseMimeType: 'application/json' }
+            });
+
+            return res.status(200).json({ success: true, evaluation: JSON.parse(response.text) });
+        }
+
         if (req.method === 'POST' && action === 'create') {
-            const { incident_date, reported_by, incident_type, location, description, severity, corrective_action, responsible_person } = req.body;
-            const query = `INSERT INTO incident_register (incident_date, reported_by, incident_type, location, description, severity, corrective_action, responsible_person, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'Open') RETURNING *;`;
-            const result = await pool.query(query, [incident_date, reported_by, incident_type, location, description, severity, corrective_action, responsible_person]);
+            const { incident_date, reported_by, incident_type, location, description, severity, corrective_action, responsible_person, incident_image_url } = req.body;
+            const query = `INSERT INTO incident_register (incident_date, reported_by, incident_type, location, description, severity, corrective_action, responsible_person, status, incident_image_url) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'Open', $9) RETURNING *;`;
+            const result = await pool.query(query, [incident_date, reported_by, incident_type, location, description, severity, corrective_action, responsible_person, incident_image_url]);
             return res.status(200).json({ success: true, incident: result.rows[0] });
         }
 
         if (req.method === 'POST' && action === 'close') {
-            const { id } = req.body;
-            const result = await pool.query(`UPDATE incident_register SET status = 'Closed', verified_at = NOW() WHERE id = $1 RETURNING *;`, [id]);
+            const { id, close_image_url, ai_close_assessment } = req.body;
+            const result = await pool.query(`UPDATE incident_register SET status = 'Closed', verified_at = NOW(), close_image_url = $2, ai_close_assessment = $3 WHERE id = $1 RETURNING *;`, [id, close_image_url, ai_close_assessment]);
             return res.status(200).json({ success: true, incident: result.rows[0] });
         }
 
