@@ -32,7 +32,7 @@
                     <th>Description</th>
                     <th>Severity</th>
                     <th>CAPA & Owner</th>
-                    <th>Audit Status</th>
+                    <th>Status</th>
                     <th>Close-Out Date & Evidence</th>
                 </tr>
             </thead>
@@ -135,9 +135,10 @@
                         auditPassed = assessmentStr.includes('satisfactory') || assessmentStr.includes('compliant');
                     }
 
+                    const statusText = auditPassed ? 'Closed - Verified (True)' : 'Closed - Verified (False)';
                     const statusBadge = auditPassed 
-                        ? '<span style="background: #c6f6d5; color: #22543d; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">PASSED (True)</span>'
-                        : '<span style="background: #fed7d7; color: #742a2a; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">FAILED (False)</span>';
+                        ? `<span style="background: #c6f6d5; color: #22543d; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">${statusText}</span>`
+                        : `<span style="background: #fed7d7; color: #742a2a; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">${statusText}</span>`;
 
                     tbody.innerHTML += `
                         <tr>
