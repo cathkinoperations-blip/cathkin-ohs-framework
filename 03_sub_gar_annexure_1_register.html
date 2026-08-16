@@ -109,7 +109,20 @@
                     <input type="text" id="reporter-role" placeholder="e.g., Estate Manager, Resident, Contractor..." required>
                 </div>
 
-                <!-- Incident Classification -->
+                <!-- Attachment Block (Positioned BEFORE Incident Type for Auto-Fill Workflow) -->
+                <div class="form-group full-width evidence-box">
+                    <label for="incident-image">Upload Evidence (Photos & PDFs) <span class="required-star">*</span></label>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 4px;">
+                        <input type="file" id="incident-image" accept="image/*,application/pdf" multiple required style="flex: 1; min-width: 220px;">
+                        <button type="button" id="btn-analyze" onclick="analyzeEvidence()" style="background: #2b6cb0; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 6px; transition: background 0.2s;">
+                            🔍 Analyse Attachments
+                        </button>
+                    </div>
+                    <div class="file-hint"><strong>Required:</strong> Minimum 1 attachment required (Maximum limit: 5 files). Click <em>Analyse Attachments</em> to automatically scan evidence and auto-fill details from Incident Type onwards.</div>
+                    <div id="analyze-status" style="display: none; margin-top: 8px; font-size: 12px; font-weight: bold; color: #2b6cb0;"></div>
+                </div>
+
+                <!-- Incident Classification (Auto-Populated from Analysis) -->
                 <div class="form-group">
                     <label for="incident-type">Incident Type <span class="required-star">*</span></label>
                     <select id="incident-type" required>
@@ -139,19 +152,6 @@
                 <div class="form-group">
                     <label for="location">Exact Location on Estate <span class="required-star">*</span></label>
                     <input type="text" id="location" placeholder="e.g., Phase 2 Roadwork, Gate 1, Clubhouse..." required>
-                </div>
-
-                <!-- Attachment Block (Positioned BEFORE Description & REQUIRED) -->
-                <div class="form-group full-width evidence-box">
-                    <label for="incident-image">Upload Evidence (Photos & PDFs) <span class="required-star">*</span></label>
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 4px;">
-                        <input type="file" id="incident-image" accept="image/*,application/pdf" multiple required style="flex: 1; min-width: 220px;">
-                        <button type="button" id="btn-analyze" onclick="analyzeEvidence()" style="background: #2b6cb0; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 6px; transition: background 0.2s;">
-                            🔍 Analyse Attachments
-                        </button>
-                    </div>
-                    <div class="file-hint"><strong>Required:</strong> Minimum 1 attachment required (Maximum limit: 5 files). Click <em>Analyse Attachments</em> to automatically scan evidence and auto-fill form details.</div>
-                    <div id="analyze-status" style="display: none; margin-top: 8px; font-size: 12px; font-weight: bold; color: #2b6cb0;"></div>
                 </div>
 
                 <!-- Description & Actions -->
