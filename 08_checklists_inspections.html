@@ -122,7 +122,7 @@
 
     async function loadActiveDefects() {
     try {
-        const response = await fetch('/api/get-defects'); // points to your updated API
+        const response = await fetch('/api/defects?action=list'); // points to your updated API
         const data = await response.json();
         
         const tbody = document.querySelector('#defects-table-body'); // adjust selector to match your table

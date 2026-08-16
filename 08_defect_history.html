@@ -46,7 +46,7 @@
     <script>
         async function loadHistory() {
             try {
-                const response = await fetch('/api/get-history');
+                const response = await fetch('/api/defects?action=history');
                 const data = await response.json();
                 const tbody = document.querySelector('#history-table tbody');
                 tbody.innerHTML = '';
