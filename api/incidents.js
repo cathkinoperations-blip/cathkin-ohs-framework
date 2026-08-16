@@ -37,24 +37,26 @@ export default async function handler(req, res) {
             return res.status(200).json({ success: true, incidents: result.rows });
         }
 
-        // AI Intake Analysis from Photo using Gemini 3.6 Flash
+        // AI Intake Analysis from Multiple Photos (up to 5)
         if (req.method === 'POST' && action === 'analyze-intake') {
-            const { imageBase64, mimeType } = req.body;
+            const { images } = req.body; // Expects an array of { imageBase64, mimeType } objects
             
+            const imageParts = (images || []).map(img => ({
+                inlineData: {
+                    data: img.imageBase64,
+                    mimeType: img.mimeType || 'image/jpeg'
+                }
+            }));
+
             const response = await ai.models.generateContent({
                 model: 'gemini-3.6-flash',
                 contents: [
+                    ...imageParts,
                     {
-                        inlineData: {
-                            data: imageBase64,
-                            mimeType: mimeType || 'image/jpeg'
-                        }
-                    },
-                    {
-                        text: `Analyze this incident or hazard photo for an OHS estate register. Return strict JSON with keys: 
+                        text: `Analyze these incident or hazard photos (up to 5 provided) for an OHS estate register. Synthesize the visual evidence and return strict JSON with keys: 
                         "incident_type" (choose strictly from: Injury, Occupational Illness, Property Damage, Near-Miss), 
                         "location" (suggest estate area if visible, else general), 
-                        "description" (detailed professional safety description), 
+                        "description" (detailed professional safety description covering all visual angles provided), 
                         "severity" (choose strictly from: Minor, Moderate, Severe, Reportable (Section 24)), 
                         "corrective_action" (suggested CAPA), 
                         "responsible_person" (suggest role like Estate Manager or Maintenance Lead).`
@@ -66,24 +68,26 @@ export default async function handler(req, res) {
             return res.status(200).json({ success: true, analysis: JSON.parse(response.text) });
         }
 
-        // AI Close-Out Verification Assessment from Photo using Gemini 3.6 Flash
+        // AI Close-Out Verification Assessment from Multiple Photos (up to 5)
         if (req.method === 'POST' && action === 'analyze-close') {
-            const { imageBase64, mimeType, description, corrective_action } = req.body;
+            const { images, description, corrective_action } = req.body;
+
+            const imageParts = (images || []).map(img => ({
+                inlineData: {
+                    data: img.imageBase64,
+                    mimeType: img.mimeType || 'image/jpeg'
+                }
+            }));
 
             const response = await ai.models.generateContent({
                 model: 'gemini-3.6-flash',
                 contents: [
+                    ...imageParts,
                     {
-                        inlineData: {
-                            data: imageBase64,
-                            mimeType: mimeType || 'image/jpeg'
-                        }
-                    },
-                    {
-                        text: `You are an OHS compliance auditor. Evaluate this remediation/close-out photo against the original incident description: "${description}" and planned corrective action: "${corrective_action}". 
+                        text: `You are an OHS compliance auditor. Evaluate these remediation/close-out photos against the original incident description: "${description}" and planned corrective action: "${corrective_action}". 
                         Return strict JSON with keys: 
                         "satisfactory" (boolean true or false), 
-                        "assessment_notes" (detailed justification explaining why the fix is satisfactory or what deficiencies remain).`
+                        "assessment_notes" (detailed justification explaining why the fix is satisfactory or what deficiencies remain across the provided images).`
                     }
                 ],
                 config: { responseMimeType: 'application/json' }
