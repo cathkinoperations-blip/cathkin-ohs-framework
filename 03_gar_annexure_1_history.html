@@ -32,7 +32,7 @@
                     <th>Description</th>
                     <th>Severity</th>
                     <th>CAPA & Owner</th>
-                    <th>Status</th>
+                    <th>Audit Status</th>
                     <th>Close-Out Date & Evidence</th>
                 </tr>
             </thead>
@@ -62,7 +62,7 @@
                     if (inc.incident_image_url) {
                         const images = inc.incident_image_url.split(',');
                         openPhotosHtml = '<div style="display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap;">';
-                        images.forEach((imgSrc, idx) => {
+                        images.forEach((imgSrc) => {
                             const trimmed = imgSrc.trim();
                             if (trimmed.startsWith('data:image') || trimmed.startsWith('http')) {
                                 openPhotosHtml += `<img src="${trimmed}" onclick="viewFile('${trimmed}')" style="width: 35px; height: 35px; object-fit: cover; border-radius: 3px; border: 1px solid #cbd5e0; cursor: pointer;" title="View opening photo">`;
@@ -76,7 +76,7 @@
                     if (inc.close_image_url) {
                         const items = inc.close_image_url.split(',');
                         closeEvidenceHtml = '<div style="display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; align-items: center;">';
-                        items.forEach((itemSrc, idx) => {
+                        items.forEach((itemSrc) => {
                             const trimmed = itemSrc.trim();
                             if (trimmed.startsWith('data:image') || trimmed.startsWith('http')) {
                                 closeEvidenceHtml += `<img src="${trimmed}" onclick="viewFile('${trimmed}')" style="width: 35px; height: 35px; object-fit: cover; border-radius: 3px; border: 1px solid #cbd5e0; cursor: pointer;" title="View close-out photo">`;
@@ -87,7 +87,15 @@
                         closeEvidenceHtml += '</div>';
                     }
 
-                    const assessmentNote = inc.ai_close_assessment ? `<br><small style="color: #2b6cb0;"><strong>AI Audit:</strong> ${inc.ai_close_assessment}</small>` : '';
+                    const assessmentNote = inc.ai_close_assessment ? `<br><small style="color: #2b6cb0;"><strong>AI Audit Notes:</strong> ${inc.ai_close_assessment}</small>` : '';
+                    
+                    // Format Status Badge based on audit outcome
+                    let statusLabel = inc.status || 'Closed - Verified';
+                    let statusBadgeStyle = 'background: #c6f6d5; color: #22543d;'; // Default green for verified
+                    
+                    if (statusLabel.includes('Failed')) {
+                        statusBadgeStyle = 'background: #fed7d7; color: #9b2c2c;'; // Red for failed audit
+                    }
 
                     tbody.innerHTML += `
                         <tr>
@@ -96,7 +104,7 @@
                             <td>${inc.description}</td>
                             <td><span style="background: #edf2f7; color: #4a5568; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.severity}</span></td>
                             <td><small><strong>Action:</strong> ${inc.corrective_action}<br><strong>Owner:</strong> ${inc.responsible_person}</small></td>
-                            <td><span style="background: #c6f6d5; color: #22543d; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.status}</span></td>
+                            <td><span style="${statusBadgeStyle} padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">${statusLabel}</span></td>
                             <td>${inc.verified_at ? new Date(inc.verified_at).toLocaleDateString() : 'N/A'}${closeEvidenceHtml}${assessmentNote}</td>
                         </tr>
                     `;

@@ -130,7 +130,6 @@
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px;">Close-Out Photos (Max 5)</label>
                 <input type="file" id="closePhotosInput" accept="image/*" multiple style="width: 100%; padding: 6px; border: 1px solid #cbd5e0; border-radius: 4px;">
-                <small style="color: #718096;">Images will be automatically optimized for AI auditing.</small>
             </div>
 
             <div style="margin-bottom: 20px;">
@@ -150,7 +149,7 @@
     </div>
 
     <script>
-    function viewImage(base64Str) {
+    function viewFile(base64Str) {
         const win = window.open();
         win.document.write(`<iframe src="${base64Str}" frameborder="0" style="border:0; top:0; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>`);
     }
@@ -231,7 +230,6 @@
                 if (res.severity) document.getElementById('severity').value = res.severity;
                 if (res.corrective_action) document.getElementById('corrective_action').value = res.corrective_action;
                 
-                // Store data URLs joined by commas for table previews
                 const allImageUrls = imagesPayload.map(img => img.imageBase64).join(',');
                 document.getElementById('incident_image_url').value = allImageUrls;
                 alert('AI successfully analyzed the photos and auto-filled the form fields! Review and submit.');
@@ -258,11 +256,10 @@
                     if (inc.incident_image_url) {
                         const images = inc.incident_image_url.split(',');
                         photoHtml = '<div style="display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap;">';
-                        images.forEach((imgSrc, idx) => {
+                        images.forEach((imgSrc) => {
                             const trimmed = imgSrc.trim();
-                            // Check if it's a base64 string or URL
                             if (trimmed.startsWith('data:image') || trimmed.startsWith('http')) {
-                                photoHtml += `<img src="${trimmed}" onclick="viewImage('${trimmed}')" style="width: 35px; height: 35px; object-fit: cover; border-radius: 3px; border: 1px solid #cbd5e0; cursor: pointer;" title="View photo">`;
+                                photoHtml += `<img src="${trimmed}" onclick="viewFile('${trimmed}')" style="width: 35px; height: 35px; object-fit: cover; border-radius: 3px; border: 1px solid #cbd5e0; cursor: pointer;" title="View photo">`;
                             }
                         });
                         photoHtml += '</div>';
@@ -304,7 +301,7 @@
         const id = document.getElementById('closeIncidentId').value;
         const notes = document.getElementById('closeNotes').value.trim();
         if (!notes) {
-            alert('Please provide a remediation summary notes.');
+            alert('Please provide remediation summary notes.');
             return;
         }
 
@@ -324,7 +321,6 @@
                 pdfDataUrl = await fileToBase64(pdfFile);
             }
 
-            // Call backend AI analysis
             const evalRes = await fetch('/api/incidents', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -342,10 +338,22 @@
                 throw new Error(evalData.error || 'AI analysis failed');
             }
 
+            const evalResult = evalData.evaluation;
+            let finalStatus = evalResult.satisfactory ? "Closed - Verified" : "Closed - Audit Failed";
+
+            if (!evalResult.satisfactory) {
+                if (!confirm('AI Warning: Remediation may be unsatisfactory. Assessment notes: ' + evalResult.assessment_notes + '\n\nDo you still wish to force close under Audit Failed status?')) {
+                    document.getElementById('closeLoading').style.display = 'none';
+                    return;
+                }
+            } else {
+                alert('AI Verification Passed! Remediation is satisfactory.');
+            }
+
             const allImageStrings = imagesArray.map(img => img.imageBase64).join(',');
             const finalCloseData = pdfDataUrl ? `${allImageStrings},${pdfDataUrl}` : allImageStrings;
 
-            const assessmentText = `Satisfactory: ${evalData.evaluation.satisfactory}. Notes: ${evalData.evaluation.assessment_notes} (Remediation Notes: ${notes})`;
+            const assessmentText = `Satisfactory: ${evalResult.satisfactory}. Notes: ${evalResult.assessment_notes} (Remediation Notes: ${notes})`;
 
             const closeRes = await fetch('/api/incidents', {
                 method: 'POST',
@@ -353,6 +361,7 @@
                 body: JSON.stringify({
                     action: 'close',
                     id: id,
+                    status: finalStatus,
                     close_image_url: finalCloseData,
                     ai_close_assessment: assessmentText
                 })
@@ -360,7 +369,7 @@
 
             const closeData = await closeRes.json();
             if (closeData.success) {
-                alert('Incident successfully verified and closed!');
+                alert('Incident record updated successfully!');
                 closeCloseModal();
                 loadIncidents();
             } else {
