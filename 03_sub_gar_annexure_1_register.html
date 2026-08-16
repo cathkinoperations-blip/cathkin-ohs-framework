@@ -285,6 +285,29 @@
         }
     }
 
+    function viewFile(fileData) {
+        // Create a new blank window/tab
+        const newWindow = window.open();
+        
+        if (newWindow) {
+            // Write an HTML page into the new tab that displays the image or file safely
+            newWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Incident Photo</title>
+                </head>
+                <body style="margin: 0; display: flex; justify-content: center; align-items: center; background: #2d3748; min-height: 100vh;">
+                    <img src="${fileData}" style="max-width: 100%; max-height: 100vh; box-shadow: 0 4px 6px rgba(0,0,0,0.3);" alt="Incident Image">
+                </body>
+                </html>
+            `);
+            newWindow.document.close();
+        } else {
+            alert("Please allow pop-ups for this site to view the images.");
+        }
+    }
+
     function openCloseModal(id) {
         document.getElementById('closeIncidentId').value = id;
         document.getElementById('closeNotes').value = '';
