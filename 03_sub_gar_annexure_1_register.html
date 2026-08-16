@@ -39,6 +39,12 @@
             resize: vertical;
             min-height: 90px;
         }
+        .evidence-box {
+            background: #f7fafc;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
         .section-card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
@@ -56,9 +62,13 @@
             margin-bottom: 16px;
         }
         .file-hint {
-            font-size: 11px;
+            font-size: 12px;
             color: #718096;
-            margin-top: 4px;
+            margin-top: 6px;
+        }
+        .required-star {
+            color: #e53e3e;
+            font-weight: bold;
         }
         @media (max-width: 600px) {
             .form-grid {
@@ -80,7 +90,7 @@
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
         <h2>Active Incident Register</h2>
-        <a href="03_sub_gar_annexure_1_history.html" class="btn-link" target="_self">View Resolved History &rarr;</a>
+        <a href="03_gar_annexure_1_history.html" class="btn-link" target="_self">View Resolved History &rarr;</a>
     </div>
 
     <!-- Log New Incident Section -->
@@ -91,17 +101,17 @@
                 
                 <!-- Reporter Information -->
                 <div class="form-group">
-                    <label for="reporter-name">Reporter Name</label>
+                    <label for="reporter-name">Reporter Name <span class="required-star">*</span></label>
                     <input type="text" id="reporter-name" placeholder="Full name..." required>
                 </div>
                 <div class="form-group">
-                    <label for="reporter-role">Reporter Role / Designation</label>
+                    <label for="reporter-role">Reporter Role / Designation <span class="required-star">*</span></label>
                     <input type="text" id="reporter-role" placeholder="e.g., Estate Manager, Resident, Contractor..." required>
                 </div>
 
                 <!-- Incident Classification -->
                 <div class="form-group">
-                    <label for="incident-type">Incident Type</label>
+                    <label for="incident-type">Incident Type <span class="required-star">*</span></label>
                     <select id="incident-type" required>
                         <option value="">Select type...</option>
                         <option value="Near-Miss">Near-Miss</option>
@@ -112,7 +122,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="severity">Severity Level</label>
+                    <label for="severity">Severity Level <span class="required-star">*</span></label>
                     <select id="severity" required>
                         <option value="Low">Low - Minor Hazard</option>
                         <option value="Medium">Medium - Moderate Risk</option>
@@ -123,31 +133,39 @@
 
                 <!-- Date & Location -->
                 <div class="form-group">
-                    <label for="incident-date">Date & Time of Incident</label>
+                    <label for="incident-date">Date & Time of Incident <span class="required-star">*</span></label>
                     <input type="datetime-local" id="incident-date" required>
                 </div>
                 <div class="form-group">
-                    <label for="location">Exact Location on Estate</label>
+                    <label for="location">Exact Location on Estate <span class="required-star">*</span></label>
                     <input type="text" id="location" placeholder="e.g., Phase 2 Roadwork, Gate 1, Clubhouse..." required>
+                </div>
+
+                <!-- Attachment Block (Positioned BEFORE Description & REQUIRED) -->
+                <div class="form-group full-width evidence-box">
+                    <label for="incident-image">Upload Evidence (Photos & PDFs) <span class="required-star">*</span></label>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 4px;">
+                        <input type="file" id="incident-image" accept="image/*,application/pdf" multiple required style="flex: 1; min-width: 220px;">
+                        <button type="button" id="btn-analyze" onclick="analyzeEvidence()" style="background: #2b6cb0; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 6px; transition: background 0.2s;">
+                            🔍 Analyse Attachments
+                        </button>
+                    </div>
+                    <div class="file-hint"><strong>Required:</strong> Minimum 1 attachment required (Maximum limit: 5 files). Click <em>Analyse Attachments</em> to automatically scan evidence and auto-fill form details.</div>
+                    <div id="analyze-status" style="display: none; margin-top: 8px; font-size: 12px; font-weight: bold; color: #2b6cb0;"></div>
                 </div>
 
                 <!-- Description & Actions -->
                 <div class="form-group full-width">
-                    <label for="description">Detailed Description of Incident</label>
-                    <textarea id="description" placeholder="Describe what happened clearly..."></textarea>
+                    <label for="description">Detailed Description of Incident <span class="required-star">*</span></label>
+                    <textarea id="description" placeholder="Describe what happened clearly..." required></textarea>
                 </div>
                 <div class="form-group full-width">
                     <label for="corrective-action">Corrective / Preventative Action (CAPA)</label>
                     <textarea id="corrective-action" placeholder="Action taken or planned..."></textarea>
                 </div>
-                <div class="form-group">
+                <div class="form-group full-width">
                     <label for="responsible-person">Responsible Person (Appointee)</label>
                     <input type="text" id="responsible-person" placeholder="Name of person accountable...">
-                </div>
-                <div class="form-group">
-                    <label for="incident-image">Upload Evidence (Photos & PDFs)</label>
-                    <input type="file" id="incident-image" accept="image/*,application/pdf" multiple>
-                    <div class="file-hint">You can upload up to 5 images and/or PDF documents.</div>
                 </div>
 
             </div>
@@ -199,7 +217,6 @@
                     <div class="file-hint">Upload up to 5 images and/or PDF documents for verification.</div>
                 </div>
 
-                <!-- Manager Authentication inside Modal -->
                 <div style="background: #f7fafc; padding: 16px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 16px;">
                     <h4 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; color: #2d3748;">Manager Authentication Required</h4>
                     <div class="form-grid">
@@ -226,7 +243,6 @@
     let currentIncidents = [];
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Set default datetime to now
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         document.getElementById('incident-date').value = now.toISOString().slice(0, 16);
@@ -278,6 +294,68 @@
             }
         } catch (err) {
             console.error('Failed to load incidents:', err);
+        }
+    }
+
+    async function analyzeEvidence() {
+        const fileInput = document.getElementById('incident-image');
+        const statusDiv = document.getElementById('analyze-status');
+        const btn = document.getElementById('btn-analyze');
+
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert('Please select at least one image or PDF file to analyze.');
+            return;
+        }
+
+        if (fileInput.files.length > 5) {
+            alert('A maximum of 5 files is allowed. Please select fewer attachments.');
+            return;
+        }
+
+        statusDiv.style.display = 'block';
+        statusDiv.style.color = '#2b6cb0';
+        statusDiv.innerHTML = '⌛ Analyzing evidence attachments and extracting incident details...';
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+
+        try {
+            const filesBase64 = [];
+            for (let file of fileInput.files) {
+                const b64 = await toBase64(file);
+                filesBase64.push(b64);
+            }
+
+            const response = await fetch('/api/incidents?action=analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'analyze', files: filesBase64 })
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.analysis) {
+                const ext = data.analysis;
+                
+                if (ext.incident_type) document.getElementById('incident-type').value = ext.incident_type;
+                if (ext.severity) document.getElementById('severity').value = ext.severity;
+                if (ext.location) document.getElementById('location').value = ext.location;
+                if (ext.description) document.getElementById('description').value = ext.description;
+                if (ext.corrective_action) document.getElementById('corrective-action').value = ext.corrective_action;
+                if (ext.responsible_person) document.getElementById('responsible-person').value = ext.responsible_person;
+
+                statusDiv.style.color = '#2f855a';
+                statusDiv.innerHTML = '✅ Evidence analyzed successfully! Form fields pre-filled below.';
+            } else {
+                statusDiv.style.color = '#c53030';
+                statusDiv.innerHTML = '⚠️ Analysis complete. Could not auto-extract details—please enter manually.';
+            }
+        } catch (err) {
+            console.error('Analysis error:', err);
+            statusDiv.style.color = '#c53030';
+            statusDiv.innerHTML = '❌ Failed to analyze attachment. Please fill in details manually.';
+        } finally {
+            btn.disabled = false;
+            btn.style.opacity = '1';
         }
     }
 
@@ -340,24 +418,21 @@
         e.preventDefault();
         
         const fileInput = document.getElementById('incident-image');
-        let imageCount = 0;
         let filesBase64 = [];
 
-        if (fileInput.files.length > 0) {
-            for (let file of fileInput.files) {
-                if (file.type.startsWith('image/')) {
-                    imageCount++;
-                }
-            }
-            if (imageCount > 5) {
-                alert('You can upload a maximum of 5 images. Please select fewer images.');
-                return;
-            }
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert('Please attach at least one photo or PDF evidence document.');
+            return;
+        }
 
-            for (let file of fileInput.files) {
-                const base64 = await toBase64(file);
-                filesBase64.push(base64);
-            }
+        if (fileInput.files.length > 5) {
+            alert('A maximum of 5 attachments is allowed. Please remove excess files.');
+            return;
+        }
+
+        for (let file of fileInput.files) {
+            const base64 = await toBase64(file);
+            filesBase64.push(base64);
         }
 
         const payload = {
@@ -384,6 +459,7 @@
             if (result.success) {
                 alert('Incident logged successfully!');
                 document.getElementById('incident-form').reset();
+                document.getElementById('analyze-status').style.display = 'none';
                 loadIncidents();
             } else {
                 alert('Error logging incident: ' + (result.error || 'Unknown error'));
@@ -394,7 +470,7 @@
         }
     });
 
-    // Handle Close-Out Verification Submission with Adaptive API Action Dispatch
+    // Handle Close-Out Verification
     document.getElementById('close-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('close-incident-id').value;
@@ -403,28 +479,19 @@
         const username = document.getElementById('mgr-username').value;
         const password = document.getElementById('mgr-password').value;
 
-        let imageCount = 0;
         let filesBase64 = [];
 
-        if (fileInput.files.length > 0) {
-            for (let file of fileInput.files) {
-                if (file.type.startsWith('image/')) {
-                    imageCount++;
-                }
-            }
-            if (imageCount > 5) {
-                alert('You can upload a maximum of 5 images for close-out verification.');
-                return;
-            }
+        if (fileInput.files.length > 5) {
+            alert('You can upload a maximum of 5 images/documents for close-out verification.');
+            return;
+        }
 
-            for (let file of fileInput.files) {
-                const base64 = await toBase64(file);
-                filesBase64.push(base64);
-            }
+        for (let file of fileInput.files) {
+            const base64 = await toBase64(file);
+            filesBase64.push(base64);
         }
 
         try {
-            // First verify manager credentials
             const authRes = await fetch('/api/verify-user', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -445,7 +512,6 @@
                 verified_by: authData.fullName
             };
 
-            // Adaptive dispatch trying common API action parameter keys (close / update / resolve)
             const actionsToTry = [
                 { url: '/api/incidents?action=close', method: 'PUT', actionKey: 'close' },
                 { url: '/api/incidents?action=update', method: 'PUT', actionKey: 'update' },
@@ -463,12 +529,8 @@
                         body: JSON.stringify({ action: attempt.actionKey, ...payloadData })
                     });
                     closeResult = await res.json();
-                    if (closeResult && closeResult.success) {
-                        break;
-                    }
-                    if (closeResult && closeResult.error && !closeResult.error.includes('action')) {
-                        break;
-                    }
+                    if (closeResult && closeResult.success) break;
+                    if (closeResult && closeResult.error && !closeResult.error.includes('action')) break;
                 } catch (err) {
                     console.warn(`Attempt failed for ${attempt.url}`, err);
                 }
@@ -499,7 +561,7 @@
 
     <div class="nav-footer">
         <a href="index.html" target="_self">📋 Main Index</a>
-        <a href="03_sub_gar_annexure_1_history.html" target="_self">Resolved Audit Trail &rarr;</a>
+        <a href="03_gar_annexure_1_history.html" target="_self">Resolved Audit Trail &rarr;</a>
     </div>
 </body>
 </html>
