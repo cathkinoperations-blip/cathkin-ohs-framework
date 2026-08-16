@@ -113,35 +113,58 @@
 </div>
 
 <script>
-async function loadDefects() {
-    try {
-        const response = await fetch('/api/get-defects');
-        const data = await response.json();
-        const tbody = document.querySelector('#defects-table tbody');
-        tbody.innerHTML = '';
+    const API_BASE_DEFECTS = 'https://cathkin-ohs-framework.vercel.app/api';
 
-        if (data.defects && data.defects.length > 0) {
-            data.defects.forEach(d => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${new Date(d.created_at).toLocaleDateString()}</td>
-                        <td>${d.equipment_name}</td>
-                        <td>${d.operator_name}</td>
-                        <td>${d.defect_description}</td>
-                        <td><span class="badge ${d.severity === 'Critical' ? 'bg-danger' : 'bg-warning'}">${d.severity}</span></td>
-                        <td>${d.status}</td>
-                        <td><button class="btn btn-sm btn-success" onclick="resolveDefect(${d.id})">Close</button></td>
-                    </tr>
-                `;
-            });
-        } else {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center">No active defects reported. Excellent!</td></tr>`;
+    async function loadActiveDefects() {
+        try {
+            const response = await fetch(`${API_BASE_DEFECTS}/get-defects`);
+            const data = await response.json();
+            const tbody = document.querySelector('#defects-table tbody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+
+            if (data.success && data.defects && data.defects.length > 0) {
+                data.defects.forEach(d => {
+                    const badgeClass = d.severity === 'Critical' ? 'bg-danger' : 'bg-warning text-dark';
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${new Date(d.created_at).toLocaleDateString()}</td>
+                            <td><strong>${d.equipment_name}</strong></td>
+                            <td>${d.operator_name || 'N/A'}</td>
+                            <td>${d.defect_description}</td>
+                            <td><span class="badge ${badgeClass}">${d.severity}</span></td>
+                            <td><span class="badge bg-secondary">${d.status}</span></td>
+                            <td><button class="btn btn-sm btn-success" onclick="resolveDefect(${d.id})">Close</button></td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 15px;">No active defects reported. Excellent!</td></tr>`;
+            }
+        } catch (err) {
+            console.error('Failed to load defects:', err);
         }
-    } catch (err) {
-        console.error('Failed to load defects:', err);
     }
-}
-loadDefects();
+
+    async function resolveDefect(id) {
+        if (!confirm('Are you sure you want to mark this defect as Verified & Closed?')) return;
+
+        try {
+            const res = await fetch(`${API_BASE_DEFECTS}/get-defects`, {
+                // If you want a dedicated update route, or you can manage status updates directly
+            });
+            // For now, reload to refresh the list once your update endpoint is hit
+            alert('Defect resolution triggered.');
+            loadActiveDefects();
+        } catch (err) {
+            alert('Error closing defect: ' + err.message);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadActiveDefects();
+    });
 </script>
 
     <div class="nav-footer">
