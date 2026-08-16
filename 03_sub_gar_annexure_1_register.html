@@ -6,7 +6,6 @@
     <title>GAR Annexure 1 Incident Register | Cathkin Estates HOA</title>
     <base target="_self">
     <link rel="stylesheet" href="style.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="header-banner">
@@ -19,98 +18,90 @@
         </div>
     </div>
 
-    <div class="container py-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Active Incidents & Corrective Action Tracker</h2>
-            <a href="03_gar_annexure_1_history.html" class="btn btn-outline-secondary btn-sm">View Closed Incident History &rarr;</a>
-        </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
+        <h2>1. Active Incidents & Corrective Action Tracker</h2>
+        <a href="03_gar_annexure_1_history.html" class="btn-link" target="_self">View Closed Incident History &rarr;</a>
+    </div>
 
-        <!-- New Incident Form Card -->
-        <div class="card shadow-sm mb-5">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Log New Incident / Injury / Near-Miss</h5>
-            </div>
-            <div class="card-body">
-                <form id="incident-form">
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Incident Date & Time</label>
-                            <input type="datetime-local" class="form-control" id="incident_date" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Reported By</label>
-                            <input type="text" class="form-control" id="reported_by" placeholder="Name & Role" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Incident Type</label>
-                            <select class="form-select" id="incident_type" required>
-                                <option value="">Choose...</option>
-                                <option value="Injury">Injury</option>
-                                <option value="Occupational Illness">Occupational Illness</option>
-                                <option value="Property Damage">Property Damage</option>
-                                <option value="Near-Miss">Near-Miss</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Location on Estate</label>
-                            <input type="text" class="form-control" id="location" placeholder="e.g. Workshop, Road Series 2, Gate 1" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Severity Level</label>
-                            <select class="form-select" id="severity" required>
-                                <option value="Minor">Minor</option>
-                                <option value="Moderate">Moderate</option>
-                                <option value="Severe">Severe</option>
-                                <option value="Reportable (Section 24)">Reportable (Section 24)</option>
-                            </select>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Detailed Description of Incident</label>
-                            <textarea class="form-control" id="description" rows="3" placeholder="Describe what happened..." required></textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Corrective / Preventative Action (CAPA)</label>
-                            <textarea class="form-control" id="corrective_action" rows="2" placeholder="Action taken or planned..." required></textarea>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Responsible Person (Appointee)</label>
-                            <input type="text" class="form-control" id="responsible_person" placeholder="Name of person accountable" required>
-                        </div>
-                        <div class="col-12 text-end">
-                            <button type="submit" class="btn btn-success px-4">Submit Incident Record</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Active Incidents Table -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">Active / Open Incidents</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped align-middle" id="incidents-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Type</th>
-                                <th>Location</th>
-                                <th>Description</th>
-                                <th>Severity</th>
-                                <th>CAPA & Owner</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td colspan="8" class="text-center text-muted">Loading active incidents...</td></tr>
-                        </tbody>
-                    </table>
+    <!-- Log New Incident Form Section -->
+    <div class="card mb-4" style="background: #fdfdfd; border: 1px solid #e2e8f0; padding: 20px; border-radius: 6px; margin-bottom: 30px;">
+        <h3 style="margin-top: 0; color: #1a365d;">Log New Incident / Injury / Near-Miss</h3>
+        <form id="incident-form">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Incident Date & Time</label>
+                    <input type="datetime-local" id="incident_date" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required>
+                </div>
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Reported By</label>
+                    <input type="text" id="reported_by" placeholder="Name & Role" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required>
+                </div>
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Incident Type</label>
+                    <select id="incident_type" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required>
+                        <option value="">Choose...</option>
+                        <option value="Injury">Injury</option>
+                        <option value="Occupational Illness">Occupational Illness</option>
+                        <option value="Property Damage">Property Damage</option>
+                        <option value="Near-Miss">Near-Miss</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Location on Estate</label>
+                    <input type="text" id="location" placeholder="e.g. Workshop, Road Series 2" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required>
+                </div>
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Severity Level</label>
+                    <select id="severity" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required>
+                        <option value="Minor">Minor</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="Severe">Severe</option>
+                        <option value="Reportable (Section 24)">Reportable (Section 24)</option>
+                    </select>
                 </div>
             </div>
-        </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Detailed Description of Incident</label>
+                <textarea id="description" rows="3" placeholder="Describe what happened..." style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required></textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Corrective / Preventative Action (CAPA)</label>
+                    <textarea id="corrective_action" rows="2" placeholder="Action taken or planned..." style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required></textarea>
+                </div>
+                <div>
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px;">Responsible Person (Appointee)</label>
+                    <input type="text" id="responsible_person" placeholder="Name of person accountable" style="width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 4px;" required>
+                </div>
+            </div>
+
+            <div style="text-align: right;">
+                <button type="submit" style="background-color: #2f855a; color: white; padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">Submit Incident Record</button>
+            </div>
+        </form>
+    </div>
+
+    <h2>2. Active / Open Incidents Table</h2>
+    <div class="card">
+        <table class="table" id="incidents-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Location</th>
+                    <th>Description</th>
+                    <th>Severity</th>
+                    <th>CAPA & Owner</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="8" style="text-align: center; color: #718096; padding: 20px;">Loading active incidents...</td></tr>
+            </tbody>
+        </table>
     </div>
 
     <script>
@@ -129,15 +120,15 @@
                                 <td><strong>${inc.incident_type}</strong></td>
                                 <td>${inc.location}</td>
                                 <td>${inc.description}</td>
-                                <td><span class="badge bg-warning text-dark">${inc.severity}</span></td>
+                                <td><span style="background: #feebc8; color: #9c4221; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.severity}</span></td>
                                 <td><small><strong>Action:</strong> ${inc.corrective_action}<br><strong>Owner:</strong> ${inc.responsible_person}</small></td>
-                                <td><span class="badge bg-primary">${inc.status}</span></td>
-                                <td><button class="btn btn-sm btn-outline-danger" onclick="closeIncident('${inc.id}')">Close & Verify</button></td>
+                                <td><span style="background: #ebf8ff; color: #2b6cb0; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.status}</span></td>
+                                <td><button onclick="closeIncident('${inc.id}')" style="background: #e53e3e; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px;">Close & Verify</button></td>
                             </tr>
                         `;
                     });
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">No active open incidents recorded.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #718096; padding: 20px;">No active open incidents recorded.</td></tr>`;
                 }
             } catch (err) {
                 console.error('Failed to load incidents:', err);
@@ -198,7 +189,7 @@
         document.addEventListener('DOMContentLoaded', loadIncidents);
     </script>
 
-    <div class="nav-footer mt-5">
+    <div class="nav-footer">
         <a href="03_incident_reporting_coida.html" target="_self">&larr; Back to Module 03 Overview</a>
         <a href="index.html" target="_self">📋 Main Index</a>
     </div>

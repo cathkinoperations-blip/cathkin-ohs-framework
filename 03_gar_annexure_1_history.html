@@ -6,7 +6,6 @@
     <title>Closed Incident History | Cathkin Estates HOA</title>
     <base target="_self">
     <link rel="stylesheet" href="style.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="header-banner">
@@ -19,34 +18,28 @@
         </div>
     </div>
 
-    <div class="container py-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Closed & Verified Incidents History</h2>
-            <a href="03_sub_gar_annexure_1_register.html" class="btn btn-secondary btn-sm">&larr; Back to Active Register</a>
-        </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
+        <h2>Closed & Verified Incidents History</h2>
+        <a href="03_sub_gar_annexure_1_register.html" class="btn-link" target="_self">&larr; Back to Active Register</a>
+    </div>
 
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped align-middle" id="history-table">
-                        <thead>
-                            <tr>
-                                <th>Incident Date</th>
-                                <th>Type & Location</th>
-                                <th>Description</th>
-                                <th>Severity</th>
-                                <th>CAPA & Owner</th>
-                                <th>Status</th>
-                                <th>Close-Out Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td colspan="7" class="text-center text-muted">Loading incident history...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+    <div class="card">
+        <table class="table" id="history-table">
+            <thead>
+                <tr>
+                    <th>Incident Date</th>
+                    <th>Type & Location</th>
+                    <th>Description</th>
+                    <th>Severity</th>
+                    <th>CAPA & Owner</th>
+                    <th>Status</th>
+                    <th>Close-Out Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">Loading incident history...</td></tr>
+            </tbody>
+        </table>
     </div>
 
     <script>
@@ -64,15 +57,15 @@
                                 <td>${new Date(inc.incident_date).toLocaleDateString()}</td>
                                 <td><strong>${inc.incident_type}</strong><br><small>${inc.location}</small></td>
                                 <td>${inc.description}</td>
-                                <td><span class="badge bg-secondary">${inc.severity}</span></td>
+                                <td><span style="background: #edf2f7; color: #4a5568; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.severity}</span></td>
                                 <td><small><strong>Action:</strong> ${inc.corrective_action}<br><strong>Owner:</strong> ${inc.responsible_person}</small></td>
-                                <td><span class="badge bg-success">${inc.status}</span></td>
-                                <td>${inc.verified_at ? new Date(inc.verified_at.toLocaleDateString ? inc.verified_at : inc.verified_at).toLocaleDateString() : 'N/A'}</td>
+                                <td><span style="background: #c6f6d5; color: #22543d; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.status}</span></td>
+                                <td>${inc.verified_at ? new Date(inc.verified_at).toLocaleDateString() : 'N/A'}</td>
                             </tr>
                         `;
                     });
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">No closed incidents found in history.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">No closed incidents found in history.</td></tr>`;
                 }
             } catch (err) {
                 console.error('Failed to load history:', err);
@@ -82,7 +75,7 @@
         document.addEventListener('DOMContentLoaded', loadHistory);
     </script>
 
-    <div class="nav-footer mt-5">
+    <div class="nav-footer">
         <a href="03_sub_gar_annexure_1_register.html" target="_self">&larr; Back to Active Register</a>
         <a href="index.html" target="_self">📋 Main Index</a>
     </div>
