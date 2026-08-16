@@ -309,7 +309,7 @@
 
         statusDiv.style.display = 'block';
         statusDiv.style.color = '#2b6cb0';
-        statusDiv.innerHTML = '⌛ Gemini analyzing evidence attachments...';
+        statusDiv.innerHTML = '⌛ Analysing evidence attachments...';
         btn.disabled = true;
 
         try {
@@ -495,6 +495,13 @@
     // Close Incident Submit with Manager Authentication
 document.getElementById('close-form').addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    // 1. Mandatory AI Analysis Guard Check
+        if (!currentCloseAiAssessment) {
+            alert('Verification required! Please click "Run Close-Out Verification" before confirming close-out.');
+            return;
+        }
+
     const id = document.getElementById('close-incident-id').value;
     const notes = document.getElementById('close-notes').value;
     const fileInput = document.getElementById('close-image');
