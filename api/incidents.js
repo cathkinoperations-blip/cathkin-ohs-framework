@@ -17,14 +17,15 @@ export default async function handler(req, res) {
     const action = req.query.action || req.body.action;
 
     try {
-        if (!process.env.GEMINI_API_KEY) {
+        const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+        if (!apiKey) {
             return res.status(500).json({ 
                 success: false, 
-                error: "GEMINI_API_KEY is missing from Vercel Environment Variables. Please add it in your Vercel Project Settings." 
+                error: "GEMINI_API_KEY is missing from Vercel Environment Variables." 
             });
         }
 
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+        const ai = new GoogleGenAI({ apiKey });
 
         if (req.method === 'GET' && action === 'list') {
             const result = await pool.query(`SELECT * FROM incident_register WHERE status != 'Closed' ORDER BY incident_date DESC;`);
@@ -36,12 +37,12 @@ export default async function handler(req, res) {
             return res.status(200).json({ success: true, incidents: result.rows });
         }
 
-        // AI Intake Analysis from Photo
+        // AI Intake Analysis from Photo using Gemini 3.6 Flash
         if (req.method === 'POST' && action === 'analyze-intake') {
             const { imageBase64, mimeType } = req.body;
             
             const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
+                model: 'gemini-3.6-flash',
                 contents: [
                     {
                         inlineData: {
@@ -65,12 +66,12 @@ export default async function handler(req, res) {
             return res.status(200).json({ success: true, analysis: JSON.parse(response.text) });
         }
 
-        // AI Close-Out Verification Assessment from Photo
+        // AI Close-Out Verification Assessment from Photo using Gemini 3.6 Flash
         if (req.method === 'POST' && action === 'analyze-close') {
             const { imageBase64, mimeType, description, corrective_action } = req.body;
 
             const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
+                model: 'gemini-3.6-flash',
                 contents: [
                     {
                         inlineData: {
@@ -106,7 +107,7 @@ export default async function handler(req, res) {
 
         return res.status(400).json({ success: false, error: 'Invalid action parameter' });
     } catch (err) {
-        console.error('API Error:', err);
+        console.error('API Error Details:', err);
         return res.status(500).json({ success: false, error: err.message });
     }
 }
