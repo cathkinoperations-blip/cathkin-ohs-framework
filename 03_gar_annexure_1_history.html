@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resolved Incident History | Cathkin Estates HOA</title>
+    <title>Resolved Incident Audit Trail | Cathkin Estates HOA</title>
     <base target="_self">
     <link rel="stylesheet" href="style.css">
     <style>
@@ -22,13 +22,50 @@
             border-bottom: 2px solid #edf2f7;
             padding-bottom: 8px;
             margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .search-bar {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 13px;
+            width: 260px;
+            max-width: 100%;
         }
         .badge-closed {
             background: #c6f6d5;
             color: #22543d;
-            padding: 2px 8px;
+            padding: 3px 8px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .evidence-btn-group {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .btn-img {
+            background: #edf2f7;
+            color: #2b6cb0;
+            border: 1px solid #cbd5e0;
+            padding: 3px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .btn-pdf {
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 3px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
             font-weight: bold;
         }
     </style>
@@ -39,40 +76,44 @@
         <div class="subtitle">Operational Health & Safety Governance Manual | Cathkin Estates HOA</div>
         <div class="meta-bar">
             <span><strong>Document Ref:</strong> OHS-MOD-003-HIST</span>
-            <span><strong>Regulatory Standard:</strong> GAR 9 & COIDA (Act 130 of 1993)</span>
-            <span><strong>Digitization:</strong> Archived Audit Records</span>
+            <span><strong>Regulatory Standard:</strong> GAR 9 Audit Compliance</span>
+            <span><strong>Digitization:</strong> Historical Records Archive</span>
         </div>
     </div>
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
-        <h2>Archived / Closed Incident Records</h2>
-        <a href="03_sub_gar_annexure_1_register.html" class="btn-link" target="_self">&larr; Back to Active Register</a>
+        <h2>Historical Audit Register</h2>
+        <a href="03_sub_gar_annexure_1_register.html" class="btn-link" target="_self">&larr; Return to Active Register</a>
     </div>
 
     <div class="section-card">
-        <div class="section-title">📂 Closed Incident & Close-Out Verification Log</div>
+        <div class="section-title">
+            <span>📂 Closed & Verified Incidents</span>
+            <input type="text" id="search-input" class="search-bar" placeholder="Search by location, description, or manager..." onkeyup="filterHistoryTable()">
+        </div>
+        
         <div style="overflow-x: auto;">
             <table class="table" id="history-table">
                 <thead>
                     <tr>
-                        <th>Date & Initial Evidence</th>
+                        <th>Dates (Logged / Closed)</th>
                         <th>Type & Location</th>
-                        <th>Description & Reporter</th>
-                        <th>Severity</th>
-                        <th>CAPA & Owner</th>
-                        <th>Close-Out Verification & Evidence</th>
+                        <th>Incident Description</th>
+                        <th>Remediation & Closure Notes</th>
+                        <th>Verification & Sign-off</th>
+                        <th>Evidence Attached</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">Loading resolved history...</td></tr>
+                    <tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">Loading historical records...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <script>
-    let currentHistory = [];
+    let resolvedIncidents = [];
 
     document.addEventListener('DOMContentLoaded', () => {
         loadHistory();
@@ -81,87 +122,104 @@
     async function loadHistory() {
         const tbody = document.querySelector('#history-table tbody');
         try {
-            let incidents = [];
-            
-            // Try fetching incidents from the API
-            const responses = await Promise.allSettled([
-                fetch('/api/incidents?action=history'),
-                fetch('/api/incidents?status=closed'),
-                fetch('/api/incidents?action=list')
-            ]);
+            // Attempt endpoint query for history or fallback to general list filtering
+            let response = await fetch('/api/incidents?action=history');
+            let data = await response.json();
 
-            for (const res of responses) {
-                if (res.status === 'fulfilled' && res.value.ok) {
-                    const data = await res.value.json();
-                    if (data.success && data.incidents) {
-                        incidents = data.incidents;
-                        break;
-                    }
-                }
+            if (!data.success || !data.incidents) {
+                response = await fetch('/api/incidents?action=list');
+                data = await response.json();
             }
-
-            // Filter out active ones to show only verified/closed incidents
-            const closedIncidents = incidents.filter(inc => 
-                inc.status && (
-                    inc.status.toLowerCase().includes('closed') || 
-                    inc.status.toLowerCase().includes('verified') || 
-                    inc.status.toLowerCase().includes('resolved')
-                )
-            );
 
             tbody.innerHTML = '';
 
-            if (closedIncidents.length > 0) {
-                currentHistory = closedIncidents;
-                closedIncidents.forEach((inc, incIndex) => {
-                    let initialEvidenceHtml = renderEvidenceButtons(inc.incident_image_url, incIndex, 'incident');
-                    let closeEvidenceHtml = renderEvidenceButtons(inc.close_image_url, incIndex, 'close');
+            if (data.success && data.incidents && data.incidents.length > 0) {
+                // Filter specifically for closed/verified items if general list returned
+                resolvedIncidents = data.incidents.filter(inc => 
+                    inc.status && inc.status.toLowerCase().includes('close')
+                );
 
-                    const reporterInfo = inc.reporter_name ? `<br><small style="color: #4a5568;"><strong>Reporter:</strong> ${inc.reporter_name} (${inc.reporter_role || 'Staff/Resident'})</small>` : '';
-                    const closeInfo = inc.remediation_notes ? `<strong>Remediation:</strong> ${inc.remediation_notes}<br>` : '';
-                    const verifiedBy = inc.verified_by ? `<small style="color: #2b6cb0;"><strong>Verified By:</strong> ${inc.verified_by}</small>` : '';
+                if (resolvedIncidents.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">No resolved incidents found in the audit trail.</td></tr>`;
+                    return;
+                }
 
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${new Date(inc.incident_date).toLocaleString()}${initialEvidenceHtml}</td>
-                            <td><strong>${inc.incident_type}</strong><br><small>${inc.location}</small></td>
-                            <td>${inc.description}${reporterInfo}</td>
-                            <td><span style="background: #edf2f7; color: #4a5568; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.severity}</span></td>
-                            <td><small><strong>Action:</strong> ${inc.corrective_action}<br><strong>Owner:</strong> ${inc.responsible_person}</small></td>
-                            <td><small>${closeInfo}${verifiedBy}</small>${closeEvidenceHtml}</td>
-                            <td><span class="badge-closed">${inc.status}</span></td>
-                        </tr>
-                    `;
-                });
+                renderTable(resolvedIncidents);
             } else {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">No resolved/closed incident records found.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">No resolved incidents recorded yet.</td></tr>`;
             }
         } catch (err) {
-            console.error('Failed to load history:', err);
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #e53e3e; padding: 20px;">Error loading resolved history records.</td></tr>`;
+            console.error('Failed to load incident history:', err);
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #e53e3e; padding: 20px;">Unable to load historical data from server.</td></tr>`;
         }
     }
 
-    function renderEvidenceButtons(rawUrl, incIndex, type) {
+    function renderTable(incidents) {
+        const tbody = document.querySelector('#history-table tbody');
+        tbody.innerHTML = '';
+
+        incidents.forEach((inc, incIndex) => {
+            const dateLogged = inc.incident_date ? new Date(inc.incident_date).toLocaleString() : 'N/A';
+            const dateClosed = inc.closed_at ? new Date(inc.closed_at).toLocaleString() : (inc.updated_at ? new Date(inc.updated_at).toLocaleString() : 'Closed');
+
+            // Format initial evidence
+            let logEvidenceHtml = renderFileList(inc.incident_image_url, incIndex, 'log');
+            // Format close-out evidence
+            let closeEvidenceHtml = renderFileList(inc.close_image_url, incIndex, 'close');
+
+            const reporterInfo = inc.reporter_name ? `<br><small style="color: #718096;"><strong>By:</strong> ${inc.reporter_name}</small>` : '';
+            const verifierInfo = inc.verified_by ? `<strong>Verified By:</strong> ${inc.verified_by}` : '<strong>Sign-off:</strong> Manager';
+
+            tbody.innerHTML += `
+                <tr>
+                    <td>
+                        <small><strong>Logged:</strong> ${dateLogged}</small><br>
+                        <small style="color: #276749;"><strong>Closed:</strong> ${dateClosed}</small>
+                    </td>
+                    <td>
+                        <strong>${inc.incident_type || 'N/A'}</strong><br>
+                        <small>${inc.location || 'Estate'}</small>
+                        ${reporterInfo}
+                    </td>
+                    <td><small>${inc.description || 'No description provided.'}</small></td>
+                    <td>
+                        <small>
+                            <strong>CAPA:</strong> ${inc.corrective_action || 'N/A'}<br>
+                            <strong>Closure Notes:</strong> ${inc.remediation_notes || 'Verified resolved.'}
+                        </small>
+                    </td>
+                    <td><small>${verifierInfo}</small></td>
+                    <td>
+                        ${logEvidenceHtml ? `<div style="margin-bottom:4px;"><small><strong>Initial:</strong></small>${logEvidenceHtml}</div>` : ''}
+                        ${closeEvidenceHtml ? `<div><small><strong>Close-Out:</strong></small>${closeEvidenceHtml}</div>` : ''}
+                        ${!logEvidenceHtml && !closeEvidenceHtml ? '<small style="color:#a0aec0;">None</small>' : ''}
+                    </td>
+                    <td><span class="badge-closed">${inc.status || 'Closed'}</span></td>
+                </tr>
+            `;
+        });
+    }
+
+    function renderFileList(rawUrl, incIndex, type) {
         if (!rawUrl) return '';
         const items = rawUrl.split(',');
-        let evidenceHtml = '<div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;">';
+        let html = '<div class="evidence-btn-group">';
         items.forEach((itemSrc, itemIndex) => {
             const trimmed = itemSrc.trim();
             if (trimmed.startsWith('data:image') || trimmed.startsWith('http')) {
-                evidenceHtml += `<button type="button" onclick="viewHistoryFile(${incIndex}, '${type}', ${itemIndex})" style="background: #edf2f7; color: #2b6cb0; border: 1px solid #cbd5e0; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📷 Photo ${itemIndex + 1}</button>`;
+                html += `<button type="button" class="btn-img" onclick="viewFile(${incIndex}, '${type}', ${itemIndex})">📷 Photo ${itemIndex + 1}</button>`;
             } else if (trimmed.startsWith('data:application/pdf')) {
-                evidenceHtml += `<button type="button" onclick="viewHistoryFile(${incIndex}, '${type}', ${itemIndex})" style="background: #2b6cb0; color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold;">📄 PDF Doc</button>`;
+                html += `<button type="button" class="btn-pdf" onclick="viewFile(${incIndex}, '${type}', ${itemIndex})">📄 PDF</button>`;
             }
         });
-        evidenceHtml += '</div>';
-        return evidenceHtml;
+        html += '</div>';
+        return html;
     }
 
-    function viewHistoryFile(incIndex, type, fileIndex) {
+    function viewFile(incIndex, type, fileIndex) {
         try {
-            const inc = currentHistory[incIndex];
-            const rawUrl = type === 'incident' ? inc.incident_image_url : inc.close_image_url;
+            const inc = resolvedIncidents[incIndex];
+            const rawUrl = type === 'log' ? inc.incident_image_url : inc.close_image_url;
             const items = rawUrl.split(',');
             
             let targetItem = items[fileIndex].trim();
@@ -175,7 +233,7 @@
                     newWindow.document.write(`
                         <!DOCTYPE html>
                         <html>
-                        <head><title>Document Viewer</title></head>
+                        <head><title>Audit Evidence - PDF Document</title></head>
                         <body style="margin: 0; height: 100vh;">
                             <embed src="${targetItem}" type="application/pdf" width="100%" height="100%">
                         </body>
@@ -185,27 +243,39 @@
                     newWindow.document.write(`
                         <!DOCTYPE html>
                         <html>
-                        <head><title>Evidence Viewer</title></head>
-                        <body style="margin: 0; display: flex; justify-content: center; align-items: center; background: #2d3748; min-height: 100vh;">
-                            <img src="${targetItem}" style="max-width: 100%; max-height: 100vh; box-shadow: 0 4px 6px rgba(0,0,0,0.3);" alt="Evidence File">
+                        <head><title>Audit Evidence - Image</title></head>
+                        <body style="margin: 0; display: flex; justify-content: center; align-items: center; background: #1a202c; min-height: 100vh;">
+                            <img src="${targetItem}" style="max-width: 100%; max-height: 100vh; box-shadow: 0 4px 6px rgba(0,0,0,0.3);" alt="Audit Evidence">
                         </body>
                         </html>
                     `);
                 }
                 newWindow.document.close();
             } else {
-                alert("Please allow pop-ups for this site to view the files.");
+                alert("Please allow pop-ups to view attached evidence documents.");
             }
         } catch (e) {
-            console.error("Error opening file:", e);
-            alert("Could not load file.");
+            console.error("Error viewing file:", e);
+            alert("Could not load evidence document.");
         }
+    }
+
+    function filterHistoryTable() {
+        const query = document.getElementById('search-input').value.toLowerCase();
+        const filtered = resolvedIncidents.filter(inc => {
+            return (inc.location && inc.location.toLowerCase().includes(query)) ||
+                   (inc.description && inc.description.toLowerCase().includes(query)) ||
+                   (inc.remediation_notes && inc.remediation_notes.toLowerCase().includes(query)) ||
+                   (inc.verified_by && inc.verified_by.toLowerCase().includes(query)) ||
+                   (inc.reporter_name && inc.reporter_name.toLowerCase().includes(query));
+        });
+        renderTable(filtered);
     }
     </script>
 
     <div class="nav-footer">
         <a href="index.html" target="_self">📋 Main Index</a>
-        <a href="03_sub_gar_annexure_1_register.html" target="_self">&larr; Back to Active Register</a>
+        <a href="03_sub_gar_annexure_1_register.html" target="_self">&larr; Return to Active Register</a>
     </div>
 </body>
 </html>
