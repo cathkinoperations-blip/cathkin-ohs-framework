@@ -287,7 +287,6 @@
             const rawUrl = type === 'incident' ? inc.incident_image_url : inc.close_image_url;
             const items = rawUrl.split(',');
             
-            // Handle chunked base64 or single strings safely
             let targetItem = items[fileIndex].trim();
             if (targetItem.startsWith('data:image') && items[fileIndex + 1] && !items[fileIndex + 1].includes('data:')) {
                 targetItem += ',' + items[fileIndex + 1].trim();
@@ -437,11 +436,12 @@
                 return;
             }
 
-            // Perform close-out
-            const closeRes = await fetch('/api/incidents', {
+            // Perform close-out with action parameter included
+            const closeRes = await fetch('/api/incidents?action=close', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    action: 'close',
                     id,
                     status: 'Closed - Verified',
                     remediation_notes: notes,
