@@ -27,13 +27,13 @@
     <div class="card mb-4" style="background: #fdfdfd; border: 1px solid #e2e8f0; padding: 20px; border-radius: 6px; margin-bottom: 30px;">
         <h3 style="margin-top: 0; color: #1a365d;">Log New Incident / Injury / Near-Miss</h3>
         
-        <!-- AI Photo Auto-Fill Section -->
-        <div style="background: #ebf8ff; border: 1px solid #bee3f8; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-            <label style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 5px;">🤖 AI Vision Assistant: Upload Incident Photo to Auto-Fill</label>
-            <input type="file" id="intake-photo-input" accept="image/*" style="margin-bottom: 10px;">
-            <button type="button" onclick="analyzeIntakePhoto()" style="background-color: #3182ce; color: white; padding: 6px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px;">Analyze Photo with Gemini AI</button>
-            <span id="ai-loading" style="margin-left: 10px; font-style: italic; color: #4a5568; display: none;">Analyzing image and extracting details...</span>
-        </div>
+    <!-- AI Photo Auto-Fill Section -->
+    <div style="background: #ebf8ff; border: 1px solid #bee3f8; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+        <label style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 5px;">🤖 AI Vision Assistant: Upload Up to 5 Incident Photos to Auto-Fill</label>
+        <input type="file" id="intake-photo-input" accept="image/*" multiple style="margin-bottom: 10px;">
+        <button type="button" onclick="analyzeIntakePhoto()" style="background-color: #3182ce; color: white; padding: 6px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px;">Analyze Photos with Gemini AI</button>
+        <span id="ai-loading" style="margin-left: 10px; font-style: italic; color: #4a5568; display: none;">Analyzing images and extracting details...</span>
+    </div>
 
         <form id="incident-form">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 15px;">
@@ -126,20 +126,30 @@
 
     async function analyzeIntakePhoto() {
         const fileInput = document.getElementById('intake-photo-input');
-        if (!fileInput.files[0]) {
-            alert('Please select an image file first.');
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert('Please select at least one image file first.');
             return;
         }
 
-        const file = fileInput.files[0];
+        if (fileInput.files.length > 5) {
+            alert('You can upload a maximum of 5 photos.');
+            return;
+        }
+
+        const files = Array.from(fileInput.files);
         document.getElementById('ai-loading').style.display = 'inline';
 
         try {
-            const base64 = await fileToBase64(file);
+            // Convert up to 5 files to base64 objects
+            const imagesPayload = await Promise.all(files.map(async (file) => ({
+                imageBase64: await fileToBase64(file),
+                mimeType: file.type
+            })));
+
             const response = await fetch('/api/incidents', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'analyze-intake', imageBase64: base64, mimeType: file.type })
+                body: JSON.stringify({ action: 'analyze-intake', images: imagesPayload })
             });
             const data = await response.json();
 
@@ -151,9 +161,10 @@
                 if (res.severity) document.getElementById('severity').value = res.severity;
                 if (res.corrective_action) document.getElementById('corrective_action').value = res.corrective_action;
                 
-                // Store simulated image URL reference
-                document.getElementById('incident_image_url').value = file.name;
-                alert('AI successfully analyzed the photo and auto-filled the form fields! Review and submit.');
+                // Store file names reference (comma-separated for multiple)
+                const fileNames = files.map(f => f.name).join(', ');
+                document.getElementById('incident_image_url').value = fileNames;
+                alert('AI successfully analyzed the photos and auto-filled the form fields! Review and submit.');
             } else {
                 alert('AI analysis failed.');
             }
@@ -195,23 +206,30 @@
     }
 
     async function promptClose(id, description, corrective_action) {
-        const input = prompt('Upload / provide close-out verification photo file name or description for AI evaluation:');
-        if (!input) return;
-
         const fakeInput = document.createElement('input');
         fakeInput.type = 'file';
         fakeInput.accept = 'image/*';
+        fakeInput.multiple = true; // Allow up to 5 close-out photos
         fakeInput.onchange = async e => {
-            const file = e.target.files[0];
-            if (!file) return;
+            const files = Array.from(e.target.files);
+            if (!files || files.length === 0) return;
 
-            alert('Running AI Close-Out Audit on remediation photo...');
+            if (files.length > 5) {
+                alert('You can upload a maximum of 5 close-out photos.');
+                return;
+            }
+
+            alert('Running AI Close-Out Audit on remediation photos...');
             try {
-                const base64 = await fileToBase64(file);
+                const imagesPayload = await Promise.all(files.map(async (file) => ({
+                    imageBase64: await fileToBase64(file),
+                    mimeType: file.type
+                })));
+
                 const response = await fetch('/api/incidents', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'analyze-close', imageBase64: base64, mimeType: file.type, description, corrective_action })
+                    body: JSON.stringify({ action: 'analyze-close', images: imagesPayload, description, corrective_action })
                 });
                 const data = await response.json();
 
@@ -227,10 +245,11 @@
                         alert('AI Verification Passed! Remediation is satisfactory.');
                     }
 
+                    const fileNames = files.map(f => f.name).join(', ');
                     const closeRes = await fetch('/api/incidents', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'close', id, close_image_url: file.name, ai_close_assessment: assessmentText })
+                        body: JSON.stringify({ action: 'close', id, close_image_url: fileNames, ai_close_assessment: assessmentText })
                     });
                     const closeData = await closeRes.json();
                     if (closeData.success) loadIncidents();
