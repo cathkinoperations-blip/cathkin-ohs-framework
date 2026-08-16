@@ -91,7 +91,7 @@
                             🔍 Analyse Attachments
                         </button>
                     </div>
-                    <div class="file-hint"><strong>Required:</strong> 1 to 5 attachments. Click <em>Analyse Attachments</em> to trigger Gemini intake scanning.</div>
+                    <div class="file-hint"><strong>Required:</strong> 1 to 5 attachments. Click <em>Analyse Attachments</em> to trigger intake scanning.</div>
                     <div id="analyze-status" style="display: none; margin-top: 8px; font-size: 12px; font-weight: bold; color: #2b6cb0;"></div>
                 </div>
 
@@ -340,7 +340,7 @@
                 if (ext.responsible_person) document.getElementById('responsible-person').value = ext.responsible_person;
 
                 statusDiv.style.color = '#2f855a';
-                statusDiv.innerHTML = '✅ Gemini analysis completed! Fields updated below.';
+                statusDiv.innerHTML = '✅ Analysis completed! Fields updated below.';
             } else {
                 throw new Error(data.error || 'Invalid API response structure');
             }
@@ -369,7 +369,7 @@
         statusDiv.style.display = 'block';
         statusDiv.style.background = '#ebf8ff';
         statusDiv.style.color = '#2b6cb0';
-        statusDiv.innerHTML = '⌛ Gemini verifying close-out evidence...';
+        statusDiv.innerHTML = '⌛ Verifying close-out evidence...';
 
         try {
             const imagesPayload = [];
