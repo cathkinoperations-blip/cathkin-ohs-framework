@@ -115,7 +115,7 @@ export default async function handler(req, res) {
             });
 
             const response = await ai.models.generateContent({
-                model: 'gemini-3.7-flash',
+                model: 'gemini-3.5-flash',
                 contents: [
                     ...imageParts,
                     {
@@ -155,7 +155,7 @@ export default async function handler(req, res) {
             });
 
             const response = await ai.models.generateContent({
-                model: 'gemini-3.6-flash',
+                model: 'gemini-3.5-flash',
                 contents: [
                     ...imageParts,
                     {
