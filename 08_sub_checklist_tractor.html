@@ -581,40 +581,47 @@
     }
 
     async function analyzeChecklistEvidence() {
-    const fileInput = document.getElementById('checklist-images');
-    const statusDiv = document.getElementById('analyze-checklist-status');
-    const btn = document.getElementById('btn-analyze-checklist');
+        const fileInput = document.getElementById('checklist-images');
+        const statusDiv = document.getElementById('analyze-checklist-status');
+        const btn = document.getElementById('btn-analyze-checklist');
 
-    if (!fileInput.files || fileInput.files.length === 0) {
-        alert('Please select at least one photo or scan to analyze.');
-        return;
-    }
-
-    statusDiv.style.display = 'block';
-    statusDiv.style.color = '#2563eb';
-    statusDiv.innerHTML = '⌛ Analysing checklist document with AI...';
-    btn.disabled = true;
-
-    try {
-        const imagesPayload = [];
-        for (let file of fileInput.files) {
-            const b64 = await toBase64(file);
-            imagesPayload.push({
-                imageBase64: b64,
-                mimeType: file.type || 'image/jpeg'
-            });
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert('Please select at least one photo or scan to analyze.');
+            return;
         }
 
-        // Call your backend AI extraction endpoint
-        const response = await fetch(`${API_BASE}/analyze-checklist`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ images: imagesPayload })
-        });
+        statusDiv.style.display = 'block';
+        statusDiv.style.color = '#2563eb';
+        statusDiv.innerHTML = '⌛ Analysing checklist document with AI...';
+        btn.disabled = true;
 
-            const data = await response.json();
+        try {
+            const imagesPayload = [];
+            for (let file of fileInput.files) {
+                const b64 = await toBase64(file);
+                imagesPayload.push({
+                    imageBase64: b64,
+                    mimeType: file.type || 'image/jpeg'
+                });
+            }
 
-            if (data.success && data.extraction) {
+            // Call your backend AI extraction endpoint
+            const response = await fetch(`${API_BASE}/analyze-checklist`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ images: imagesPayload })
+            });
+
+            // Safely parse text first to catch server error pages before JSON parsing crashes
+            const responseText = await response.text();
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                throw new Error(`Server returned non-JSON response: ${responseText.substring(0, 120)}...`);
+            }
+
+            if (response.ok && data.success && data.extraction) {
                 const ext = data.extraction;
                 
                 // Automatically populate fields for user review
@@ -623,7 +630,6 @@
                 if (ext.operator_name) document.getElementById('log-operator').value = ext.operator_name;
                 if (ext.manager_initials) document.getElementById('log-manager').value = ext.manager_initials;
 
-                // If the AI extracts individual checklist row statuses or defects, you can map them here too
                 statusDiv.style.color = '#16a34a';
                 statusDiv.innerHTML = '✅ Analysis complete! Review the populated fields below, make any adjustments, and click Submit.';
             } else {
