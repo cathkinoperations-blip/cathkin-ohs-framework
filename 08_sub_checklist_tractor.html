@@ -285,6 +285,25 @@
         </div>
     </div>
 
+    <!-- AI Analysis Review Panel (Appears after analysis) -->
+    <div id="ai-review-container" class="card" style="display: none; background: #fff; border: 1px solid #2563eb; margin-top: 15px; padding: 16px; border-radius: 8px;">
+        <h3 style="margin-top: 0; color: #1e293b; font-size: 11pt;">📋 Extracted Inspection Breakdown (Review Below)</h3>
+        <div id="ai-extracted-metadata" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; font-size: 9pt;"></div>
+        
+        <div style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 8.5pt;" id="ai-results-preview-table">
+                <thead style="background: #f1f5f9; position: sticky; top: 0;">
+                    <tr>
+                        <th style="padding: 8px; text-align: left;">Component / Item</th>
+                        <th style="padding: 8px; text-align: center;">Status (Pass/Fail)</th>
+                        <th style="padding: 8px; text-align: left;">Notes / Defects</th>
+                    </tr>
+                </thead>
+                <tbody id="ai-results-preview-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+
 <script>
     const API_BASE = 'https://cathkin-ohs-framework.vercel.app/api';
     let allChecklistItems = [];

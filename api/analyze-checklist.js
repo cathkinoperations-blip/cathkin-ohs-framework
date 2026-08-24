@@ -31,7 +31,17 @@ export default async function handler(req, res) {
                     }
                 },
                 {
-                    text: "Analyze this completed tractor inspection checklist document. Extract the following details into a strict JSON object with these exact keys: 'log_date' (YYYY-MM-DD format if possible), 'hours_meter' (string, e.g. '1420 hrs'), 'operator_name' (string), and 'manager_initials' (string). If a field is missing, leave it as an empty string. Return ONLY valid JSON with no extra commentary."
+                    text: `Analyze this completed tractor inspection checklist document. 
+                    Extract the following into a strict JSON object:
+                    - 'log_date' (YYYY-MM-DD string)
+                    - 'hours_meter' (string)
+                    - 'operator_name' (string)
+                    - 'manager_initials' (string)
+                    - 'results': An array of objects for each checklist item found, where each object has:
+                      - 'component': name of the part/check item
+                      - 'status': 'Pass', 'Fail', or 'N/A'
+                      - 'note': any handwritten defect or comment (or empty string)
+                    Return ONLY valid JSON with no extra commentary.`
                 }
             ]
         });
