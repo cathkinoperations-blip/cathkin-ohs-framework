@@ -150,14 +150,17 @@
                             <div class="closeout-box">
                                 <h4 style="margin: 0 0 6px 0; font-size: 9.5pt; color: #1e293b;">🔒 Close Out / Resolve Inspection Record</h4>
                                 ${isClosed ? `
-                                    <p style="color: #15803d; font-size: 8.5pt; margin: 0;">✓ This log has been closed out and verified.</p>
+                                    <p style="color: #15803d; font-size: 8.5pt; margin: 0;">✓ This log has been closed out and verified on <strong>${log.closeout_date || 'N/A'}</strong> by <strong>${log.manager_signoff || ''}</strong>.</p>
                                 ` : `
                                     <p style="font-size: 8.5pt; color: #64748b; margin-bottom: 8px;">Verify that all corresponding maintenance actions or defect rectifications have been completed before closing out.</p>
                                     <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                                        <input type="date" id="closeout-date-${logId}" style="width: 130px; padding: 6px; font-size: 8.5pt; border: 1px solid #cbd5e1; border-radius: 4px;" value="${new Date().toISOString().split('T')[0]}">
                                         <input type="text" id="closeout-notes-${logId}" placeholder="Resolution / Maintenance Notes..." style="flex: 2; padding: 6px; font-size: 8.5pt; border: 1px solid #cbd5e1; border-radius: 4px;">
-                                        <input type="text" id="closeout-sign-${logId}" placeholder="Manager Initials (e.g. JB)" style="width: 150px; padding: 6px; font-size: 8.5pt; border: 1px solid #cbd5e1; border-radius: 4px;">
+                                        <input type="text" id="closeout-sign-${logId}" placeholder="Manager Initials (e.g. JB)" style="width: 140px; padding: 6px; font-size: 8.5pt; border: 1px solid #cbd5e1; border-radius: 4px;">
                                         <button class="btn btn-success" onclick="closeOutLog(${logId})">✓ Close Out Log</button>
                                     </div>
+                                `}
+                            </div>
                                 `}
                             </div>
                         </div>
