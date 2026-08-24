@@ -304,6 +304,16 @@
         </div>
     </div>
 
+    <!-- Place this inside your AI review container (e.g. right under the table or next to the push failures button) -->
+    <div style="margin-top: 12px; display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
+        <button type="button" class="btn btn-primary" onclick="applyAiReviewEdits()" style="font-size: 8.5pt; padding: 6px 14px; background: #16a34a;">
+            ✓ Apply AI Edits to Main Form
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="syncAiFailuresToDefects()" style="font-size: 8.5pt; padding: 6px 12px;">
+            ⚠️ Push Failed Items to Defect Log
+        </button>
+    </div>
+
 <script>
     const API_BASE = 'https://cathkin-ohs-framework.vercel.app/api';
     let allChecklistItems = [];
