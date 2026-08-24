@@ -1,7 +1,9 @@
 // api/analyze-checklist.js (Vercel Serverless Function)
 import { GoogleGenAI } from '@google/genai';
 
-const ai = new GoogleGenAI();
+const ai = new GoogleGenAI({ 
+    apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY 
+});
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -18,9 +20,9 @@ export default async function handler(req, res) {
         const img = images[0];
         const base64Data = img.imageBase64.replace(/^data:image\/\w+;base64,/, '');
 
-        // Prompt Gemini to extract the fields from the checklist photo
+        // Prompt Gemini using the current Gemini 3.5 Flash model
         const response = await ai.models.generateContent({
-            model: 'gemini-flash',
+            model: 'gemini-3.5-flash',
             contents: [
                 {
                     inlineData: {
@@ -29,13 +31,12 @@ export default async function handler(req, res) {
                     }
                 },
                 {
-                    text: "Analyze this completed tractor inspection checklist document. Extract the following details into a strict JSON object with these exact keys: 'log_date' (YYYY-MM-DD format if possible), 'hours_meter' (string, e.g. '1420 hrs'), 'operator_name' (string), and 'manager_initials' (string). If a field is missing, leave it as an empty string."
+                    text: "Analyze this completed tractor inspection checklist document. Extract the following details into a strict JSON object with these exact keys: 'log_date' (YYYY-MM-DD format if possible), 'hours_meter' (string, e.g. '1420 hrs'), 'operator_name' (string), and 'manager_initials' (string). If a field is missing, leave it as an empty string. Return ONLY valid JSON with no extra commentary."
                 }
             ]
         });
 
-        const textResponse = response.text.trim();
-        // Clean up markdown code blocks if the model wrapped the JSON
+        const textResponse = response.text ? response.text.trim() : '';
         const jsonString = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
         const extractedData = JSON.parse(jsonString);
 
