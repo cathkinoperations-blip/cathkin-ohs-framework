@@ -16,11 +16,9 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'No images provided for analysis.' });
         }
 
-        // Take the first uploaded image/scan
         const img = images[0];
         const base64Data = img.imageBase64.replace(/^data:image\/\w+;base64,/, '');
 
-        // Prompt Gemini using the current Gemini 3.5 Flash model
         const response = await ai.models.generateContent({
             model: 'gemini-3.5-flash',
             contents: [
