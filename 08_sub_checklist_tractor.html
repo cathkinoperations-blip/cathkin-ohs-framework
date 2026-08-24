@@ -668,12 +668,19 @@
 
             if (response.ok && data.success && data.extraction) {
                 const ext = data.extraction;
+
+                // Map header fields safely (supporting alternative keys if your backend uses different names)
+                const extractedDate = ext.log_date || ext.date || ext.inspection_date || '';
+                const extractedHours = ext.hours_meter || ext.hours || '';
+                const extractedOperator = ext.operator_name || ext.operator || '';
+                const extractedManager = ext.manager_initials || ext.manager || '';
                 
-                // Deduplicate extracted results by component name to prevent multi-page form repeats
-                const rawResults = ext.results || [];
+                // Deduplicate extracted results by component name
+                const rawResults = ext.results || ext.items || [];
                 const uniqueMap = new Map();
                 rawResults.forEach(item => {
-                    const key = (item.component || '').trim().toLowerCase();
+                    const compName = item.component || item.name || '';
+                    const key = compName.trim().toLowerCase();
                     if (key && !uniqueMap.has(key)) {
                         uniqueMap.set(key, item);
                     } else if (key && uniqueMap.has(key)) {
@@ -685,18 +692,18 @@
                 });
                 globalAiExtractedResults = Array.from(uniqueMap.values());
                 
-                // Populate form metadata inputs initially
-                if (ext.log_date) document.getElementById('log-date').value = ext.log_date;
-                if (ext.hours_meter) document.getElementById('log-hours').value = ext.hours_meter;
-                if (ext.operator_name) document.getElementById('log-operator').value = ext.operator_name;
-                if (ext.manager_initials) document.getElementById('log-manager').value = ext.manager_initials;
-
+                // Populate form metadata inputs
+                if (extractedDate) document.getElementById('log-date').value = extractedDate;
+                if (extractedHours) document.getElementById('log-hours').value = extractedHours;
+                if (extractedOperator) document.getElementById('log-operator').value = extractedOperator;
+                if (extractedManager) document.getElementById('log-manager').value = extractedManager;
+                
                 // Make metadata summary fully editable right inside the review card header
                 document.getElementById('ai-extracted-metadata').innerHTML = `
-                    <div><b>Date:</b> <input type="date" id="edit-ai-date" value="${ext.log_date || ''}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
-                    <div><b>Hours:</b> <input type="text" id="edit-ai-hours" value="${ext.hours_meter || ''}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
-                    <div><b>Operator:</b> <input type="text" id="edit-ai-operator" value="${ext.operator_name || ''}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
-                    <div><b>Manager:</b> <input type="text" id="edit-ai-manager" value="${ext.manager_initials || ''}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
+                    <div><b>Date:</b> <input type="date" id="edit-ai-date" value="${extractedDate}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
+                    <div><b>Hours:</b> <input type="text" id="edit-ai-hours" value="${extractedHours}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
+                    <div><b>Operator:</b> <input type="text" id="edit-ai-operator" value="${extractedOperator}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
+                    <div><b>Manager:</b> <input type="text" id="edit-ai-manager" value="${extractedManager}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
                 `;
 
                 // Populate the clean, deduplicated checklist preview table
@@ -707,20 +714,24 @@
                     tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 10px;">No explicit line items parsed.</td></tr>`;
                 } else {
                     globalAiExtractedResults.forEach((item) => {
+                        const compName = item.component || item.name || '';
+                        const itemStatus = item.status || 'Pass';
+                        const itemNote = item.note || item.notes || '';
+
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
                             <td style="padding: 6px; border-bottom: 1px solid #f1f5f9;">
-                                <input type="text" class="ai-edit-component" value="${item.component || ''}" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px; font-size:8.5pt;">
+                                <input type="text" class="ai-edit-component" value="${compName}" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px; font-size:8.5pt;">
                             </td>
                             <td style="padding: 6px; border-bottom: 1px solid #f1f5f9; text-align: center;">
-                                <select class="ai-edit-status" style="padding:4px; font-size:8.5pt; font-weight:bold; border-radius:4px; border:1px solid #cbd5e1; color: ${item.status === 'Pass' ? '#16a34a' : item.status === 'Fail' ? '#dc2626' : '#64748b'};">
-                                    <option value="Pass" ${item.status === 'Pass' ? 'selected' : ''}>Pass</option>
-                                    <option value="Fail" ${item.status === 'Fail' ? 'selected' : ''}>Fail</option>
-                                    <option value="N/A" ${item.status === 'N/A' ? 'selected' : ''}>N/A</option>
+                                <select class="ai-edit-status" style="padding:4px; font-size:8.5pt; font-weight:bold; border-radius:4px; border:1px solid #cbd5e1; color: ${itemStatus === 'Pass' ? '#16a34a' : itemStatus === 'Fail' ? '#dc2626' : '#64748b'};">
+                                    <option value="Pass" ${itemStatus === 'Pass' ? 'selected' : ''}>Pass</option>
+                                    <option value="Fail" ${itemStatus === 'Fail' ? 'selected' : ''}>Fail</option>
+                                    <option value="N/A" ${itemStatus === 'N/A' ? 'selected' : ''}>N/A</option>
                                 </select>
                             </td>
                             <td style="padding: 6px; border-bottom: 1px solid #f1f5f9;">
-                                <input type="text" class="ai-edit-note" value="${item.note || ''}" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px; font-size:8.5pt;">
+                                <input type="text" class="ai-edit-note" value="${itemNote}" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px; font-size:8.5pt;">
                             </td>
                         `;
                         tbody.appendChild(tr);

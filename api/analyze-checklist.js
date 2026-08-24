@@ -16,18 +16,18 @@ export default async function handler(req, res) {
             return res.status(400).json({ error: 'No images provided for analysis.' });
         }
 
-        const img = images[0];
-        const base64Data = img.imageBase64.replace(/^data:image\/\w+;base64,/, '');
+        // Map all uploaded images/pages into the contents array so multi-page forms are fully read
+        const imageParts = images.map(img => ({
+            inlineData: {
+                data: img.imageBase64.replace(/^data:image\/\w+;base64,/, ''),
+                mimeType: img.mimeType || 'image/jpeg'
+            }
+        }));
 
         const response = await ai.models.generateContent({
             model: 'gemini-3.5-flash',
             contents: [
-                {
-                    inlineData: {
-                        data: base64Data,
-                        mimeType: img.mimeType || 'image/jpeg'
-                    }
-                },
+                ...imageParts,
                 {
                     text: `Analyze this multi-page completed Massey Ferguson 268 Xtra Tractor & Slasher inspection checklist document. 
                     Extract the header details and all checklist items into a strict JSON object with:
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
                     - 'hours_meter' (string, e.g., '05036')
                     - 'operator_name' (string)
                     - 'manager_initials' (string)
-                    - 'results': An array of objects for each checklist item found. IMPORTANT: Deduplicate any repeated line items so each unique component is only listed once. Each object needs:
+                    - 'results': An array of objects for each checklist item found across all pages. IMPORTANT: Deduplicate any repeated line items so each unique component is only listed once. Each object needs:
                       - 'component': name of the part/check item
                       - 'status': 'Pass', 'Fail', or 'N/A'
                       - 'note': any handwritten comments (e.g., 'oil full, coolant full' or 'badly damaged')
