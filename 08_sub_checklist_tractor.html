@@ -611,6 +611,21 @@
 
     let globalAiExtractedResults = []; // Temporary holder for AI extracted rows
 
+    function applyAiReviewEdits() {
+        // 1. Sync metadata inputs back to main fields explicitly
+        const editDate = document.getElementById('edit-ai-date')?.value;
+        const editHours = document.getElementById('edit-ai-hours')?.value;
+        const editOperator = document.getElementById('edit-ai-operator')?.value;
+        const editManager = document.getElementById('edit-ai-manager')?.value;
+
+        if (editDate) document.getElementById('log-date').value = editDate;
+        if (editHours) document.getElementById('log-hours').value = editHours;
+        if (editOperator) document.getElementById('log-operator').value = editOperator;
+        if (editManager) document.getElementById('log-manager').value = editManager;
+
+        alert('✅ AI review edits successfully applied! You can now review the main form or click "Submit & Save Inspection Log" at the bottom.');
+    }
+
     async function analyzeChecklistEvidence() {
         const fileInput = document.getElementById('checklist-images');
         const statusDiv = document.getElementById('analyze-checklist-status');
