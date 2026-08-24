@@ -29,16 +29,16 @@ export default async function handler(req, res) {
                     }
                 },
                 {
-                    text: `Analyze this completed tractor inspection checklist document. 
-                    Extract the following into a strict JSON object:
-                    - 'log_date' (YYYY-MM-DD string)
-                    - 'hours_meter' (string)
+                    text: `Analyze this multi-page completed Massey Ferguson 268 Xtra Tractor & Slasher inspection checklist document. 
+                    Extract the header details and all checklist items into a strict JSON object with:
+                    - 'log_date' (Format as YYYY-MM-DD, e.g., from '17/08/2026' extract '2026-08-17')
+                    - 'hours_meter' (string, e.g., '05036')
                     - 'operator_name' (string)
                     - 'manager_initials' (string)
-                    - 'results': An array of objects for each checklist item found, where each object has:
+                    - 'results': An array of objects for each checklist item found. IMPORTANT: Deduplicate any repeated line items so each unique component is only listed once. Each object needs:
                       - 'component': name of the part/check item
                       - 'status': 'Pass', 'Fail', or 'N/A'
-                      - 'note': any handwritten defect or comment (or empty string)
+                      - 'note': any handwritten comments (e.g., 'oil full, coolant full' or 'badly damaged')
                     Return ONLY valid JSON with no extra commentary.`
                 }
             ]

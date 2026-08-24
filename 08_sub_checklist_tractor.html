@@ -266,10 +266,6 @@
             <span id="auth-status-msg" style="font-size: 8.5pt; font-weight: bold; margin-top: 6px; display: block;"></span>
         </div>
 
-        <div class="action-footer">
-            <button class="btn btn-success" id="submit-btn" onclick="submitInspectionLog()">💾 Submit & Save Inspection Log</button>
-        </div>
-
         <!-- Evidence & AI Intake Section -->
         <div class="card" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
             <h3 style="margin-top: 0; font-size: 11pt; color: #1e293b;">🤖 AI Checklist Intake & Scan</h3>
@@ -312,6 +308,10 @@
         <button type="button" class="btn btn-secondary" onclick="syncAiFailuresToDefects()" style="font-size: 8.5pt; padding: 6px 12px;">
             ⚠️ Push Failed Items to Defect Log
         </button>
+    </div>
+    
+    <div class="action-footer">
+        <button class="btn btn-success" id="submit-btn" onclick="submitInspectionLog()">💾 Submit & Save Inspection Log</button>
     </div>
 
 <script>
@@ -668,7 +668,22 @@
 
             if (response.ok && data.success && data.extraction) {
                 const ext = data.extraction;
-                globalAiExtractedResults = ext.results || [];
+                
+                // Deduplicate extracted results by component name to prevent multi-page form repeats
+                const rawResults = ext.results || [];
+                const uniqueMap = new Map();
+                rawResults.forEach(item => {
+                    const key = (item.component || '').trim().toLowerCase();
+                    if (key && !uniqueMap.has(key)) {
+                        uniqueMap.set(key, item);
+                    } else if (key && uniqueMap.has(key)) {
+                        const existing = uniqueMap.get(key);
+                        if (item.status === 'Fail' || (item.note && !existing.note)) {
+                            uniqueMap.set(key, item);
+                        }
+                    }
+                });
+                globalAiExtractedResults = Array.from(uniqueMap.values());
                 
                 // Populate form metadata inputs initially
                 if (ext.log_date) document.getElementById('log-date').value = ext.log_date;
@@ -684,14 +699,14 @@
                     <div><b>Manager:</b> <input type="text" id="edit-ai-manager" value="${ext.manager_initials || ''}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
                 `;
 
-                // Populate the checklist items breakdown preview table with interactive input and select controls
+                // Populate the clean, deduplicated checklist preview table
                 const tbody = document.getElementById('ai-results-preview-tbody');
                 tbody.innerHTML = '';
                 
                 if (globalAiExtractedResults.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 10px;">No explicit line items parsed.</td></tr>`;
                 } else {
-                    globalAiExtractedResults.forEach((item, index) => {
+                    globalAiExtractedResults.forEach((item) => {
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
                             <td style="padding: 6px; border-bottom: 1px solid #f1f5f9;">
@@ -712,13 +727,15 @@
                     });
                 }
 
-                // Append a quick-action button right inside the review container to push failed checks into the Defect Log
+                // Append quick-action buttons inside the review container
                 let actionToolbar = document.getElementById('ai-review-actions');
                 if (!actionToolbar) {
                     actionToolbar = document.createElement('div');
                     actionToolbar.id = 'ai-review-actions';
                     actionToolbar.style.marginTop = '12px';
-                    actionToolbar.style.textAlign = 'right';
+                    actionToolbar.style.display = 'flex';
+                    actionToolbar.style.justifyContent = 'flex-end';
+                    actionToolbar.style.gap = '10px';
                     reviewContainer.appendChild(actionToolbar);
                 }
                 actionToolbar.innerHTML = `
@@ -727,11 +744,9 @@
                     </button>
                 `;
 
-                // Unhide the review container box
                 reviewContainer.style.display = 'block';
-
                 statusDiv.style.color = '#16a34a';
-                statusDiv.innerHTML = '✅ Analysis complete! You can now edit any metadata, statuses, or notes, or push failures directly to the Defect Log.';
+                statusDiv.innerHTML = '✅ Analysis complete! Header metadata loaded, duplicates removed, and clean line items ready for review.';
             } else {
                 throw new Error(data.error || 'Failed to extract data from image');
             }
