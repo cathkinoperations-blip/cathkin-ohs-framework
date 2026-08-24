@@ -499,10 +499,10 @@
     }
 
     async function submitInspectionLog() {
-    const logDate = document.getElementById('log-date').value;
-    const hours = document.getElementById('log-hours').value;
-    const operator = document.getElementById('log-operator').value;
-    const manager = document.getElementById('log-manager').value;
+        const logDate = document.getElementById('edit-ai-date')?.value || document.getElementById('log-date').value;
+        const hours = document.getElementById('edit-ai-hours')?.value || document.getElementById('log-hours').value;
+        const operator = document.getElementById('edit-ai-operator')?.value || document.getElementById('log-operator').value;
+        const manager = document.getElementById('edit-ai-manager')?.value || document.getElementById('log-manager').value;
 
     if (!operator) { alert('Please enter the Operator name before submitting.'); return; }
 
@@ -645,43 +645,68 @@
                 const ext = data.extraction;
                 globalAiExtractedResults = ext.results || [];
                 
-                // Populate form metadata inputs
+                // Populate form metadata inputs initially
                 if (ext.log_date) document.getElementById('log-date').value = ext.log_date;
                 if (ext.hours_meter) document.getElementById('log-hours').value = ext.hours_meter;
                 if (ext.operator_name) document.getElementById('log-operator').value = ext.operator_name;
                 if (ext.manager_initials) document.getElementById('log-manager').value = ext.manager_initials;
 
-                // Populate metadata badge summary inside review container
+                // Make metadata summary fully editable right inside the review card header
                 document.getElementById('ai-extracted-metadata').innerHTML = `
-                    <div><b>Date:</b> ${ext.log_date || 'N/A'}</div>
-                    <div><b>Hours:</b> ${ext.hours_meter || 'N/A'}</div>
-                    <div><b>Operator:</b> ${ext.operator_name || 'N/A'}</div>
-                    <div><b>Manager:</b> ${ext.manager_initials || 'N/A'}</div>
+                    <div><b>Date:</b> <input type="date" id="edit-ai-date" value="${ext.log_date || ''}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
+                    <div><b>Hours:</b> <input type="text" id="edit-ai-hours" value="${ext.hours_meter || ''}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
+                    <div><b>Operator:</b> <input type="text" id="edit-ai-operator" value="${ext.operator_name || ''}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
+                    <div><b>Manager:</b> <input type="text" id="edit-ai-manager" value="${ext.manager_initials || ''}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
                 `;
 
-                // Populate the checklist items breakdown preview table
+                // Populate the checklist items breakdown preview table with interactive input and select controls
                 const tbody = document.getElementById('ai-results-preview-tbody');
                 tbody.innerHTML = '';
+                
                 if (globalAiExtractedResults.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 10px;">No explicit line items parsed.</td></tr>`;
                 } else {
-                    globalAiExtractedResults.forEach(item => {
-                        const statusColor = item.status === 'Pass' ? '#16a34a' : item.status === 'Fail' ? '#dc2626' : '#64748b';
+                    globalAiExtractedResults.forEach((item, index) => {
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
-                            <td style="padding: 6px; border-bottom: 1px solid #f1f5f9;">${item.component}</td>
-                            <td style="padding: 6px; border-bottom: 1px solid #f1f5f9; text-align: center; font-weight: bold; color: ${statusColor};">${item.status}</td>
-                            <td style="padding: 6px; border-bottom: 1px solid #f1f5f9;">${item.note || '-'}</td>
+                            <td style="padding: 6px; border-bottom: 1px solid #f1f5f9;">
+                                <input type="text" class="ai-edit-component" value="${item.component || ''}" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px; font-size:8.5pt;">
+                            </td>
+                            <td style="padding: 6px; border-bottom: 1px solid #f1f5f9; text-align: center;">
+                                <select class="ai-edit-status" style="padding:4px; font-size:8.5pt; font-weight:bold; border-radius:4px; border:1px solid #cbd5e1; color: ${item.status === 'Pass' ? '#16a34a' : item.status === 'Fail' ? '#dc2626' : '#64748b'};">
+                                    <option value="Pass" ${item.status === 'Pass' ? 'selected' : ''}>Pass</option>
+                                    <option value="Fail" ${item.status === 'Fail' ? 'selected' : ''}>Fail</option>
+                                    <option value="N/A" ${item.status === 'N/A' ? 'selected' : ''}>N/A</option>
+                                </select>
+                            </td>
+                            <td style="padding: 6px; border-bottom: 1px solid #f1f5f9;">
+                                <input type="text" class="ai-edit-note" value="${item.note || ''}" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px; font-size:8.5pt;">
+                            </td>
                         `;
                         tbody.appendChild(tr);
                     });
                 }
 
+                // Append a quick-action button right inside the review container to push failed checks into the Defect Log
+                let actionToolbar = document.getElementById('ai-review-actions');
+                if (!actionToolbar) {
+                    actionToolbar = document.createElement('div');
+                    actionToolbar.id = 'ai-review-actions';
+                    actionToolbar.style.marginTop = '12px';
+                    actionToolbar.style.textAlign = 'right';
+                    reviewContainer.appendChild(actionToolbar);
+                }
+                actionToolbar.innerHTML = `
+                    <button type="button" class="btn btn-secondary" onclick="syncAiFailuresToDefects()" style="font-size: 8.5pt; padding: 6px 12px;">
+                        ⚠️ Push Failed Items to Defect Log
+                    </button>
+                `;
+
                 // Unhide the review container box
                 reviewContainer.style.display = 'block';
 
                 statusDiv.style.color = '#16a34a';
-                statusDiv.innerHTML = '✅ Analysis complete! Review the parsed metadata above and the extracted line items breakdown below.';
+                statusDiv.innerHTML = '✅ Analysis complete! You can now edit any metadata, statuses, or notes, or push failures directly to the Defect Log.';
             } else {
                 throw new Error(data.error || 'Failed to extract data from image');
             }
@@ -691,6 +716,39 @@
             statusDiv.innerHTML = '⚠️ Analysis failed: ' + err.message;
         } finally {
             btn.disabled = false;
+        }
+    }
+
+    // Helper function to send any AI 'Fail' statuses straight into the Defect Log
+    function syncAiFailuresToDefects() {
+        let addedCount = 0;
+        document.querySelectorAll('#ai-results-preview-tbody tr').forEach(tr => {
+            const comp = tr.querySelector('.ai-edit-component')?.value;
+            const status = tr.querySelector('.ai-edit-status')?.value;
+            const note = tr.querySelector('.ai-edit-note')?.value;
+
+            if (status === 'Fail') {
+                const defectTbody = document.getElementById('defect-tbody');
+                const firstRow = defectTbody.querySelector('.defect-row');
+                const descInput = firstRow?.querySelector('.def-desc');
+                
+                if (descInput && descInput.value.trim() === '') {
+                    descInput.value = `AI Scan Failure - ${comp}: ${note || 'Inspection failed'}`;
+                } else {
+                    addDefectRow();
+                    const rows = defectTbody.querySelectorAll('.defect-row');
+                    const lastRow = rows[rows.length - 1];
+                    lastRow.querySelector('.def-desc').value = `AI Scan Failure - ${comp}: ${note || 'Inspection failed'}`;
+                }
+                addedCount++;
+            }
+        });
+
+        if (addedCount > 0) {
+            alert(`Successfully pushed ${addedCount} failed item(s) to the Defect Remedy Action Log below![cite: 1]`);
+            document.getElementById('defect-tbody').scrollIntoView({ behavior: 'smooth' });
+        } else {
+            alert('No items with a "Status: Fail" were found in the review table.');
         }
     }
 </script>
