@@ -698,7 +698,7 @@
                 if (extractedOperator) document.getElementById('log-operator').value = extractedOperator;
                 if (extractedManager) document.getElementById('log-manager').value = extractedManager;
                 
-                // Make metadata summary fully editable right inside the review card header
+                // Make metadata summary fully editable right inside the review card header (including Manager field restored)
                 document.getElementById('ai-extracted-metadata').innerHTML = `
                     <div><b>Date:</b> <input type="date" id="edit-ai-date" value="${extractedDate}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
                     <div><b>Hours:</b> <input type="text" id="edit-ai-hours" value="${extractedHours}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
@@ -758,6 +758,10 @@
                 reviewContainer.style.display = 'block';
                 statusDiv.style.color = '#16a34a';
                 statusDiv.innerHTML = '✅ Analysis complete! Header metadata loaded, duplicates removed, and clean line items ready for review.';
+
+                // Automatically trigger pushing failed items straight to the defect log upon analysis completion
+                syncAiFailuresToDefects();
+
             } else {
                 throw new Error(data.error || 'Failed to extract data from image');
             }
@@ -796,10 +800,7 @@
         });
 
         if (addedCount > 0) {
-            alert(`Successfully pushed ${addedCount} failed item(s) to the Defect Remedy Action Log below![cite: 1]`);
-            document.getElementById('defect-tbody').scrollIntoView({ behavior: 'smooth' });
-        } else {
-            alert('No items with a "Status: Fail" were found in the review table.');
+            console.log(`Successfully synced ${addedCount} failed item(s) to the Defect Remedy Action Log.`);
         }
     }
 </script>
