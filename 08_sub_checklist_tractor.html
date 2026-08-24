@@ -480,70 +480,91 @@
     }
 
     async function submitInspectionLog() {
-        const logDate = document.getElementById('log-date').value;
-        const hours = document.getElementById('log-hours').value;
-        const operator = document.getElementById('log-operator').value;
-        const manager = document.getElementById('log-manager').value;
+    const logDate = document.getElementById('log-date').value;
+    const hours = document.getElementById('log-hours').value;
+    const operator = document.getElementById('log-operator').value;
+    const manager = document.getElementById('log-manager').value;
 
-        if (!operator) { alert('Please enter the Operator name before submitting.'); return; }
+    if (!operator) { alert('Please enter the Operator name before submitting.'); return; }
 
-        const defects = getActiveDefects();
+    const defects = getActiveDefects();
 
-        // Gatekeeper Check against Database Authentication
-        if (defects.length > 0 && !managerAuthorized) {
-            alert('⚠️ Action Blocked: This inspection contains logged defects. Valid Manager database credentials are required before submission can proceed.');
-            document.getElementById('manager-auth-box').scrollIntoView({ behavior: 'smooth' });
-            return;
-        }
+    // Gatekeeper Check against Database Authentication
+    if (defects.length > 0 && !managerAuthorized) {
+        alert('⚠️ Action Blocked: This inspection contains logged defects. Valid Manager database credentials are required before submission can proceed.');
+        document.getElementById('manager-auth-box').scrollIntoView({ behavior: 'smooth' });
+        return;
+    }
 
-        const ppe = Array.from(document.querySelectorAll('.ppe-check:checked')).map(el => el.value);
+    const ppe = Array.from(document.querySelectorAll('.ppe-check:checked')).map(el => el.value);
 
-        const results = [];
-        document.querySelectorAll('#tractor-tbody tr, #slasher-tbody tr').forEach(tr => {
-            const id = tr.getAttribute('data-id');
-            if (!id) return;
-            const selectedStatus = tr.querySelector(`input[name="status-${id}"]:checked`);
-            const note = tr.querySelector('.item-note').value;
-            results.push({
-                itemId: id,
-                status: selectedStatus ? selectedStatus.value : 'Unchecked',
-                note: note
-            });
+    const results = [];
+    document.querySelectorAll('#tractor-tbody tr, #slasher-tbody tr').forEach(tr => {
+        const id = tr.getAttribute('data-id');
+        if (!id) return;
+        const selectedStatus = tr.querySelector(`input[name="status-${id}"]:checked`);
+        const note = tr.querySelector('.item-note').value;
+        results.push({
+            itemId: id,
+            status: selectedStatus ? selectedStatus.value : 'Unchecked',
+            note: note
         });
+    });
 
-        const payload = { logDate, hours, operator, manager, ppe, results, defects, inspectionType: currentMode };
-
-        try {
-            const res = await fetch(`${API_BASE}/inspection-logs`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            if (!res.ok) throw new Error('Failed to submit log');
-
-            // Automatically sync any logged defects to the active defects tracking table
-            if (defects && defects.length > 0) {
-                for (const defect of defects) {
-                    await fetch(`${API_BASE}/save-defect`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            equipment_name: 'Massey Ferguson 268 Xtra',
-                            operator_name: operator,
-                            defect_description: defect.description,
-                            severity: 'Moderate',
-                            verified_by: manager || 'Manager'
-                        })
-                    });
-                }
-            }
-            
-            alert(`${currentMode} inspection log successfully saved to Neon database!`);
-            window.location.reload();
-        } catch (err) {
-            alert('Error submitting log: ' + err.message);
+    // 1. Process and convert uploaded files to Base64 BEFORE creating the payload
+    const fileInput = document.getElementById('checklist-images');
+    let filesBase64 = [];
+    if (fileInput && fileInput.files && fileInput.files.length > 0) {
+        for (let file of fileInput.files) {
+            const base64 = await toBase64(file);
+            filesBase64.push(base64);
         }
     }
+
+    // 2. Include image_url inside the payload object
+    const payload = { 
+        logDate, 
+        hours, 
+        operator, 
+        manager, 
+        ppe, 
+        results, 
+        defects, 
+        inspectionType: currentMode,
+        image_url: filesBase64.join(',') // Saves all attached images into your Neon image_url column
+    };
+
+    try {
+        const res = await fetch(`${API_BASE}/inspection-logs`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('Failed to submit log');
+
+        // Automatically sync any logged defects to the active defects tracking table
+        if (defects && defects.length > 0) {
+            for (const defect of defects) {
+                await fetch(`${API_BASE}/save-defect`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        equipment_name: 'Massey Ferguson 268 Xtra',
+                        operator_name: operator,
+                        defect_description: defect.description,
+                        severity: 'Moderate',
+                        verified_by: manager || 'Manager'
+                    })
+                });
+            }
+        }
+        
+        alert(`${currentMode} inspection log successfully saved to Neon database!`);
+        window.location.reload();
+    } catch (err) {
+        alert('Error submitting log: ' + err.message);
+    }
+}
 
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
