@@ -269,6 +269,20 @@
         <div class="action-footer">
             <button class="btn btn-success" id="submit-btn" onclick="submitInspectionLog()">💾 Submit & Save Inspection Log</button>
         </div>
+
+        <!-- Evidence & AI Intake Section -->
+        <div class="card" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
+            <h3 style="margin-top: 0; font-size: 11pt; color: #1e293b;">🤖 AI Checklist Intake & Scan</h3>
+            <p style="font-size: 9pt; color: #64748b; margin-bottom: 12px;">Snap or upload a photo/scan of the completed paper checklist first. The AI will extract the hours, operator name, and check results for your review.</p>
+            
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <input type="file" id="checklist-images" accept="image/*,application/pdf" multiple style="flex: 1; min-width: 220px; background: #fff; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                <button type="button" id="btn-analyze-checklist" onclick="analyzeChecklistEvidence()" style="background: #2563eb; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                    🔍 Analyse Checklist Scan
+                </button>
+            </div>
+            <div id="analyze-checklist-status" style="display: none; margin-top: 8px; font-size: 12px; font-weight: bold; color: #2563eb;"></div>
+        </div>
     </div>
 
 <script>
@@ -535,6 +549,66 @@
         document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
         fetchChecklistItems();
     });
+
+
+
+    async function analyzeChecklistEvidence() {
+    const fileInput = document.getElementById('checklist-images');
+    const statusDiv = document.getElementById('analyze-checklist-status');
+    const btn = document.getElementById('btn-analyze-checklist');
+
+    if (!fileInput.files || fileInput.files.length === 0) {
+        alert('Please select at least one photo or scan to analyze.');
+        return;
+    }
+
+    statusDiv.style.display = 'block';
+    statusDiv.style.color = '#2563eb';
+    statusDiv.innerHTML = '⌛ Analysing checklist document with AI...';
+    btn.disabled = true;
+
+    try {
+        const imagesPayload = [];
+        for (let file of fileInput.files) {
+            const b64 = await toBase64(file);
+            imagesPayload.push({
+                imageBase64: b64,
+                mimeType: file.type || 'image/jpeg'
+            });
+        }
+
+        // Call your backend AI extraction endpoint
+        const response = await fetch(`${API_BASE}/analyze-checklist`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ images: imagesPayload })
+        });
+
+            const data = await response.json();
+
+            if (data.success && data.extraction) {
+                const ext = data.extraction;
+                
+                // Automatically populate fields for user review
+                if (ext.log_date) document.getElementById('log-date').value = ext.log_date;
+                if (ext.hours_meter) document.getElementById('log-hours').value = ext.hours_meter;
+                if (ext.operator_name) document.getElementById('log-operator').value = ext.operator_name;
+                if (ext.manager_initials) document.getElementById('log-manager').value = ext.manager_initials;
+
+                // If the AI extracts individual checklist row statuses or defects, you can map them here too
+                statusDiv.style.color = '#16a34a';
+                statusDiv.innerHTML = '✅ Analysis complete! Review the populated fields below, make any adjustments, and click Submit.';
+            } else {
+                throw new Error(data.error || 'Failed to extract data from image');
+            }
+        } catch (err) {
+            console.error('AI Analysis error:', err);
+            statusDiv.style.color = '#dc2626';
+            statusDiv.innerHTML = '⚠️ Analysis failed: ' + err.message;
+        } finally {
+            btn.disabled = false;
+        }
+    }
 </script>
 
 </body>
