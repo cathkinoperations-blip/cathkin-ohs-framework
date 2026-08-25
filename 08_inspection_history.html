@@ -85,6 +85,34 @@
         </table>
     </div>
 
+    <!-- Simple Modal for Viewing Original Checklist Items -->
+    <div id="original-form-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: #ffffff; width: 90%; max-width: 700px; max-height: 85vh; border-radius: 8px; padding: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px;">
+                <h3 id="modal-title" style="margin: 0; color: #1e293b; font-size: 12pt;">Inspection Checklist Summary Table</h3>
+                <button onclick="closeOriginalFormModal()" style="background: none; border: none; font-size: 16pt; cursor: pointer; color: #64748b;">&times;</button>
+            </div>
+            <div id="modal-meta-info" style="font-size: 9pt; color: #475569; margin-bottom: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; background: #f8fafc; padding: 10px; border-radius: 6px;"></div>
+            <div style="flex: 1; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component / Item ID</th>
+                            <th>Status</th>
+                            <th>Notes / Defects</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-results-tbody">
+                        <tr><td colspan="3" style="text-align: center; color: #64748b; padding: 20px;">Loading checklist items...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 16px; text-align: right;">
+                <button class="btn btn-secondary" onclick="closeOriginalFormModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
 <script>
     const API_BASE = 'https://cathkin-ohs-framework.vercel.app/api';
 
@@ -126,7 +154,7 @@
 
             tbody.innerHTML += `
                 <tr>
-                    <td><strong>${log.log_date || 'N/A'}</strong></td>
+                    <td><strong>${log.log_date || log.date || 'N/A'}</strong></td>
                     <td>${typeBadge}</td>
                     <td>${log.hours || '-'}</td>
                     <td>${log.operator || 'Unknown'}</td>
@@ -135,7 +163,7 @@
                     <td>
                         <div style="display: flex; gap: 6px;">
                             <button class="btn" onclick="toggleDetails(${logId})">🔍 Details</button>
-                            <a href="08_tractor_inspection.html" class="btn" title="Open Original Checklist Form">🔗 Form</a>
+                            <button class="btn btn-primary" onclick="openOriginalChecklistModal('${logId}')" title="Open Original Checklist Form">📋 Form</button>
                         </div>
                     </td>
                 </tr>
@@ -200,7 +228,6 @@
             });
 
             if (!res.ok) {
-                // Fallback simulation if backend patch endpoint is pending implementation
                 console.warn('Backend endpoint patch simulated locally.');
             }
 
@@ -209,6 +236,57 @@
         } catch (err) {
             alert('Error closing out log: ' + err.message);
         }
+    }
+
+    // Modal table viewer functions for history logs
+    async function openOriginalChecklistModal(logId) {
+        const modal = document.getElementById('original-form-modal');
+        const tbody = document.getElementById('modal-results-tbody');
+        const metaDiv = document.getElementById('modal-meta-info');
+        
+        modal.style.display = 'flex';
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 20px;">Fetching inspection items...</td></tr>`;
+
+        try {
+            const res = await fetch(`${API_BASE}/inspection-logs/${logId}`);
+            if (!res.ok) throw new Error('Failed to retrieve inspection log details.');
+            
+            const logData = await res.json();
+
+            metaDiv.innerHTML = `
+                <div><b>Date:</b> ${logData.logDate || logData.date || 'N/A'}</div>
+                <div><b>Hours:</b> ${logData.hours || 'N/A'}</div>
+                <div><b>Operator:</b> ${logData.operator || 'N/A'}</div>
+                <div><b>Type:</b> ${logData.inspectionType || logData.inspection_type || 'Daily'}</div>
+            `;
+
+            tbody.innerHTML = '';
+            const results = logData.results || logData.items || [];
+
+            if (results.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 20px;">No items recorded for this entry.</td></tr>`;
+                return;
+            }
+
+            results.forEach(item => {
+                const statusColor = item.status === 'Pass' ? '#16a34a' : item.status === 'Fail' ? '#dc2626' : '#64748b';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong style="color: #1e293b;">${item.component || item.itemId || 'Item'}</strong></td>
+                    <td><span style="font-weight: bold; color: ${statusColor};">${item.status || 'N/A'}</span></td>
+                    <td>${item.note || item.notes || '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+        } catch (err) {
+            console.error('Error loading log details:', err);
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #dc2626; padding: 20px;">Error loading items: ${err.message}</td></tr>`;
+        }
+    }
+
+    function closeOriginalFormModal() {
+        document.getElementById('original-form-modal').style.display = 'none';
     }
 
     document.addEventListener('DOMContentLoaded', fetchInspectionLogs);
