@@ -116,6 +116,7 @@
             .btn, .nav-footer-custom, .dynamic-form-box, .status-toggle, .mode-selector, .screen-only-section { display: none !important; } 
             body { background: #fff; margin: 0; padding: 10px; max-width: 100%; }
             .card { box-shadow: none; border: none; padding: 0; }
+            .qr-container { display: flex !important; }
         }
     </style>
 </head>
@@ -467,17 +468,22 @@
         return defects;
     }
 
+    // Helper to evaluate and update manager auth box visibility
+    function checkAndUpdateManagerAuthVisibility() {
+        const defects = getActiveDefects();
+        const authBox = document.getElementById('manager-auth-box');
+        if (defects.length > 0) {
+            authBox.style.display = 'block';
+        } else {
+            authBox.style.display = 'none';
+            managerAuthorized = false;
+        }
+    }
+
     // Real-time listener to toggle the manager password box if text is typed into defects
     document.addEventListener('input', (e) => {
         if (e.target.classList.contains('def-desc')) {
-            const defects = getActiveDefects();
-            const authBox = document.getElementById('manager-auth-box');
-            if (defects.length > 0) {
-                authBox.style.display = 'block';
-            } else {
-                authBox.style.display = 'none';
-                managerAuthorized = false;
-            }
+            checkAndUpdateManagerAuthVisibility();
         }
     });
 
@@ -783,6 +789,8 @@
 
         if (addedCount > 0) {
             console.log(`Successfully synced ${addedCount} failed item(s) to the Defect Remedy Action Log.`);
+            // Forcefully check and trigger the authorization box display
+            checkAndUpdateManagerAuthVisibility();
         }
     }
 </script>
