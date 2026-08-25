@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- QRCode generator library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <title>MF268 Tractor & Slasher Inspection Log | Cathkin Estates HOA</title>
     <!-- Force all links on this page to open in the same window -->
     <base target="_self">
@@ -266,6 +268,20 @@
             <span id="auth-status-msg" style="font-size: 8.5pt; font-weight: bold; margin-top: 6px; display: block;"></span>
         </div>
 
+        <!-- Evidence & AI Intake Section Restored -->
+        <div class="card" style="background: #f8fafc; border: 1px dashed #cbd5e1; margin-top: 24px;">
+            <h3 style="margin-top: 0; font-size: 11pt; color: #1e293b;">🤖 AI Checklist Intake & Scan</h3>
+            <p style="font-size: 9pt; color: #64748b; margin-bottom: 12px;">Snap or upload a photo/scan of the completed paper checklist first. The AI will extract the hours, operator name, and check results for your review.</p>
+            
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <input type="file" id="checklist-images" accept="image/*,application/pdf" multiple style="flex: 1; min-width: 220px; background: #fff; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                <button type="button" id="btn-analyze-checklist" onclick="analyzeChecklistEvidence()" style="background: #2563eb; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                    🔍 Analyse Checklist Scan
+                </button>
+            </div>
+            <div id="analyze-checklist-status" style="display: none; margin-top: 8px; font-size: 12px; font-weight: bold; color: #2563eb;"></div>
+        </div>
+
         <!-- Static QR Code Block (Hidden on Print/PDF) -->
         <div class="qr-container" style="display: flex; align-items: center; gap: 12px; background: #f8fafc; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; width: fit-content; margin-top: 20px;">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://cathkin-ohs-framework.vercel.app/08_sub_checklist_tractor.html" alt="Page QR Code" style="width: 80px; height: 80px; display: block;">
@@ -273,6 +289,33 @@
                 <h4 style="margin: 0 0 2px 0; font-size: 9pt; color: #1e293b;">📱 Mobile Page Link</h4>
                 <p style="font-size: 8pt; color: #64748b; margin: 0; max-width: 130px;">Scan to open this checklist directly on your phone.</p>
             </div>
+        </div>
+    </div>
+
+    <!-- AI Analysis Review Panel (Appears after analysis) -->
+    <div id="ai-review-container" class="card" style="display: none; background: #fff; border: 1px solid #2563eb; margin-top: 15px; padding: 16px; border-radius: 8px;">
+        <h3 style="margin-top: 0; color: #1e293b; font-size: 11pt;">📋 Extracted Inspection Breakdown (Review Below)</h3>
+        <div id="ai-extracted-metadata" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; font-size: 9pt;"></div>
+        
+        <div style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 8.5pt;" id="ai-results-preview-table">
+                <thead style="background: #f1f5f9; position: sticky; top: 0;">
+                    <tr>
+                        <th style="padding: 8px; text-align: left;">Component / Item</th>
+                        <th style="padding: 8px; text-align: center;">Status (Pass/Fail)</th>
+                        <th style="padding: 8px; text-align: left;">Notes / Defects</th>
+                    </tr>
+                </thead>
+                <tbody id="ai-results-preview-tbody"></tbody>
+            </table>
+        </div>
+        <div style="margin-top: 12px; display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
+            <button type="button" class="btn btn-primary" onclick="applyAiReviewEdits()" style="font-size: 8.5pt; padding: 6px 14px; background: #16a34a;">
+                ✓ Apply AI Edits to Main Form
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="syncAiFailuresToDefects()" style="font-size: 8.5pt; padding: 6px 12px;">
+                ⚠️ Push Failed Items to Defect Log
+            </button>
         </div>
     </div>
     
@@ -475,10 +518,10 @@
     }
 
     async function submitInspectionLog() {
-        const logDate = document.getElementById('log-date').value;
-        const hours = document.getElementById('log-hours').value;
-        const operator = document.getElementById('log-operator').value;
-        const manager = document.getElementById('log-manager').value;
+        const logDate = document.getElementById('edit-ai-date')?.value || document.getElementById('log-date').value;
+        const hours = document.getElementById('edit-ai-hours')?.value || document.getElementById('log-hours').value;
+        const operator = document.getElementById('edit-ai-operator')?.value || document.getElementById('log-operator').value;
+        const manager = document.getElementById('edit-ai-manager')?.value || document.getElementById('log-manager').value;
 
         if (!operator) { alert('Please enter the Operator name before submitting.'); return; }
 
@@ -506,6 +549,15 @@
             });
         });
 
+        const fileInput = document.getElementById('checklist-images');
+        let filesBase64 = [];
+        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+            for (let file of fileInput.files) {
+                const base64 = await toBase64(file);
+                filesBase64.push(base64);
+            }
+        }
+
         const payload = { 
             logDate, 
             hours, 
@@ -514,7 +566,8 @@
             ppe, 
             results, 
             defects, 
-            inspectionType: currentMode
+            inspectionType: currentMode,
+            image_url: filesBase64.join(',')
         };
 
         try {
@@ -525,7 +578,6 @@
             });
             if (!res.ok) throw new Error('Failed to submit log');
 
-            // Automatically sync any logged defects to the active defects tracking table
             if (defects && defects.length > 0) {
                 for (const defect of defects) {
                     await fetch(`${API_BASE}/save-defect`, {
@@ -553,6 +605,185 @@
         document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
         fetchChecklistItems();
     });
+
+    function toBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    let globalAiExtractedResults = [];
+
+    function applyAiReviewEdits() {
+        const editDate = document.getElementById('edit-ai-date')?.value;
+        const editHours = document.getElementById('edit-ai-hours')?.value;
+        const editOperator = document.getElementById('edit-ai-operator')?.value;
+        const editManager = document.getElementById('edit-ai-manager')?.value;
+
+        if (editDate) document.getElementById('log-date').value = editDate;
+        if (editHours) document.getElementById('log-hours').value = editHours;
+        if (editOperator) document.getElementById('log-operator').value = editOperator;
+        if (editManager) document.getElementById('log-manager').value = editManager;
+
+        alert('✅ AI review edits successfully applied! You can now review the main form or click "Submit & Save Inspection Log" at the bottom.');
+    }
+
+    async function analyzeChecklistEvidence() {
+        const fileInput = document.getElementById('checklist-images');
+        const statusDiv = document.getElementById('analyze-checklist-status');
+        const reviewContainer = document.getElementById('ai-review-container');
+        const btn = document.getElementById('btn-analyze-checklist');
+
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert('Please select at least one photo or scan to analyze.');
+            return;
+        }
+
+        statusDiv.style.display = 'block';
+        statusDiv.style.color = '#2563eb';
+        statusDiv.innerHTML = '⌛ Analysing checklist document with AI...';
+        btn.disabled = true;
+
+        try {
+            const imagesPayload = [];
+            for (let file of fileInput.files) {
+                const b64 = await toBase64(file);
+                imagesPayload.push({
+                    imageBase64: b64,
+                    mimeType: file.type || 'image/jpeg'
+                });
+            }
+
+            const response = await fetch(`${API_BASE}/analyze-checklist`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ images: imagesPayload })
+            });
+
+            const responseText = await response.text();
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                throw new Error(`Server returned non-JSON response: ${responseText.substring(0, 120)}...`);
+            }
+
+            if (response.ok && data.success && data.extraction) {
+                const ext = data.extraction;
+
+                const extractedDate = ext.log_date || ext.date || ext.inspection_date || '';
+                const extractedHours = ext.hours_meter || ext.hours || '';
+                const extractedOperator = ext.operator_name || ext.operator || '';
+                const extractedManager = ext.manager_initials || ext.manager || '';
+                
+                const rawResults = ext.results || ext.items || [];
+                const uniqueMap = new Map();
+                rawResults.forEach(item => {
+                    const compName = item.component || item.name || '';
+                    const key = compName.trim().toLowerCase();
+                    if (key && !uniqueMap.has(key)) {
+                        uniqueMap.set(key, item);
+                    } else if (key && uniqueMap.has(key)) {
+                        const existing = uniqueMap.get(key);
+                        if (item.status === 'Fail' || (item.note && !existing.note)) {
+                            uniqueMap.set(key, item);
+                        }
+                    }
+                });
+                globalAiExtractedResults = Array.from(uniqueMap.values());
+                
+                if (extractedDate) document.getElementById('log-date').value = extractedDate;
+                if (extractedHours) document.getElementById('log-hours').value = extractedHours;
+                if (extractedOperator) document.getElementById('log-operator').value = extractedOperator;
+                if (extractedManager) document.getElementById('log-manager').value = extractedManager;
+                
+                document.getElementById('ai-extracted-metadata').innerHTML = `
+                    <div><b>Date:</b> <input type="date" id="edit-ai-date" value="${extractedDate}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
+                    <div><b>Hours:</b> <input type="text" id="edit-ai-hours" value="${extractedHours}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
+                    <div><b>Operator:</b> <input type="text" id="edit-ai-operator" value="${extractedOperator}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
+                    <div><b>Manager:</b> <input type="text" id="edit-ai-manager" value="${extractedManager}" style="width:100%; padding:4px; font-size:8.5pt; border:1px solid #cbd5e1; border-radius:4px;"></div>
+                `;
+
+                const tbody = document.getElementById('ai-results-preview-tbody');
+                tbody.innerHTML = '';
+                
+                if (globalAiExtractedResults.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: #64748b; padding: 10px;">No explicit line items parsed.</td></tr>`;
+                } else {
+                    globalAiExtractedResults.forEach((item) => {
+                        const compName = item.component || item.name || '';
+                        const itemStatus = item.status || 'Pass';
+                        const itemNote = item.note || item.notes || '';
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td style="padding: 6px; border-bottom: 1px solid #f1f5f9;">
+                                <input type="text" class="ai-edit-component" value="${compName}" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px; font-size:8.5pt;">
+                            </td>
+                            <td style="padding: 6px; border-bottom: 1px solid #f1f5f9; text-align: center;">
+                                <select class="ai-edit-status" style="padding:4px; font-size:8.5pt; font-weight:bold; border-radius:4px; border:1px solid #cbd5e1; color: ${itemStatus === 'Pass' ? '#16a34a' : itemStatus === 'Fail' ? '#dc2626' : '#64748b'};">
+                                    <option value="Pass" ${itemStatus === 'Pass' ? 'selected' : ''}>Pass</option>
+                                    <option value="Fail" ${itemStatus === 'Fail' ? 'selected' : ''}>Fail</option>
+                                    <option value="N/A" ${itemStatus === 'N/A' ? 'selected' : ''}>N/A</option>
+                                </select>
+                            </td>
+                            <td style="padding: 6px; border-bottom: 1px solid #f1f5f9;">
+                                <input type="text" class="ai-edit-note" value="${itemNote}" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px; font-size:8.5pt;">
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+
+                reviewContainer.style.display = 'block';
+                statusDiv.style.color = '#16a34a';
+                statusDiv.innerHTML = '✅ Analysis complete! Header metadata loaded, duplicates removed, and clean line items ready for review.';
+
+                syncAiFailuresToDefects();
+
+            } else {
+                throw new Error(data.error || 'Failed to extract data from image');
+            }
+        } catch (err) {
+            console.error('AI Analysis error:', err);
+            statusDiv.style.color = '#dc2626';
+            statusDiv.innerHTML = '⚠️ Analysis failed: ' + err.message;
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    function syncAiFailuresToDefects() {
+        let addedCount = 0;
+        document.querySelectorAll('#ai-results-preview-tbody tr').forEach(tr => {
+            const comp = tr.querySelector('.ai-edit-component')?.value;
+            const status = tr.querySelector('.ai-edit-status')?.value;
+            const note = tr.querySelector('.ai-edit-note')?.value;
+
+            if (status === 'Fail') {
+                const defectTbody = document.getElementById('defect-tbody');
+                const firstRow = defectTbody.querySelector('.defect-row');
+                const descInput = firstRow?.querySelector('.def-desc');
+                
+                if (descInput && descInput.value.trim() === '') {
+                    descInput.value = `AI Scan Failure - ${comp}: ${note || 'Inspection failed'}`;
+                } else {
+                    addDefectRow();
+                    const rows = defectTbody.querySelectorAll('.defect-row');
+                    const lastRow = rows[rows.length - 1];
+                    lastRow.querySelector('.def-desc').value = `AI Scan Failure - ${comp}: ${note || 'Inspection failed'}`;
+                }
+                addedCount++;
+            }
+        });
+
+        if (addedCount > 0) {
+            console.log(`Successfully synced ${addedCount} failed item(s) to the Defect Remedy Action Log.`);
+        }
+    }
 </script>
 
 </body>
