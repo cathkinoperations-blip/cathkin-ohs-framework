@@ -113,7 +113,7 @@
         .action-footer { text-align: center; margin-top: 30px; }
 
         @media print { 
-            .btn, .nav-footer-custom, .dynamic-form-box, .status-toggle, .mode-selector, .qr-container { display: none; } 
+            .btn, .nav-footer-custom, .dynamic-form-box, .status-toggle, .mode-selector, .screen-only-section { display: none !important; } 
             body { background: #fff; margin: 0; padding: 10px; max-width: 100%; }
             .card { box-shadow: none; border: none; padding: 0; }
         }
@@ -231,91 +231,94 @@
             </tbody>
         </table>
 
-        <!-- Defects Section -->
-        <h2 style="margin-top: 32px;">
-            <span>3. Defect Remedy & Repair Action Log</span>
-            <button class="btn btn-secondary" onclick="addDefectRow()" style="font-size: 8pt; padding: 4px 10px;">+ Add Defect Entry</button>
-        </h2>
-        <p style="font-size: 9pt; color: #64748b; margin-top: -6px;">Note: If any defects or equipment failures are logged below, a Manager/Admin credential check is strictly required to authorize submission.</p>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 35%;">Defect / Issue Identified</th>
-                    <th style="width: 35%;">Corrective Action Taken</th>
-                    <th style="width: 15%;">Target Date</th>
-                    <th style="width: 15%;">Manager Sign-off Initials</th>
-                </tr>
-            </thead>
-            <tbody id="defect-tbody">
-                <tr class="defect-row">
-                    <td><input type="text" class="item-note def-desc" placeholder="Describe issue (leave blank if none)..."></td>
-                    <td><input type="text" class="item-note def-action" placeholder="Action taken..."></td>
-                    <td><input type="date" class="item-note def-date"></td>
-                    <td><input type="text" class="item-note def-sign" placeholder="Initials"></td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- SCREEN-ONLY SECTION: Section 3 & AI Scan (Omitted from Print / PDF) -->
+        <div class="screen-only-section">
+            <h2 style="margin-top: 32px;">
+                <span>3. Defect Remedy & Repair Action Log</span>
+                <button class="btn btn-secondary" onclick="addDefectRow()" style="font-size: 8pt; padding: 4px 10px;">+ Add Defect Entry</button>
+            </h2>
+            <p style="font-size: 9pt; color: #64748b; margin-top: -6px;">Note: If any defects or equipment failures are logged below, a Manager/Admin credential check is strictly required to authorize submission.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">Defect / Issue Identified</th>
+                        <th style="width: 35%;">Corrective Action Taken</th>
+                        <th style="width: 15%;">Target Date</th>
+                        <th style="width: 15%;">Manager Sign-off Initials</th>
+                    </tr>
+                </thead>
+                <tbody id="defect-tbody">
+                    <tr class="defect-row">
+                        <td><input type="text" class="item-note def-desc" placeholder="Describe issue (leave blank if none)..."></td>
+                        <td><input type="text" class="item-note def-action" placeholder="Action taken..."></td>
+                        <td><input type="date" class="item-note def-date"></td>
+                        <td><input type="text" class="item-note def-sign" placeholder="Initials"></td>
+                    </tr>
+                </tbody>
+            </table>
 
-        <!-- Secure Manager Database Authorization Box (Appears/Enforced on Defects) -->
-        <div id="manager-auth-box" style="background: #fffbeb; border: 1px solid #f59e0b; padding: 16px; border-radius: 6px; margin-top: 20px; display: none;">
-            <h4 style="margin: 0 0 6px 0; color: #b45309; font-size: 10pt;">🔒 Database Manager Defect Authorization Required</h4>
-            <p style="font-size: 9pt; color: #92400e; margin-bottom: 10px;">Defects have been flagged in this inspection log. Please authenticate with your username and password.</p>
-            <div style="display: flex; gap: 10px; max-width: 500px; flex-wrap: wrap;">
-                <input type="text" id="manager-username-input" class="item-note" placeholder="Username (e.g. Manager)" style="background: #fff; flex: 1; min-width: 180px;">
-                <input type="password" id="manager-password-input" class="item-note" placeholder="Password / PIN" style="background: #fff; flex: 1; min-width: 150px;">
-                <button type="button" class="btn btn-primary" onclick="verifyManagerUser()" style="background: #b45309; white-space: nowrap;">Verify User</button>
+            <!-- Secure Manager Database Authorization Box -->
+            <div id="manager-auth-box" style="background: #fffbeb; border: 1px solid #f59e0b; padding: 16px; border-radius: 6px; margin-top: 20px; display: none;">
+                <h4 style="margin: 0 0 6px 0; color: #b45309; font-size: 10pt;">🔒 Database Manager Defect Authorization Required</h4>
+                <p style="font-size: 9pt; color: #92400e; margin-bottom: 10px;">Defects have been flagged in this inspection log. Please authenticate with your username and password.</p>
+                <div style="display: flex; gap: 10px; max-width: 500px; flex-wrap: wrap;">
+                    <input type="text" id="manager-username-input" class="item-note" placeholder="Username (e.g. manager_test)" style="background: #fff; flex: 1; min-width: 180px;">
+                    <input type="password" id="manager-password-input" class="item-note" placeholder="Password / PIN" style="background: #fff; flex: 1; min-width: 150px;">
+                    <button type="button" class="btn btn-primary" onclick="verifyManagerUser()" style="background: #b45309; white-space: nowrap;">Verify User</button>
+                </div>
+                <span id="auth-status-msg" style="font-size: 8.5pt; font-weight: bold; margin-top: 6px; display: block;"></span>
             </div>
-            <span id="auth-status-msg" style="font-size: 8.5pt; font-weight: bold; margin-top: 6px; display: block;"></span>
-        </div>
 
-        <!-- Evidence & AI Intake Section Restored -->
-        <div class="card" style="background: #f8fafc; border: 1px dashed #cbd5e1; margin-top: 24px;">
-            <h3 style="margin-top: 0; font-size: 11pt; color: #1e293b;">🤖 AI Checklist Intake & Scan</h3>
-            <p style="font-size: 9pt; color: #64748b; margin-bottom: 12px;">Snap or upload a photo/scan of the completed paper checklist first. The AI will extract the hours, operator name, and check results for your review.</p>
-            
-            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input type="file" id="checklist-images" accept="image/*,application/pdf" multiple style="flex: 1; min-width: 220px; background: #fff; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
-                <button type="button" id="btn-analyze-checklist" onclick="analyzeChecklistEvidence()" style="background: #2563eb; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 6px;">
-                    🔍 Analyse Checklist Scan
-                </button>
+            <!-- AI Checklist Intake & Scan Section -->
+            <div class="card" style="background: #f8fafc; border: 1px dashed #cbd5e1; margin-top: 24px;">
+                <h3 style="margin-top: 0; font-size: 11pt; color: #1e293b;">🤖 AI Checklist Intake & Scan</h3>
+                <p style="font-size: 9pt; color: #64748b; margin-bottom: 12px;">Snap or upload a photo/scan of the completed paper checklist first. The AI will extract the hours, operator name, and check results for your review.</p>
+                
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <input type="file" id="checklist-images" accept="image/*,application/pdf" multiple style="flex: 1; min-width: 220px; background: #fff; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                    <button type="button" id="btn-analyze-checklist" onclick="analyzeChecklistEvidence()" style="background: #2563eb; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                        🔍 Analyse Checklist Scan
+                    </button>
+                </div>
+                <div id="analyze-checklist-status" style="display: none; margin-top: 8px; font-size: 12px; font-weight: bold; color: #2563eb;"></div>
             </div>
-            <div id="analyze-checklist-status" style="display: none; margin-top: 8px; font-size: 12px; font-weight: bold; color: #2563eb;"></div>
-        </div>
 
-        <!-- Static QR Code Block (Hidden on Print/PDF) -->
+            <!-- AI Analysis Review Panel -->
+            <div id="ai-review-container" class="card" style="display: none; background: #fff; border: 1px solid #2563eb; margin-top: 15px; padding: 16px; border-radius: 8px;">
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 11pt;">📋 Extracted Inspection Breakdown (Review Below)</h3>
+                <div id="ai-extracted-metadata" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; font-size: 9pt;"></div>
+                
+                <div style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 8.5pt;" id="ai-results-preview-table">
+                        <thead style="background: #f1f5f9; position: sticky; top: 0;">
+                            <tr>
+                                <th style="padding: 8px; text-align: left;">Component / Item</th>
+                                <th style="padding: 8px; text-align: center;">Status (Pass/Fail)</th>
+                                <th style="padding: 8px; text-align: left;">Notes / Defects</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ai-results-preview-tbody"></tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 12px; display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
+                    <button type="button" class="btn btn-primary" onclick="applyAiReviewEdits()" style="font-size: 8.5pt; padding: 6px 14px; background: #16a34a;">
+                        ✓ Apply AI Edits to Main Form
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="syncAiFailuresToDefects()" style="font-size: 8.5pt; padding: 6px 12px;">
+                        ⚠️ Push Failed Items to Defect Log
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- END OF SCREEN-ONLY SECTION -->
+
+        <!-- Static QR Code Block (Visible on Screen and Print/PDF) -->
         <div class="qr-container" style="display: flex; align-items: center; gap: 12px; background: #f8fafc; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; width: fit-content; margin-top: 20px;">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=https://cathkin-ohs-framework.vercel.app/08_sub_checklist_tractor.html" alt="Page QR Code" style="width: 80px; height: 80px; display: block;">
             <div>
                 <h4 style="margin: 0 0 2px 0; font-size: 9pt; color: #1e293b;">📱 Mobile Page Link</h4>
                 <p style="font-size: 8pt; color: #64748b; margin: 0; max-width: 130px;">Scan to open this checklist directly on your phone.</p>
             </div>
-        </div>
-    </div>
-
-    <!-- AI Analysis Review Panel (Appears after analysis) -->
-    <div id="ai-review-container" class="card" style="display: none; background: #fff; border: 1px solid #2563eb; margin-top: 15px; padding: 16px; border-radius: 8px;">
-        <h3 style="margin-top: 0; color: #1e293b; font-size: 11pt;">📋 Extracted Inspection Breakdown (Review Below)</h3>
-        <div id="ai-extracted-metadata" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; font-size: 9pt;"></div>
-        
-        <div style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 8.5pt;" id="ai-results-preview-table">
-                <thead style="background: #f1f5f9; position: sticky; top: 0;">
-                    <tr>
-                        <th style="padding: 8px; text-align: left;">Component / Item</th>
-                        <th style="padding: 8px; text-align: center;">Status (Pass/Fail)</th>
-                        <th style="padding: 8px; text-align: left;">Notes / Defects</th>
-                    </tr>
-                </thead>
-                <tbody id="ai-results-preview-tbody"></tbody>
-            </table>
-        </div>
-        <div style="margin-top: 12px; display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
-            <button type="button" class="btn btn-primary" onclick="applyAiReviewEdits()" style="font-size: 8.5pt; padding: 6px 14px; background: #16a34a;">
-                ✓ Apply AI Edits to Main Form
-            </button>
-            <button type="button" class="btn btn-secondary" onclick="syncAiFailuresToDefects()" style="font-size: 8.5pt; padding: 6px 12px;">
-                ⚠️ Push Failed Items to Defect Log
-            </button>
         </div>
     </div>
     
@@ -504,7 +507,6 @@
                 statusMsg.textContent = `✓ Authorized successfully by ${data.fullName} (${data.role}).`;
                 document.getElementById('manager-username-input').disabled = true;
                 document.getElementById('manager-password-input').disabled = true;
-                // Automatically populate manager initials field with their name
                 document.getElementById('log-manager').value = `${data.firstName[0]}${data.surname[0]}`;
             } else {
                 managerAuthorized = false;
@@ -527,7 +529,6 @@
 
         const defects = getActiveDefects();
 
-        // Gatekeeper Check against Database Authentication
         if (defects.length > 0 && !managerAuthorized) {
             alert('⚠️ Action Blocked: This inspection contains logged defects. Valid Manager database credentials are required before submission can proceed.');
             document.getElementById('manager-auth-box').scrollIntoView({ behavior: 'smooth' });
