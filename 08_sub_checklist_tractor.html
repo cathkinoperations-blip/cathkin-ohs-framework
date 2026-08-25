@@ -117,7 +117,9 @@
             body { background: #fff; margin: 0; padding: 10px; max-width: 100%; }
             .card { box-shadow: none; border: none; padding: 0; }
             .qr-container { display: flex !important; }
+            .page-break-before {page-break-before: always; break-before: page;}
         }
+    
     </style>
 </head>
 <body>
@@ -202,6 +204,7 @@
         </table>
 
         <!-- Slasher Section -->
+        <div class="card page-break-before">
         <h2 style="margin-top: 32px;">
             <span>2. Slasher & PTO Implement Checklist</span>
             <button class="btn btn-secondary" onclick="toggleAddRowForm('slasher')" style="font-size: 8pt; padding: 4px 10px;">+ Add Item</button>
@@ -216,6 +219,7 @@
                 <button class="btn btn-primary" onclick="addNewItem('slasher')">Save Item</button>
             </div>
         </div>
+        
         <table>
             <thead>
                 <tr>
@@ -231,6 +235,7 @@
                 <tr><td colspan="6" style="text-align: center; color: #64748b; padding: 20px;">Loading items...</td></tr>
             </tbody>
         </table>
+        
 
         <!-- SCREEN-ONLY SECTION: Section 3 & AI Scan (Omitted from Print / PDF) -->
         <div class="screen-only-section">
@@ -257,6 +262,7 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
 
             <!-- Secure Manager Database Authorization Box -->
             <div id="manager-auth-box" style="background: #fffbeb; border: 1px solid #f59e0b; padding: 16px; border-radius: 6px; margin-top: 20px; display: none;">
