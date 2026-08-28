@@ -1,1 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <title>Dynamic Safety Inspection Log | Cathkin Estates HOA</title>
+    <base target="_self">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .card { background: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #cbd5e1; padding: 24px; margin-bottom: 24px; }
+        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .mode-selector { display: flex; gap: 8px; margin-bottom: 20px; background: #e2e8f0; padding: 4px; border-radius: 6px; width: fit-content; }
+        .mode-btn { background: transparent; border: none; padding: 8px 16px; font-size: 9.5pt; font-weight: 600; cursor: pointer; border-radius: 4px; color: #475569; transition: all 0.2s; }
+        .mode-btn.active { background: #ffffff; color: var(--primary-color, #1e3a8a); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; background: #f8fafc; padding: 16px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 24px; }
+        .meta-field label { display: block; font-weight: 600; font-size: 8.5pt; color: #1e293b; margin-bottom: 4px; text-transform: uppercase; }
+        .meta-field input { width: 100%; padding: 8px 12px; font-size: 10pt; border: 1px solid #cbd5e1; border-radius: 4px; background: #fff; box-sizing: border-box; }
+        .ppe-container { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 16px; padding-top: 12px; border-top: 1px dashed #cbd5e1; margin-top: 4px; align-items: center; }
+        .ppe-container label { font-weight: 600; color: #1e293b; font-size: 9pt; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 10px; }
+        th { background-color: #f1f5f9; color: #334155; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 9pt; border-bottom: 2px solid #cbd5e1; }
+        td { padding: 12px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+        tr:hover { background-color: #f8fafc; }
+        .risk-badge { padding: 3px 8px; border-radius: 12px; font-size: 7.5pt; font-weight: 700; text-transform: uppercase; }
+        .risk-high { background: #fee2e2; color: #991b1b; }
+        .risk-med { background: #ffedd5; color: #9a3412; }
+        .risk-low { background: #dcfce7; color: #166534; }
+        .status-toggle { display: inline-flex; background: #e2e8f0; border-radius: 6px; padding: 2px; gap: 2px; }
+        .status-toggle label { padding: 6px 12px; font-size: 8.5pt; font-weight: 600; cursor: pointer; border-radius: 4px; transition: all 0.2s; color: #475569; }
+        .status-toggle input { display: none; }
+        .status-toggle input:checked + span { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .status-pass input:checked + span { color: #16a34a; background: #dcfce7; }
+        .status-fail input:checked + span { color: #dc2626; background: #fee2e2; }
+        .status-na input:checked + span { color: #64748b; background: #e2e8f0; }
+        .item-note { width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 9pt; box-sizing: border-box; }
+        .btn { padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; border: none; font-size: 9pt; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #e2e8f0; color: #334155; }
+        .btn-success { background: #16a34a; color: white; padding: 12px 24px; font-size: 11pt; }
+        .dynamic-form-box { background: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 20px; }
+        .dynamic-form-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+        .dynamic-form-grid input, .dynamic-form-grid select { padding: 8px; font-size: 9pt; border: 1px solid #cbd5e1; border-radius: 4px; flex: 1; min-width: 140px; }
+        .nav-footer-custom { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .action-footer { text-align: center; margin-top: 30px; }
+    </style>
+</head>
+<body>
+
+    <div class="nav-footer-custom">
+        <div style="display: flex; gap: 16px; align-items: center;">
+            <a href="08_checklists_inspections_new.html">&larr; Back to Module 08 Hub</a>
+            <a href="08_inspection_history.html" style="font-weight: 600;">📊 View Audit History</a>
+        </div>
+        <button class="btn btn-secondary" onclick="window.print()">🖨️ Print / Save PDF</button>
+    </div>
+
+    <div class="card">
+        <div class="header-bar">
+            <div>
+                <h1 id="form-title">Loading Checklist...</h1>
+                <p id="form-subtitle" style="margin: 4px 0 0 0; color: #64748b; font-size: 9.5pt;">Operational Safety Check</p>
+            </div>
+        </div>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" id="mode-daily" onclick="switchMode('Daily')">☀️ Daily Pre-Start</button>
+            <button class="mode-btn" id="mode-weekly" onclick="switchMode('Weekly')">📅 Weekly / Monthly Service</button>
+        </div>
+
+        <div class="meta-grid">
+            <div class="meta-field">
+                <label>Inspection Date</label>
+                <input type="date" id="log-date">
+            </div>
+            <div class="meta-field">
+                <label>Hours Meter / Usage</label>
+                <input type="text" id="log-hours">
+            </div>
+            <div class="meta-field">
+                <label>Operator / Inspector Name</label>
+                <input type="text" id="log-operator">
+            </div>
+            <div class="meta-field">
+                <label>Manager Initials</label>
+                <input type="text" id="log-manager" style="max-width: 100px;">
+            </div>
+            <div class="ppe-container" id="ppe-section">
+                <span style="font-weight: 700; font-size: 9pt; color: #1e293b;">PPE Worn & Inspected:</span>
+                <label><input type="checkbox" class="ppe-check" value="Boots"> Safety Boots</label>
+                <label><input type="checkbox" class="ppe-check" value="Vest"> Hi-Viz Vest</label>
+                <label><input type="checkbox" class="ppe-check" value="Glasses"> Eye Protection</label>
+                <label><input type="checkbox" class="ppe-check" value="Earmuffs"> Hearing Protection</label>
+            </div>
+        </div>
+
+        <h2>
+            <span id="section-title-text">Checklist Items</span>
+            <button class="btn btn-secondary" onclick="toggleAddRowForm()" style="font-size: 8pt; padding: 4px 10px;">+ Add Item</button>
+        </h2>
+        
+        <div id="item-form-container" class="dynamic-form-box" style="display:none;">
+            <h4 style="margin:0 0 8px 0; font-size: 9pt;">Add Custom Checklist Item</h4>
+            <div class="dynamic-form-grid">
+                <input type="text" id="new-comp" placeholder="Component" style="flex:2;">
+                <input type="text" id="new-desc" placeholder="Action Required" style="flex:3;">
+                <select id="new-freq"><option value="Daily">Daily</option><option value="Weekly">Weekly</option><option value="Monthly">Monthly</option></select>
+                <select id="new-risk"><option value="High">High</option><option value="Med">Med</option><option value="Low">Low</option></select>
+                <button class="btn btn-primary" onclick="addNewItem()">Save Item</button>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 20%;">Component</th>
+                    <th style="width: 30%;">Action Required / Check Details</th>
+                    <th style="width: 12%;">Frequency</th>
+                    <th style="width: 8%;">Risk</th>
+                    <th style="width: 18%;">Status</th>
+                    <th style="width: 12%;">Notes / Defects</th>
+                </tr>
+            </thead>
+            <tbody id="checklist-tbody">
+                <tr><td colspan="6" style="text-align: center; color: #64748b; padding: 20px;">Loading items...</td></tr>
+            </tbody>
+        </table>
+
+        <!-- Defect Log & Authorization Section -->
+        <div class="screen-only-section" style="margin-top: 32px;">
+            <h2>
+                <span>Defect Remedy & Repair Action Log</span>
+                <button class="btn btn-secondary" onclick="addDefectRow()" style="font-size: 8pt; padding: 4px 10px;">+ Add Defect Entry</button>
+            </h2>
+            <p style="font-size: 9pt; color: #64748b; margin-top: -6px;">Note: If any defects or equipment failures are logged below, a Manager/Admin credential check is strictly required.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">Defect / Issue Identified</th>
+                        <th style="width: 35%;">Corrective Action Taken</th>
+                        <th style="width: 15%;">Target Date</th>
+                        <th style="width: 15%;">Manager Sign-off Initials</th>
+                    </tr>
+                </thead>
+                <tbody id="defect-tbody">
+                    <tr class="defect-row">
+                        <td><input type="text" class="item-note def-desc" placeholder="Describe issue (leave blank if none)..."></td>
+                        <td><input type="text" class="item-note def-action" placeholder="Action taken..."></td>
+                        <td><input type="date" class="item-note def-date"></td>
+                        <td><input type="text" class="item-note def-sign" placeholder="Initials"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="manager-auth-box" style="background: #fffbeb; border: 1px solid #f59e0b; padding: 16px; border-radius: 6px; margin-top: 20px; display: none;">
+            <h4 style="margin: 0 0 6px 0; color: #b45309; font-size: 10pt;">🔒 Database Manager Defect Authorization Required</h4>
+            <p style="font-size: 9pt; color: #92400e; margin-bottom: 10px;">Defects have been flagged. Please authenticate with your username and password.</p>
+            <div style="display: flex; gap: 10px; max-width: 500px; flex-wrap: wrap;">
+                <input type="text" id="manager-username-input" class="item-note" placeholder="Username" style="background: #fff; flex: 1; min-width: 180px;">
+                <input type="password" id="manager-password-input" class="item-note" placeholder="Password / PIN" style="background: #fff; flex: 1; min-width: 150px;">
+                <button type="button" class="btn btn-primary" onclick="verifyManagerUser()" style="background: #b45309; white-space: nowrap;">Verify User</button>
+            </div>
+            <span id="auth-status-msg" style="font-size: 8.5pt; font-weight: bold; margin-top: 6px; display: block;"></span>
+        </div>
+
+        <!-- AI Scan Section -->
+        <div class="card" style="background: #f8fafc; border: 1px dashed #cbd5e1; margin-top: 24px;">
+            <h3 style="margin-top: 0; font-size: 11pt; color: #1e293b;">🤖 AI Checklist Intake & Scan</h3>
+            <p style="font-size: 9pt; color: #64748b; margin-bottom: 12px;">Upload a scan/photo of the completed paper checklist to auto-extract fields.</p>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <input type="file" id="checklist-images" accept="image/*,application/pdf" multiple style="flex: 1; min-width: 220px; background: #fff; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                <button type="button" id="btn-analyze-checklist" onclick="analyzeChecklistEvidence()" style="background: #2563eb; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">🔍 Analyse Checklist Scan</button>
+            </div>
+            <div id="analyze-checklist-status" style="display: none; margin-top: 8px; font-size: 12px; font-weight: bold; color: #2563eb;"></div>
+        </div>
+
+        <div id="ai-review-container" class="card" style="display: none; background: #fff; border: 1px solid #2563eb; margin-top: 15px; padding: 16px; border-radius: 8px;">
+            <h3 style="margin-top: 0; color: #1e293b; font-size: 11pt;">📋 Extracted Inspection Breakdown</h3>
+            <div id="ai-extracted-metadata" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; font-size: 9pt;"></div>
+            <div style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 8.5pt;">
+                    <thead style="background: #f1f5f9; position: sticky; top: 0;">
+                        <tr><th style="padding: 8px;">Component</th><th style="padding: 8px; text-align: center;">Status</th><th style="padding: 8px;">Notes</th></tr>
+                    </thead>
+                    <tbody id="ai-results-preview-tbody"></tbody>
+                </table>
+            </div>
+            <div style="margin-top: 12px; display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" class="btn btn-primary" onclick="applyAiReviewEdits()" style="background: #16a34a;">✓ Apply AI Edits</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="action-footer">
+        <button class="btn btn-success" onclick="submitInspectionLog()">💾 Submit & Save Inspection Log</button>
+    </div>
+
+<script>
+    const API_BASE = 'https://cathkin-ohs-framework.vercel.app/api';
+    const urlParams = new URLSearchParams(window.location.search);
+    const categorySlug = urlParams.get('category') || 'tractor';
+    
+    let allChecklistItems = [];
+    let currentMode = 'Daily';
+    let managerAuthorized = false;
+
+    async function loadChecklistData() {
+        try {
+            // Fetch category meta & items matching category slug
+            const res = await fetch(`${API_BASE}/checklist-items?category=${categorySlug}`);
+            const data = await res.json();
+            
+            if (data.definition) {
+                document.getElementById('form-title').textContent = data.definition.title;
+                document.getElementById('form-subtitle').textContent = data.definition.description;
+                document.getElementById('section-title-text').textContent = `${data.definition.title} Items`;
+            } else {
+                document.getElementById('form-title').textContent = `${categorySlug.toUpperCase()} Inspection Log`;
+            }
+
+            allChecklistItems = data.items || data; // handle array or object response
+            filterAndRenderItems();
+        } catch (error) {
+            console.error('Error loading checklist:', error);
+        }
+    }
+
+    function switchMode(mode) {
+        currentMode = mode;
+        document.getElementById('mode-daily').classList.toggle('active', mode === 'Daily');
+        document.getElementById('mode-weekly').classList.toggle('active', mode === 'Weekly');
+        filterAndRenderItems();
+    }
+
+    function filterAndRenderItems() {
+        const tbody = document.getElementById('checklist-tbody');
+        tbody.innerHTML = '';
+
+        const filtered = allChecklistItems.filter(item => {
+            const freq = (item.frequency || '').toLowerCase();
+            if (currentMode === 'Daily') return freq.includes('daily');
+            return freq.includes('weekly') || freq.includes('monthly');
+        });
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #64748b; padding: 15px;">No ${currentMode.toLowerCase()} checks listed.</td></tr>`;
+            return;
+        }
+
+        filtered.forEach(item => {
+            const riskClass = item.risk_level === 'High' ? 'risk-high' : item.risk_level === 'Med' ? 'risk-med' : 'risk-low';
+            tbody.innerHTML += `
+                <tr data-id="${item.id}">
+                    <td><strong style="color: #1e293b;">${item.component}</strong></td>
+                    <td>${item.description}</td>
+                    <td><span style="font-size: 8.5pt; color: #475569;">${item.frequency}</span></td>
+                    <td><span class="risk-badge ${riskClass}">${item.risk_level || 'Med'}</span></td>
+                    <td>
+                        <div class="status-toggle">
+                            <label class="status-pass"><input type="radio" name="status-${item.id}" value="Pass"><span>Pass</span></label>
+                            <label class="status-fail"><input type="radio" name="status-${item.id}" value="Fail"><span>Fail</span></label>
+                            <label class="status-na"><input type="radio" name="status-${item.id}" value="NA"><span>N/A</span></label>
+                        </div>
+                    </td>
+                    <td><input type="text" class="item-note" placeholder="Note..."></td>
+                </tr>
+            `;
+        });
+    }
+
+    function toggleAddRowForm() {
+        const box = document.getElementById('item-form-container');
+        box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function addNewItem() {
+        const comp = document.getElementById('new-comp').value;
+        const desc = document.getElementById('new-desc').value;
+        const freq = document.getElementById('new-freq').value;
+        const risk = document.getElementById('new-risk').value;
+
+        if (!comp || !desc) { alert('Fill in component and description.'); return; }
+
+        try {
+            const res = await fetch(`${API_BASE}/checklist-items`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ category: categorySlug, component: comp, description: desc, frequency: freq, risk_level: risk })
+            });
+            if (!res.ok) throw new Error('Failed to save');
+            alert('Item added successfully!');
+            toggleAddRowForm();
+            loadChecklistData();
+        } catch (err) { alert('Error: ' + err.message); }
+    }
+
+    function addDefectRow() {
+        const tbody = document.getElementById('defect-tbody');
+        const tr = document.createElement('tr');
+        tr.className = 'defect-row';
+        tr.innerHTML = `
+            <td><input type="text" class="item-note def-desc" placeholder="Describe issue..."></td>
+            <td><input type="text" class="item-note def-action" placeholder="Action taken..."></td>
+            <td><input type="date" class="item-note def-date"></td>
+            <td><input type="text" class="item-note def-sign" placeholder="Initials"></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function getActiveDefects() {
+        const defects = [];
+        document.querySelectorAll('.defect-row').forEach(tr => {
+            const desc = tr.querySelector('.def-desc').value.trim();
+            if (desc !== '') {
+                defects.push({
+                    description: desc,
+                    action: tr.querySelector('.def-action').value,
+                    targetDate: tr.querySelector('.def-date').value,
+                    signOff: tr.querySelector('.def-sign').value
+                });
+            }
+        });
+        return defects;
+    }
+
+    document.addEventListener('input', (e) => {
+        if (e.target.classList.contains('def-desc')) {
+            const defects = getActiveDefects();
+            document.getElementById('manager-auth-box').style.display = defects.length > 0 ? 'block' : 'none';
+            if (defects.length === 0) managerAuthorized = false;
+        }
+    });
+
+    async function verifyManagerUser() {
+        const userInput = document.getElementById('manager-username-input').value.trim();
+        const pwdInput = document.getElementById('manager-password-input').value;
+        const statusMsg = document.getElementById('auth-status-msg');
+        
+        try {
+            const response = await fetch(`${API_BASE}/verify-user`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: userInput, password: pwdInput, requiredRole: 'Manager' })
+            });
+            const data = await response.json();
+            if (response.ok && data.authorized) {
+                managerAuthorized = true;
+                statusMsg.style.color = '#15803d';
+                statusMsg.textContent = `✓ Authorized by ${data.fullName}`;
+                document.getElementById('log-manager').value = `${data.firstName[0]}${data.surname[0]}`;
+            } else {
+                managerAuthorized = false;
+                statusMsg.style.color = '#b91c1c';
+                statusMsg.textContent = '✕ Authorization denied.';
+            }
+        } catch (err) { statusMsg.textContent = 'Connection error.'; }
+    }
+
+    async function submitInspectionLog() {
+        const logDate = document.getElementById('log-date').value;
+        const hours = document.getElementById('log-hours').value;
+        const operator = document.getElementById('log-operator').value;
+        const manager = document.getElementById('log-manager').value;
+
+        if (!operator) { alert('Please enter operator name.'); return; }
+        const defects = getActiveDefects();
+        if (defects.length > 0 && !managerAuthorized) {
+            alert('⚠️ Action Blocked: Manager authorization required for defects.');
+            return;
+        }
+
+        const ppe = Array.from(document.querySelectorAll('.ppe-check:checked')).map(el => el.value);
+        const results = [];
+        document.querySelectorAll('#checklist-tbody tr').forEach(tr => {
+            const id = tr.getAttribute('data-id');
+            if (!id) return;
+            const status = tr.querySelector(`input[name="status-${id}"]:checked")`)?.value || 'Unchecked';
+            const note = tr.querySelector('.item-note').value;
+            results.push({ itemId: id, status, note });
+        });
+
+        try {
+            const res = await fetch(`${API_BASE}/inspection-logs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ checklist_type: categorySlug, logDate, hours, operator, manager, ppe, results, defects, inspectionType: currentMode })
+            });
+            if (!res.ok) throw new Error('Submission failed');
+            alert('Inspection log saved successfully!');
+            window.location.reload();
+        } catch (err) { alert('Error: ' + err.message); }
+    }
+
+    async function analyzeChecklistEvidence() {
+        const fileInput = document.getElementById('checklist-images');
+        const statusDiv = document.getElementById('analyze-checklist-status');
+        if (!fileInput.files.length) { alert('Select an image/scan first.'); return; }
+        statusDiv.style.display = 'block';
+        statusDiv.textContent = '⌛ Analysing with AI...';
+
+        try {
+            const b64 = await toBase64(fileInput.files[0]);
+            const res = await fetch(`${API_BASE}/analyze-checklist`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ images: [{ imageBase64: b64, mimeType: fileInput.files[0].type }] })
+            });
+            const data = await res.json();
+            if (data.success && data.extraction) {
+                const ext = data.extraction;
+                if (ext.log_date) document.getElementById('log-date').value = ext.log_date;
+                if (ext.hours_meter) document.getElementById('log-hours').value = ext.hours_meter;
+                if (ext.operator_name) document.getElementById('log-operator').value = ext.operator_name;
+                document.getElementById('ai-review-container').style.display = 'block';
+                statusDiv.textContent = '✅ Analysis complete!';
+            }
+        } catch (err) { statusDiv.textContent = '⚠️ Analysis failed: ' + err.message; }
+    }
+
+    function toBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
+        loadChecklistData();
+    });
+</script>
+</body>
+</html>
 
