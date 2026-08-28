@@ -1,1 +1,46 @@
+<div class="action-card-grid" id="category-grid">
+    <div style="color: #64748b; padding: 20px;">Loading operational categories...</div>
+</div>
+
+<script>
+    async function loadChecklistCategories() {
+        try {
+            const response = await fetch('/api/checklist-categories');
+            const data = await response.json();
+            
+            const grid = document.getElementById('category-grid');
+            grid.innerHTML = '';
+
+            if (data && data.length > 0) {
+                data.forEach(cat => {
+                    const isDev = cat.status === 'Under Development';
+                    const linkTarget = isDev ? '#' : `08_sub_checklist_dynamic.html?category=${cat.category_slug}`;
+                    const onClickAttr = isDev ? `onclick="alert('This checklist is scheduled for future development.'); return false;"` : '';
+                    const btnBg = isDev ? 'background-color: #718096;' : '';
+                    const btnText = isDev ? 'Under Development' : `Open ${cat.title} &rarr;`;
+                    const borderStyle = cat.border_color ? `border-left: 4px solid ${cat.border_color};` : '';
+
+                    grid.innerHTML += `
+                        <div class="action-card" style="${borderStyle}">
+                            <div>
+                                <h4>${cat.title}</h4>
+                                <p>${cat.description}</p>
+                            </div>
+                            <a href="${linkTarget}" class="btn-link" style="${btnBg}" ${onClickAttr} target="_self">${btnText}</a>
+                        </div>
+                    `;
+                });
+            } else {
+                grid.innerHTML = `<p style="color: #64748b;">No categories configured.</p>`;
+            }
+        } catch (err) {
+            console.error('Failed to load categories:', err);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadChecklistCategories();
+        loadActiveDefects();
+    });
+</script>
 
