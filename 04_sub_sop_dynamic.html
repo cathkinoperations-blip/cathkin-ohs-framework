@@ -46,12 +46,12 @@
     <script>
         const API_BASE = 'https://cathkin-ohs-framework.vercel.app/api';
         const urlParams = new URLSearchParams(window.location.search);
-        // Defaults to 'firebreaks' if no slug parameter is provided
         const sopSlug = urlParams.get('sop') || 'firebreaks';
 
         async function loadSopContent() {
             try {
-                const response = await fetch(`${API_BASE}/import-sop?slug=${encodeURIComponent(slug)}`);
+                // FIXED: Use sopSlug instead of slug
+                const response = await fetch(`${API_BASE}/import-sop?slug=${encodeURIComponent(sopSlug)}`);
                 const data = await response.json();
 
                 if (!data.success || !data.sop) {
@@ -92,7 +92,6 @@
                 sections.forEach(sec => {
                     let sectionHtml = `<h2>${sec.heading}</h2>`;
 
-                    // Render bullet points if available
                     if (sec.items && sec.items.length > 0) {
                         sectionHtml += '<ul>';
                         sec.items.forEach(item => {
@@ -101,7 +100,6 @@
                         sectionHtml += '</ul>';
                     }
 
-                    // Render embedded images or block burn maps if available
                     if (sec.images && sec.images.length > 0) {
                         sectionHtml += '<div class="sop-image-grid">';
                         sec.images.forEach(img => {
