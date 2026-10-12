@@ -6,6 +6,19 @@
     <title>Module 04: Safe Operating Procedures | Cathkin Estates HOA</title>
     <base target="_self">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-bar { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px 0; }
+        .btn-upload { background-color: #10b981; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 9pt; }
+        .btn-upload:hover { background-color: #059669; }
+        
+        /* Modal Overlay Styling */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-card { background: white; padding: 25px; border-radius: 8px; width: 100%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; }
+        .modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 14pt; cursor: pointer; color: #64748b; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; font-size: 8.5pt; margin-bottom: 5px; color: #1e293b; }
+        .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 9pt; box-sizing: border-box; }
+    </style>
 </head>
 <body>
     <div class="header-banner">
@@ -21,13 +34,50 @@
     <h2>1. Purpose & Administrative Scope</h2>
     <p>Safe Operating Procedures (SOPs) define mandatory operational steps to protect estate staff, contractors, and residents from harm. In accordance with Section 8(2)(e) of the OHS Act, all operators must be formally trained and declared competent on these SOPs before being authorized to execute high-risk maintenance tasks.</p>
 
-    <h2>2. Estate Baseline Risk SOP Framework</h2>
+    <div class="admin-bar">
+        <h2>2. Estate Baseline Risk SOP Framework</h2>
+        <button onclick="toggleUploadModal(true)" class="btn-upload">➕ Upload New SOP</button>
+    </div>
     <p style="font-size: 9pt; color: #64748b; margin-top: -6px;">Procedures below are loaded dynamically from the central database.</p>
     
     <div class="action-card-grid" id="sop-cards-container">
         <!-- Populated dynamically via JavaScript -->
         <div class="action-card" style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 30px;">
             Loading SOP framework from database...
+        </div>
+    </div>
+
+    <!-- Upload Modal Overlay -->
+    <div id="upload-modal" class="modal-overlay">
+        <div class="modal-card">
+            <button onclick="toggleUploadModal(false)" class="modal-close">&times;</button>
+            <h3 style="margin-top:0; color:#1a365d;">Upload & Parse New SOP</h3>
+            <p style="font-size: 8.5pt; color: #64748b;">Select a Word document (.docx). Gemini AI will automatically extract the structure, reference code, alerts, and sections.</p>
+            
+            <div class="form-group">
+                <label>URL Slug Identifier (e.g. <code>sop_5_chainsaw</code>):</label>
+                <input type="text" id="upload-slug" placeholder="e.g. sop_1_fire">
+            </div>
+
+            <div class="form-group">
+                <label>HSSE Category:</label>
+                <select id="upload-category">
+                    <option value="Safe Work Procedures">Safe Work Procedures</option>
+                    <option value="Machinery & Equipment">Machinery & Equipment</option>
+                    <option value="Emergency Protocols">Emergency Protocols</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Word Document (.docx):</label>
+                <input type="file" id="upload-file" accept=".docx">
+            </div>
+
+            <div style="text-align: right; margin-top: 20px;">
+                <button onclick="toggleUploadModal(false)" class="btn-upload" style="background:#64748b; margin-right: 8px;">Cancel</button>
+                <button onclick="submitNewSop()" id="btn-submit-upload" class="btn-upload">Upload & Run AI Parser</button>
+            </div>
+            <div id="upload-status" style="margin-top: 10px; font-size: 8.5pt; color: #1e293b; font-weight: bold;"></div>
         </div>
     </div>
 
@@ -42,9 +92,17 @@
     <script>
         const API_BASE = 'https://cathkin-ohs-framework.vercel.app/api';
 
+        function toggleUploadModal(show) {
+            document.getElementById('upload-modal').style.display = show ? 'flex' : 'none';
+            if (!show) {
+                document.getElementById('upload-status').textContent = '';
+                document.getElementById('upload-file').value = '';
+                document.getElementById('upload-slug').value = '';
+            }
+        }
+
         async function loadSopList() {
             try {
-                // Fetch all SOPs from your backend/database endpoint
                 const response = await fetch(`${API_BASE}/import-sop`);
                 const data = await response.json();
                 
@@ -67,7 +125,7 @@
                 } else {
                     container.innerHTML = `
                         <div class="action-card" style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 20px;">
-                            No SOP records found in database. Use the AI import tool to add procedures.
+                            No SOP records found in database. Use the "Upload New SOP" button above to add procedures.
                         </div>
                     `;
                 }
@@ -79,6 +137,57 @@
                     </div>
                 `;
             }
+        }
+
+        async function submitNewSop() {
+            const slug = document.getElementById('upload-slug').value.trim();
+            const category = document.getElementById('upload-category').value;
+            const fileInput = document.getElementById('upload-file');
+            const statusSpan = document.getElementById('upload-status');
+
+            if (!slug) {
+                alert('Please provide a unique URL slug identifier (e.g. sop_5_chainsaw).');
+                return;
+            }
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('Please select a Word (.docx) file.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            statusSpan.textContent = '⌛ Reading document, processing with AI, and saving record to database...';
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const base64File = e.target.result;
+                    const response = await fetch(`${API_BASE}/import-sop`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            fileBase64: base64File,
+                            mimeType: file.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            slug: slug,
+                            category: category
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        statusSpan.textContent = `✅ Successfully created SOP: "${result.title}"! Reloading list...`;
+                        setTimeout(() => {
+                            toggleUploadModal(false);
+                            loadSopList();
+                        }, 1200);
+                    } else {
+                        statusSpan.textContent = `❌ Error: ${result.error || 'Failed to parse document'}`;
+                    }
+                } catch (err) {
+                    console.error(err);
+                    statusSpan.textContent = '❌ Network error during upload and AI parsing.';
+                }
+            };
+            reader.readAsDataURL(file);
         }
 
         document.addEventListener('DOMContentLoaded', loadSopList);
