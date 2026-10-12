@@ -36,7 +36,7 @@ export default async function handler(req, res) {
 
         // 2. Send document to Gemini to parse content into structured JSON
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-3.8-flash',
             contents: [
                 {
                     inlineData: { data: base64Data, mimeType: mimeType || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }
