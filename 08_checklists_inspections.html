@@ -16,176 +16,142 @@
         <div class="meta-bar">
             <span><strong>Document Ref:</strong> OHS-MOD-007</span>
             <span><strong>Regulatory Standard:</strong> OHS Act General Machinery & Driven Machinery Regulations</span>
-            <span><strong>Digitization:</strong> Paper Forms & Airtable Integration</span>
+            <span><strong>Digitization:</strong> Dynamic Database Integration</span>
         </div>
     </div>
 
     <h2>1. Executive Summary</h2>
-    <p>Routine pre-start and periodic inspections prevent equipment failure, ensure worker safety, and maintain statutory compliance across estate operations. All pre-start checklists are logged physically on site by operators and reviewed by management or submitted directly into the estate's <strong>Airtable Operational Management Base</strong>[cite: 4].</p>
+    <p>Routine pre-start and periodic inspections prevent equipment failure, ensure worker safety, and maintain statutory compliance across estate operations. All pre-start checklists are logged physically on site by operators and submitted directly into the estate's operational management database.</p>
 
     <h2>2. Operational Inspection Suite</h2>
-    <div class="action-card-grid">
-        <!-- Existing Core Checklists -->
-        <div class="action-card">
-            <div>
-                <h4>Tractor & Slasher Pre-Start Log</h4>
-                <p>Inspection form for MF268 Xtra tractor, PTO guard, slasher gearbox, blades, and hydraulics[cite: 4].</p>
-            </div>
-            <a href="08_sub_checklist_tractor.html" class="btn-link" target="_self">Open Tractor Checklist &rarr;</a>
-        </div>
-
-        <div class="action-card">
-            <div>
-                <h4>Bakkie & Vehicle Pre-Start Log</h4>
-                <p>Daily and weekly pre-start checks for estate vehicles (Toyota 1 Old & Toyota 2 New) including fluids, tyres, and diffs[cite: 4].</p>
-            </div>
-            <a href="08_sub_checklist_vehicle.html" class="btn-link" target="_self">Open Vehicle Checklist &rarr;</a>
-        </div>
-
-        <div class="action-card">
-            <div>
-                <h4>Trailer Maintenance Checklist</h4>
-                <p>Pre-use and periodic inspection form covering wheel nuts, U-bolts, tow hitch integrity, and chassis condition[cite: 4].</p>
-            </div>
-            <a href="08_sub_checklist_trailer.html" class="btn-link" target="_self">Open Trailer Checklist &rarr;</a>
-        </div>
-
-        <div class="action-card">
-            <div>
-                <h4>First Aid & Fire Inspection Log</h4>
-                <p>Monthly statutory audit form for First Aid Kit contents (GSR 3) and fire extinguisher pressures[cite: 4].</p>
-            </div>
-            <a href="08_sub_checklist_firstaid_fire.html" class="btn-link" target="_self">Open First Aid/Fire Form &rarr;</a>
-        </div>
-
-        <!-- Newly Added High-Risk Task Checklists (Under Development) -->
-        <div class="action-card" style="border-left: 4px solid #dd6b20;">
-            <div>
-                <h4>Chainsaw & Brush Cutter Pre-Start Log</h4>
-                <p>Pre-use safety check covering chain tension, chain brakes, bar condition, PPE inspection, and fuel mixture compliance.</p>
-            </div>
-            <a href="#" class="btn-link" style="background-color: #718096;" onclick="alert('This checklist is scheduled for future development.'); return false;" target="_self">Under Development</a>
-        </div>
-
-        <div class="action-card" style="border-left: 4px solid #dd6b20;">
-            <div>
-                <h4>Workshop & Power Tools Inspection Log</h4>
-                <p>Statutory checks for angle grinders, drill presses, welding equipment guards, earth leakage units, and hot-work safety.</p>
-            </div>
-            <a href="#" class="btn-link" style="background-color: #718096;" onclick="alert('This checklist is scheduled for future development.'); return false;" target="_self">Under Development</a>
-        </div>
-
-        <div class="action-card" style="border-left: 4px solid #dd6b20;">
-            <div>
-                <h4>Road Repairs & Asphalt Safety Checklist</h4>
-                <p>Site setup logs covering traffic barricading, flagman PPE, plate compactor controls, and thermal burn prevention.</p>
-            </div>
-            <a href="#" class="btn-link" style="background-color: #718096;" onclick="alert('This checklist is scheduled for future development.'); return false;" target="_self">Under Development</a>
-        </div>
-
-        <div class="action-card" style="border-left: 4px solid #dd6b20;">
-            <div>
-                <h4>Game Capture & Boma Infrastructure Log</h4>
-                <p>Periodic structural integrity audit for game fences, holding pens, and escape route clearances during wildlife operations.</p>
-            </div>
-            <a href="#" class="btn-link" style="background-color: #718096;" onclick="alert('This checklist is scheduled for future development.'); return false;" target="_self">Under Development</a>
-        </div>
+    <div class="action-card-grid" id="category-grid">
+        <div style="color: #64748b; padding: 20px;">Loading operational categories...</div>
     </div>
 
     <div class="meta-field ppe-container" style="grid-column: 1 / -1; background: #f8fafc; border: 1px solid #cbd5e1; padding: 16px; border-radius: 6px; margin-top: 12px;">
-    <label for="checklist-images" style="display: block; font-weight: 600; font-size: 8.5pt; color: #1e293b; margin-bottom: 4px; text-transform: uppercase;">Upload Completed Checklist Evidence (Photos / Scans)</label>
-    <input type="file" id="checklist-images" accept="image/*,application/pdf" multiple style="width: 100%; padding: 8px; background: #fff; border: 1px solid #cbd5e1; border-radius: 4px;">
-    <small style="color: #64748b; font-size: 8pt; margin-top: 4px; display: block;">Attach photos or scanned PDF sheets of the signed paper checklist.</small>
+        <label for="checklist-images" style="display: block; font-weight: 600; font-size: 8.5pt; color: #1e293b; margin-bottom: 4px; text-transform: uppercase;">Upload Completed Checklist Evidence (Photos / Scans)</label>
+        <input type="file" id="checklist-images" accept="image/*,application/pdf" multiple style="width: 100%; padding: 8px; background: #fff; border: 1px solid #cbd5e1; border-radius: 4px;">
+        <small style="color: #64748b; font-size: 8pt; margin-top: 4px; display: block;">Attach photos or scanned PDF sheets of the signed paper checklist.</small>
     </div>
 
-    <div class="card mb-4">
-    <h3>Active Equipment Defects & Action Items</h3>
-    <table class="table" id="defects-table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Equipment</th>
-                <th>Operator</th>
-                <th>Defect Description</th>
-                <th>Severity</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Populated dynamically via JavaScript -->
-        </tbody>
-    </table>
-</div>
+    <div class="card mb-4" style="margin-top: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="margin: 0;">Active Equipment Defects & Action Items</h3>
+            <a href="08_defect_history.html" style="font-size: 14px; text-decoration: none; color: #0284c7;">View Defect History &rarr;</a>
+        </div>
+        <table class="table" id="defects-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Equipment</th>
+                    <th>Operator</th>
+                    <th>Defect Description</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="defects-table-body">
+                <tr><td colspan="7" class="text-center text-muted py-3" style="text-align: center; color: #64748b; padding: 15px;">Loading active defects...</td></tr>
+            </tbody>
+        </table>
+    </div>
 
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-    <h3 style="margin: 0;">Active Equipment Defects & Action Items</h3>
-    <a href="08_defect_history.html" style="font-size: 14px; text-decoration: none; color: #0284c7;">View Defect History &rarr;</a>
-</div>
+    <script>
+        async function loadChecklistCategories() {
+            try {
+                const response = await fetch('/api/checklist-categories');
+                const data = await response.json();
+                
+                const grid = document.getElementById('category-grid');
+                grid.innerHTML = '';
 
-<script>
-    const API_BASE_DEFECTS = 'https://cathkin-ohs-framework.vercel.app/api';
+                if (data && data.length > 0) {
+                    data.forEach(cat => {
+                        const isDev = cat.status === 'Under Development';
+                        const linkTarget = isDev ? '#' : `08_sub_checklist_dynamic.html?category=${cat.category_slug}`;
+                        const onClickAttr = isDev ? `onclick="alert('This checklist is scheduled for future development.'); return false;"` : '';
+                        const btnBg = isDev ? 'background-color: #718096;' : '';
+                        const btnText = isDev ? 'Under Development' : `Open ${cat.title} &rarr;`;
+                        const borderStyle = cat.border_color ? `border-left: 4px solid ${cat.border_color};` : '';
 
-    async function loadActiveDefects() {
-    try {
-        const response = await fetch('/api/defects?action=list'); // points to your updated API
-        const data = await response.json();
-        
-        const tbody = document.querySelector('#defects-table-body'); // adjust selector to match your table
-        if (!tbody) return;
-        tbody.innerHTML = '';
-
-        if (data.success && data.defects && data.defects.length > 0) {
-            data.defects.forEach(d => {
-                // Double safety filter on the frontend as well
-                if (d.status !== 'Closed' && d.status !== 'Verified & Closed') {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${new Date(d.created_at).toLocaleDateString()}</td>
-                            <td><strong>${d.equipment_name}</strong></td>
-                            <td>${d.operator_name || 'N/A'}</td>
-                            <td>${d.defect_description}</td>
-                            <td><span class="badge bg-warning text-dark">${d.severity}</span></td>
-                            <td>${d.status}</td>
-                            <td><button class="btn btn-sm btn-outline-danger" onclick="resolveDefect('${d.id}')">Close</button></td>
-                        </tr>
-                    `;
+                        grid.innerHTML += `
+                            <div class="action-card" style="${borderStyle}">
+                                <div>
+                                    <h4>${cat.title}</h4>
+                                    <p>${cat.description}</p>
+                                </div>
+                                <a href="${linkTarget}" class="btn-link" style="${btnBg}" ${onClickAttr} target="_self">${btnText}</a>
+                            </div>
+                        `;
+                    });
+                } else {
+                    grid.innerHTML = `<p style="color: #64748b;">No categories configured.</p>`;
                 }
-            });
-        } else {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-3">No active defects found.</td></tr>`;
+            } catch (err) {
+                console.error('Failed to load categories:', err);
+            }
         }
-    } catch (err) {
-        console.error('Failed to load active defects:', err);
-    }
-}
 
-    async function resolveDefect(id) {
-    if (!confirm('Are you sure you want to close this defect? It will be moved to history.')) return;
+        async function loadActiveDefects() {
+            try {
+                const response = await fetch('/api/defects?action=list');
+                const data = await response.json();
+                
+                const tbody = document.getElementById('defects-table-body');
+                if (!tbody) return;
+                tbody.innerHTML = '';
 
-    try {
-        const response = await fetch('/api/resolve-defect', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id })
-        });
-        
-        const data = await response.json();
-        if (data.success) {
-            // Reload the active defects list so it disappears from view
+                if (data.success && data.defects && data.defects.length > 0) {
+                    data.defects.forEach(d => {
+                        if (d.status !== 'Closed' && d.status !== 'Verified & Closed') {
+                            tbody.innerHTML += `
+                                <tr>
+                                    <td>${new Date(d.created_at).toLocaleDateString()}</td>
+                                    <td><strong>${d.equipment_name}</strong></td>
+                                    <td>${d.operator_name || 'N/A'}</td>
+                                    <td>${d.defect_description}</td>
+                                    <td><span class="badge bg-warning text-dark">${d.severity}</span></td>
+                                    <td>${d.status}</td>
+                                    <td><button class="btn btn-sm btn-outline-danger" onclick="resolveDefect('${d.id}')" style="padding: 4px 8px; cursor: pointer;">Close</button></td>
+                                </tr>
+                            `;
+                        }
+                    });
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 15px;">No active defects found.</td></tr>`;
+                }
+            } catch (err) {
+                console.error('Failed to load active defects:', err);
+            }
+        }
+
+        async function resolveDefect(id) {
+            if (!confirm('Are you sure you want to close this defect? It will be moved to history.')) return;
+
+            try {
+                const response = await fetch('/api/resolve-defect', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    loadActiveDefects();
+                } else {
+                    alert('Failed to close defect: ' + data.error);
+                }
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadChecklistCategories();
             loadActiveDefects();
-        } else {
-            alert('Failed to close defect: ' + data.error);
-        }
-    } catch (err) {
-        alert('Error: ' + err.message);
-    }
-}
-
-    document.addEventListener('DOMContentLoaded', () => {
-        loadActiveDefects();
-    });
-</script>
+        });
+    </script>
 
     <div class="nav-footer">
         <a href="07_hazmat_environmental.html" target="_self">&larr; Back to Module 07</a>
