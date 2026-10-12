@@ -15,8 +15,16 @@
         .alert-box { background-color: #fff5f5; border-left: 4px solid #e53e3e; padding: 12px 16px; margin-bottom: 20px; font-size: 8.5pt; color: #9b2c2c; border-radius: 4px; }
         .nav-link { display: inline-block; margin-bottom: 15px; color: #3182ce; text-decoration: none; font-weight: bold; font-size: 9pt; }
         .nav-link:hover { text-decoration: underline; }
-        .btn-print { background-color: #3182ce; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; float: right; font-size: 9pt; }
-        .btn-print:hover { background-color: #2b6cb0; }
+        
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; flex-wrap: wrap; gap: 10px; }
+        .btn { background-color: #3182ce; color: white; padding: 7px 14px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 8.5pt; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+        .btn:hover { background-color: #2b6cb0; }
+        .btn-secondary { background-color: #475569; }
+        .btn-secondary:hover { background-color: #334155; }
+        .btn-success { background-color: #10b981; }
+        .btn-success:hover { background-color: #059669; }
+
+        .reupload-panel { display: none; margin-top: 10px; padding: 12px; background: #f1f5f9; border-radius: 6px; border: 1px dashed #cbd5e1; width: 100%; }
         
         /* Image / Map Grid Styling */
         .sop-image-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 16px 0; }
@@ -25,15 +33,36 @@
         .sop-image-caption { font-size: 8pt; color: #64748b; margin: 8px 0 2px 0; font-weight: 600; }
 
         @media print { 
-            .btn-print, .nav-link { display: none; } 
+            .toolbar, .nav-link, .reupload-panel { display: none; } 
             body { border: none; margin: 0; padding: 10px; box-shadow: none; max-width: 100%; } 
         }
     </style>
 </head>
 <body>
     <div>
-        <button class="btn-print" onclick="window.print()">🖨️ Print SOP Document</button>
         <a href="04_sop_safe_work.html" class="nav-link">&larr; Back to Module 04 Hub</a>
+    </div>
+
+    <!-- Admin / Utility Toolbar -->
+    <div class="toolbar">
+        <div>
+            <a href="04_sop_safe_work.html" class="nav-link" style="margin-bottom:0;">Module 04</a>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <a id="btn-download" href="#" class="btn btn-secondary" style="display:none;" download>📥 Download Word Doc</a>
+            <button onclick="toggleReupload()" class="btn btn-secondary">🔄 Re-upload & Regenerate</button>
+            <button class="btn" onclick="window.print()">🖨️ Print</button>
+        </div>
+        
+        <!-- Reupload Drawer -->
+        <div id="reupload-drawer" class="reupload-panel">
+            <p style="margin-top: 0; font-weight: bold; color: #1e293b;">Update this SOP via AI Word Document Import:</p>
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <input type="file" id="new-sop-file" accept=".docx" style="font-size: 8.5pt;">
+                <button onclick="reuploadAndRegenerate()" id="btn-submit-regenerate" class="btn btn-success">Upload & Run AI Parser</button>
+                <span id="reupload-status" style="font-size: 8.5pt; color: #64748b;"></span>
+            </div>
+        </div>
     </div>
     
     <h1 id="sop-main-title">Loading SOP Document...</h1>
@@ -47,10 +76,15 @@
         const API_BASE = 'https://cathkin-ohs-framework.vercel.app/api';
         const urlParams = new URLSearchParams(window.location.search);
         const sopSlug = urlParams.get('sop') || 'firebreaks';
+        let currentCategory = 'Safe Work Procedures';
+
+        function toggleReupload() {
+            const drawer = document.getElementById('reupload-drawer');
+            drawer.style.display = drawer.style.display === 'block' ? 'none' : 'block';
+        }
 
         async function loadSopContent() {
             try {
-                // FIXED: Use sopSlug instead of slug
                 const response = await fetch(`${API_BASE}/import-sop?slug=${encodeURIComponent(sopSlug)}`);
                 const data = await response.json();
 
@@ -58,17 +92,26 @@
                     document.getElementById('sop-main-title').textContent = 'SOP Document Not Found';
                     document.getElementById('sop-sections-container').innerHTML = `
                         <div class="alert-box" style="background: #fffbeb; border-color: #f59e0b; color: #b45309;">
-                            <strong>Notice:</strong> No record could be found for slug <code>${sopSlug}</code>. Please check your database or upload the manual using the admin portal.
+                            <strong>Notice:</strong> No record could be found for slug <code>${sopSlug}</code>.
                         </div>
                     `;
                     return;
                 }
 
                 const sop = data.sop;
+                currentCategory = sop.category || 'Safe Work Procedures';
                 document.getElementById('page-title').textContent = `${sop.reference}: ${sop.title} | Cathkin Estates HOA`;
                 document.getElementById('sop-main-title').textContent = `${sop.reference}: ${sop.title.toUpperCase()}`;
 
-                // Render Alert Box if stored in database
+                // Setup Original File Download Link if file_data exists
+                if (sop.file_data) {
+                    const downloadBtn = document.getElementById('btn-download');
+                    downloadBtn.href = sop.file_data; // base64 data URI
+                    downloadBtn.download = `${sop.slug}.docx`;
+                    downloadBtn.style.display = 'inline-flex';
+                }
+
+                // Render Alert Box
                 if (sop.alert_json) {
                     const alert = typeof sop.alert_json === 'string' ? JSON.parse(sop.alert_json) : sop.alert_json;
                     document.getElementById('sop-alert-container').innerHTML = `
@@ -78,10 +121,9 @@
                     `;
                 }
 
-                // Render Sections, Bullet Items, and Images/Maps
+                // Render Sections
                 const container = document.getElementById('sop-sections-container');
                 container.innerHTML = '';
-
                 const sections = typeof sop.sections_json === 'string' ? JSON.parse(sop.sections_json) : sop.sections_json;
 
                 if (!sections || sections.length === 0) {
@@ -91,40 +133,60 @@
                 
                 sections.forEach(sec => {
                     let sectionHtml = `<h2>${sec.heading}</h2>`;
-
                     if (sec.items && sec.items.length > 0) {
                         sectionHtml += '<ul>';
-                        sec.items.forEach(item => {
-                            sectionHtml += `<li>${item}</li>`;
-                        });
+                        sec.items.forEach(item => { sectionHtml += `<li>${item}</li>`; });
                         sectionHtml += '</ul>';
                     }
-
-                    if (sec.images && sec.images.length > 0) {
-                        sectionHtml += '<div class="sop-image-grid">';
-                        sec.images.forEach(img => {
-                            sectionHtml += `
-                                <div class="sop-image-card">
-                                    <img src="${img.url}" alt="${img.caption || 'SOP Diagram'}" loading="lazy">
-                                    <p class="sop-image-caption">${img.caption || ''}</p>
-                                </div>
-                            `;
-                        });
-                        sectionHtml += '</div>';
-                    }
-
                     container.innerHTML += sectionHtml;
                 });
 
             } catch (err) {
                 console.error('Failed to load SOP:', err);
                 document.getElementById('sop-main-title').textContent = 'Error Loading SOP Document';
-                document.getElementById('sop-sections-container').innerHTML = `
-                    <div class="alert-box">
-                        <strong>Connection Error:</strong> Unable to connect to the backend database API. Please try again later.
-                    </div>
-                `;
             }
+        }
+
+        async function reuploadAndRegenerate() {
+            const fileInput = document.getElementById('new-sop-file');
+            const statusSpan = document.getElementById('reupload-status');
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('Please select a replacement .docx file first.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            statusSpan.textContent = '⌛ Reading file and running AI regeneration...';
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const base64File = e.target.result;
+                    const response = await fetch(`${API_BASE}/import-sop`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            fileBase64: base64File,
+                            mimeType: file.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            slug: sopSlug,
+                            category: currentCategory
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        statusSpan.textContent = '✅ Regenerated successfully! Reloading page...';
+                        setTimeout(() => window.location.reload(), 1200);
+                    } else {
+                        statusSpan.textContent = `❌ Error: ${result.error || 'Failed to parse'}`;
+                    }
+                } catch (err) {
+                    console.error(err);
+                    statusSpan.textContent = '❌ Network error during regeneration.';
+                }
+            };
+            reader.readAsDataURL(file);
         }
 
         document.addEventListener('DOMContentLoaded', loadSopContent);
