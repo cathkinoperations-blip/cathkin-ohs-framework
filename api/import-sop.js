@@ -1,6 +1,4 @@
 import { GoogleGenAI } from '@google/genai';
-import fs from 'fs';
-import path from 'path';
 import pkg from 'pg';
 const { Pool } = pkg;
 
@@ -25,32 +23,15 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { fileBase64, fileName, mimeType, slug, category } = req.body;
+        const { fileBase64, mimeType, slug, category } = req.body;
 
         if (!fileBase64 || !slug) {
             return res.status(400).json({ success: false, error: 'Missing file data or slug.' });
         }
 
-        // 1. Save uploaded file to the local 'Reference' folder
-        // Strip out the base64 header prefix if present (e.g. "data:application/vnd.openxmlformats...")
         const base64Data = fileBase64.replace(/^data:.*;base64,/, "");
-        const buffer = Buffer.from(base64Data, 'base64');
-        
-        // Define target directory and ensure it exists
-        const refDirectory = path.join(process.cwd(), 'Reference');
-        if (!fs.existsSync(refDirectory)) {
-            fs.mkdirSync(refDirectory, { recursive: true });
-        }
 
-        // Construct safe filename (fall back to slug if no filename provided)
-        const safeFileName = fileName || `${slug}.docx`;
-        const filePath = path.join(refDirectory, safeFileName);
-        
-        // Write file to disk
-        fs.writeFileSync(filePath, buffer);
-        console.log(`Saved uploaded file to: ${filePath}`);
-
-        // 2. Send document to Gemini to parse content into structured JSON
+        // 1. Send document to Gemini to parse content into structured JSON
         const ai = new GoogleGenAI();
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
@@ -83,10 +64,10 @@ export default async function handler(req, res) {
 
         const parsedData = JSON.parse(response.text);
 
-        // 3. Insert/Update record in PostgreSQL database
+        // 2. Insert/Update record in PostgreSQL database (storing file base64 directly)
         const query = `
-            INSERT INTO sops (slug, reference, title, category, alert_json, sections_json, updated_at) 
-            VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
+            INSERT INTO sops (slug, reference, title, category, alert_json, sections_json, file_data, updated_at) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP)
             ON CONFLICT (slug) 
             DO UPDATE SET 
                 reference = EXCLUDED.reference,
@@ -94,6 +75,7 @@ export default async function handler(req, res) {
                 category = EXCLUDED.category,
                 alert_json = EXCLUDED.alert_json,
                 sections_json = EXCLUDED.sections_json,
+                file_data = EXCLUDED.file_data,
                 updated_at = CURRENT_TIMESTAMP
             RETURNING id;
         `;
@@ -104,7 +86,8 @@ export default async function handler(req, res) {
             parsedData.title || 'Standard Operating Procedure',
             category || 'Safe Work Procedures',
             parsedData.alert ? JSON.stringify(parsedData.alert) : null,
-            JSON.stringify(parsedData.sections || [])
+            JSON.stringify(parsedData.sections || []),
+            fileBase64 // Stores file payload directly in DB
         ];
 
         const dbResult = await pool.query(query, values);
@@ -113,12 +96,11 @@ export default async function handler(req, res) {
             success: true, 
             sopId: dbResult.rows[0].id, 
             title: parsedData.title,
-            slug: slug,
-            savedPath: `/Reference/${safeFileName}`
+            slug: slug 
         });
 
     } catch (err) {
-        console.error('SOP Import & Save Error:', err);
+        console.error('SOP Import Error:', err);
         return res.status(500).json({ success: false, error: err.message });
     }
 }
