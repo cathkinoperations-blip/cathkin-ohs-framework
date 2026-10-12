@@ -1,15 +1,15 @@
 import { GoogleGenAI } from '@google/genai';
+import fs from 'fs';
+import path from 'path';
 import pkg from 'pg';
 const { Pool } = pkg;
 
-// Initialize PostgreSQL pool (ensure process.env.DATABASE_URL is set in Vercel)
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
 
 export default async function handler(req, res) {
-    // Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -25,26 +25,43 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { fileBase64, mimeType, slug, category } = req.body;
+        const { fileBase64, fileName, mimeType, slug, category } = req.body;
 
         if (!fileBase64 || !slug) {
             return res.status(400).json({ success: false, error: 'Missing file data or slug.' });
         }
 
-        // Initialize Gemini SDK
-        const ai = new GoogleGenAI();
+        // 1. Save uploaded file to the local 'Reference' folder
+        // Strip out the base64 header prefix if present (e.g. "data:application/vnd.openxmlformats...")
+        const base64Data = fileBase64.replace(/^data:.*;base64,/, "");
+        const buffer = Buffer.from(base64Data, 'base64');
+        
+        // Define target directory and ensure it exists
+        const refDirectory = path.join(process.cwd(), 'Reference');
+        if (!fs.existsSync(refDirectory)) {
+            fs.mkdirSync(refDirectory, { recursive: true });
+        }
 
-        // Prompt Gemini to parse document content and structure into headings, lists, and images/maps
+        // Construct safe filename (fall back to slug if no filename provided)
+        const safeFileName = fileName || `${slug}.docx`;
+        const filePath = path.join(refDirectory, safeFileName);
+        
+        // Write file to disk
+        fs.writeFileSync(filePath, buffer);
+        console.log(`Saved uploaded file to: ${filePath}`);
+
+        // 2. Send document to Gemini to parse content into structured JSON
+        const ai = new GoogleGenAI();
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: [
                 {
-                    inlineData: { data: fileBase64, mimeType: mimeType || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }
+                    inlineData: { data: base64Data, mimeType: mimeType || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }
                 },
                 {
                     text: `Analyze this manual or SOP document thoroughly. Extract and return a strict JSON object with this exact schema:
                     {
-                      "reference": "SOP Code or Reference (e.g. SOP 02 or Fire Manual)",
+                      "reference": "SOP Code or Reference (e.g. SOP 02)",
                       "title": "Document Title",
                       "alert": { 
                         "type": "danger", 
@@ -53,14 +70,9 @@ export default async function handler(req, res) {
                       } (or null if no alert box is present),
                       "sections": [
                         {
-                          "heading": "Section Heading (e.g. 1. Mandatory PPE)",
+                          "heading": "Section Heading",
                           "items": ["bullet point 1", "bullet point 2"],
-                          "images": [
-                            { 
-                              "url": "https://images.unsplash.com/... (or placeholder URL if embedded image/map)", 
-                              "caption": "Description or title of the map/diagram" 
-                            }
-                          ] (leave empty array [] if no images in this section)
+                          "images": []
                         }
                       ]
                     }`
@@ -71,7 +83,7 @@ export default async function handler(req, res) {
 
         const parsedData = JSON.parse(response.text);
 
-        // Insert into PostgreSQL 'sops' table
+        // 3. Insert/Update record in PostgreSQL database
         const query = `
             INSERT INTO sops (slug, reference, title, category, alert_json, sections_json, updated_at) 
             VALUES ($1, $2, $3, $4, $5, $6, CURRENT_TIMESTAMP)
@@ -101,11 +113,12 @@ export default async function handler(req, res) {
             success: true, 
             sopId: dbResult.rows[0].id, 
             title: parsedData.title,
-            slug: slug 
+            slug: slug,
+            savedPath: `/Reference/${safeFileName}`
         });
 
     } catch (err) {
-        console.error('SOP Import Error:', err);
+        console.error('SOP Import & Save Error:', err);
         return res.status(500).json({ success: false, error: err.message });
     }
 }
