@@ -48,7 +48,7 @@ export default async function handler(req, res) {
             const ai = new GoogleGenAI({});
 
             const response = await ai.models.generateContent({
-                model: 'gemini-3.5-flash',
+                model: 'gemini-3.5-flash-lite',
                 contents: [
                     {
                         inlineData: { data: base64Data, mimeType: mimeType || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }
