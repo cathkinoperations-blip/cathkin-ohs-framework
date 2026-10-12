@@ -13,11 +13,16 @@
         
         /* Modal Overlay Styling */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-card { background: white; padding: 25px; border-radius: 8px; width: 100%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; }
+        .modal-card { background: white; padding: 25px; border-radius: 8px; width: 100%; max-width: 520px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; }
         .modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 14pt; cursor: pointer; color: #64748b; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-weight: bold; font-size: 8.5pt; margin-bottom: 5px; color: #1e293b; }
         .form-group input, .form-group select { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 9pt; box-sizing: border-box; }
+
+        /* Risk Badges matching reference screenshot */
+        .risk-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 7.5pt; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; }
+        .risk-critical { background-color: #fee2e2; color: #991b1b; }
+        .risk-high { background-color: #ffedd5; color: #9a3412; }
     </style>
 </head>
 <body>
@@ -35,13 +40,12 @@
     <p>Safe Operating Procedures (SOPs) define mandatory operational steps to protect estate staff, contractors, and residents from harm. In accordance with Section 8(2)(e) of the OHS Act, all operators must be formally trained and declared competent on these SOPs before being authorized to execute high-risk maintenance tasks.</p>
 
     <div class="admin-bar">
-        <h2>2. Estate Baseline Risk SOP Framework</h2>
-        <button onclick="toggleUploadModal(true)" class="btn-upload">➕ Upload New SOP</button>
+        <h2>2. ESTATE BASELINE RISK SOP FRAMEWORK (ORDERED BY RISK LEVEL)</h2>
+        <button onclick="openUploadModal()" class="btn-upload">➕ Upload New SOP</button>
     </div>
-    <p style="font-size: 9pt; color: #64748b; margin-top: -6px;">Procedures below are loaded dynamically from the central database.</p>
+    <p style="font-size: 9pt; color: #64748b; margin-top: -6px;">Procedures below are loaded dynamically from the central database and linked directly to risk register scores.</p>
     
     <div class="action-card-grid" id="sop-cards-container">
-        <!-- Populated dynamically via JavaScript -->
         <div class="action-card" style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 30px;">
             Loading SOP framework from database...
         </div>
@@ -51,21 +55,24 @@
     <div id="upload-modal" class="modal-overlay">
         <div class="modal-card">
             <button onclick="toggleUploadModal(false)" class="modal-close">&times;</button>
-            <h3 style="margin-top:0; color:#1a365d;">Upload & Parse New SOP</h3>
-            <p style="font-size: 8.5pt; color: #64748b;">Select a Word document (.docx). Gemini AI will automatically extract the structure, reference code, alerts, and sections.</p>
+            <h3 style="margin-top:0; color:#1a365d;">Upload & Link SOP to Risk Register</h3>
+            <p style="font-size: 8.5pt; color: #64748b;">Select a Word document (.docx) and choose the baseline risk assessment activity to link its score.</p>
             
             <div class="form-group">
-                <label>URL Slug Identifier (e.g. <code>sop_5_chainsaw</code>):</label>
+                <label>URL Slug Identifier (e.g. <code>sop_1_fire</code>):</label>
                 <input type="text" id="upload-slug" placeholder="e.g. sop_1_fire">
             </div>
 
             <div class="form-group">
-                <label>HSSE Category:</label>
-                <select id="upload-category">
-                    <option value="Safe Work Procedures">Safe Work Procedures</option>
-                    <option value="Machinery & Equipment">Machinery & Equipment</option>
-                    <option value="Emergency Protocols">Emergency Protocols</option>
+                <label>Linked Risk Register Activity:</label>
+                <select id="upload-risk-id" onchange="updateSelectedScore()">
+                    <option value="">-- Loading activities... --</option>
                 </select>
+            </div>
+
+            <div class="form-group">
+                <label>Associated Inherent Risk Score:</label>
+                <input type="text" id="upload-score-preview" value="N/A" readonly style="background: #f1f5f9; color: #475569; font-weight: bold;">
             </div>
 
             <div class="form-group">
@@ -81,7 +88,6 @@
         </div>
     </div>
 
-    <!-- Standard Framework Bottom Navigation -->
     <div class="nav-footer">
         <a href="03_incident_reporting_coida.html" target="_self" class="btn-index">&larr; Module 03</a>
         <a href="index.html" target="_self" class="btn-index">Main Index</a>
@@ -91,6 +97,7 @@
 
     <script>
         const API_BASE = 'https://cathkin-ohs-framework.vercel.app/api';
+        let loadedRisks = [];
 
         function toggleUploadModal(show) {
             document.getElementById('upload-modal').style.display = show ? 'flex' : 'none';
@@ -99,6 +106,34 @@
                 document.getElementById('upload-file').value = '';
                 document.getElementById('upload-slug').value = '';
             }
+        }
+
+        async function openUploadModal() {
+            toggleUploadModal(true);
+            const riskSelect = document.getElementById('upload-risk-id');
+            
+            try {
+                const response = await fetch(`${API_BASE}/import-sop?action=risks`);
+                const data = await response.json();
+                
+                if (data.success && data.risks) {
+                    loadedRisks = data.risks;
+                    riskSelect.innerHTML = '<option value="">-- Select Risk Activity --</option>';
+                    data.risks.forEach(r => {
+                        riskSelect.innerHTML += `<option value="${r.id}" data-score="${r.inherent_score}">${r.activity} (Score: ${r.inherent_score})</option>`;
+                    });
+                }
+            } catch (err) {
+                console.error('Failed to load risk register activities:', err);
+                riskSelect.innerHTML = '<option value="">Error loading activities</option>';
+            }
+        }
+
+        function updateSelectedScore() {
+            const riskSelect = document.getElementById('upload-risk-id');
+            const selectedOption = riskSelect.options[riskSelect.selectedIndex];
+            const score = selectedOption.getAttribute('data-score');
+            document.getElementById('upload-score-preview').value = score ? score : 'N/A';
         }
 
         async function loadSopList() {
@@ -111,12 +146,18 @@
 
                 if (data.success && data.sops && data.sops.length > 0) {
                     data.sops.forEach(sop => {
+                        const score = parseInt(sop.inherent_score || '15', 10);
+                        const riskClass = score >= 20 ? 'risk-critical' : 'risk-high';
+                        const levelText = score >= 20 ? 'CRITICAL RISK' : 'HIGH RISK';
+                        const badgeText = `${levelText} (SCORE: ${score})`;
+                        
                         container.innerHTML += `
                             <div class="action-card">
                                 <div>
-                                    <span class="badge" style="background: #e2e8f0; color: #1e293b;">${sop.reference}</span>
+                                    <span class="risk-badge ${riskClass}">${badgeText}</span>
+                                    <span class="badge" style="background: #e2e8f0; color: #1e293b; margin-left: 6px;">${sop.reference}</span>
                                     <h4>${sop.title}</h4>
-                                    <p>${sop.category || 'Standard Operating Procedure'}</p>
+                                    <p>${sop.activity ? 'Linked Activity: ' + sop.activity : (sop.category || 'Standard Operating Procedure')}</p>
                                 </div>
                                 <a href="04_sub_sop_dynamic.html?sop=${encodeURIComponent(sop.slug)}" class="btn-link" target="_self">Open SOP &rarr;</a>
                             </div>
@@ -141,12 +182,12 @@
 
         async function submitNewSop() {
             const slug = document.getElementById('upload-slug').value.trim();
-            const category = document.getElementById('upload-category').value;
+            const riskId = document.getElementById('upload-risk-id').value;
             const fileInput = document.getElementById('upload-file');
             const statusSpan = document.getElementById('upload-status');
 
             if (!slug) {
-                alert('Please provide a unique URL slug identifier (e.g. sop_5_chainsaw).');
+                alert('Please provide a unique URL slug identifier (e.g. sop_1_fire).');
                 return;
             }
             if (!fileInput.files || fileInput.files.length === 0) {
@@ -168,7 +209,8 @@
                             fileBase64: base64File,
                             mimeType: file.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                             slug: slug,
-                            category: category
+                            risk_id: riskId,
+                            category: 'Safe Work Procedures'
                         })
                     });
 
