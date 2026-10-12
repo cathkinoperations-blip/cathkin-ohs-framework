@@ -40,7 +40,16 @@ export default async function handler(req, res) {
                 if (sop.rows.length === 0) {
                     return res.status(404).json({ success: false, error: 'SOP not found' });
                 }
-                return res.json({ success: true, sop: sop.rows[0] });
+
+                // Map database columns to match frontend expectations
+                const record = sop.rows[0];
+                const formattedSop = {
+                    ...record,
+                    sections: record.sections_json,
+                    alerts: record.alert_json
+                };
+
+                return res.json({ success: true, sop: formattedSop });
             }
             
             // Query all SOPs joined with risk_register, sorted by score
