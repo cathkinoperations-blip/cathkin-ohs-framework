@@ -45,7 +45,7 @@
         async function loadSopList() {
             try {
                 // Fetch all SOPs from your backend/database
-                const response = await fetch(`${API_BASE}/sops?category=Safe Work Procedures`);
+                const response = await fetch(`${API_BASE}/import-sop?category=Safe Work Procedures`);
                 const data = await response.json();
                 
                 const container = document.getElementById('sop-cards-container');
