@@ -24,7 +24,6 @@ export default async function handler(req, res) {
             const slug = req.query.slug;
             
             if (slug) {
-                // Fetch a single SOP by its slug
                 const sop = await pool.query('SELECT * FROM sops WHERE slug = $1', [slug]);
                 if (sop.rows.length === 0) {
                     return res.status(404).json({ success: false, error: 'SOP not found' });
@@ -32,7 +31,6 @@ export default async function handler(req, res) {
                 return res.json({ success: true, sop: sop.rows[0] });
             }
             
-            // Return all SOPs for the module list page
             const allSops = await pool.query('SELECT id, slug, reference, title, category, updated_at FROM sops ORDER BY reference ASC');
             return res.json({ success: true, sops: allSops.rows });
         }
@@ -47,10 +45,8 @@ export default async function handler(req, res) {
 
             const base64Data = fileBase64.replace(/^data:.*;base64,/, "");
 
-            // Initialize Gemini
             const ai = new GoogleGenAI({});
 
-            // Parse document content with Gemini
             const response = await ai.models.generateContent({
                 model: 'gemini-2.5-flash',
                 contents: [
@@ -80,9 +76,11 @@ export default async function handler(req, res) {
                 responseMimeType: 'application/json'
             });
 
-            const parsedData = JSON.parse(response.text);
+            // Safely clean and parse JSON response
+            const rawText = response.text();
+            const cleanedText = rawText.replace(/```json\s*([\s\S]*?)\s*```/, '$1').replace(/```\s*([\s\S]*?)\s*```/, '$1').trim();
+            const parsedData = JSON.parse(cleanedText);
 
-            // Insert or update record in PostgreSQL database
             const query = `
                 INSERT INTO sops (slug, reference, title, category, alert_json, sections_json, file_data, updated_at) 
                 VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP)
