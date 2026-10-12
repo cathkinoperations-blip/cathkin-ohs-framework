@@ -18,91 +18,110 @@ export default async function handler(req, res) {
         return;
     }
 
-    if (req.method !== 'POST') {
-        return res.status(405).json({ success: false, error: 'Method not allowed' });
-    }
-
     try {
-        const { fileBase64, mimeType, slug, category } = req.body;
-
-        if (!fileBase64 || !slug) {
-            return res.status(400).json({ success: false, error: 'Missing file data or slug.' });
+        // --- HANDLE GET REQUESTS (Fetching single SOP or listing all SOPs) ---
+        if (req.method === 'GET') {
+            const slug = req.query.slug;
+            
+            if (slug) {
+                // Fetch a single SOP by its slug
+                const sop = await pool.query('SELECT * FROM sops WHERE slug = $1', [slug]);
+                if (sop.rows.length === 0) {
+                    return res.status(404).json({ success: false, error: 'SOP not found' });
+                }
+                return res.json({ success: true, sop: sop.rows[0] });
+            }
+            
+            // Return all SOPs for the module list page
+            const allSops = await pool.query('SELECT id, slug, reference, title, category, updated_at FROM sops ORDER BY reference ASC');
+            return res.json({ success: true, sops: allSops.rows });
         }
 
-        const base64Data = fileBase64.replace(/^data:.*;base64,/, "");
+        // --- HANDLE POST REQUESTS (AI document upload and import) ---
+        if (req.method === 'POST') {
+            const { fileBase64, mimeType, slug, category } = req.body;
 
-        // 1. Initialize Gemini correctly using the standard library pattern
-        const ai = new GoogleGenAI({}); // Picks up process.env.GEMINI_API_KEY automatically
+            if (!fileBase64 || !slug) {
+                return res.status(400).json({ success: false, error: 'Missing file data or slug.' });
+            }
 
-        // 2. Send document to Gemini to parse content into structured JSON
-        const response = await ai.models.generateContent({
-            model: 'gemini-3.8-flash',
-            contents: [
-                {
-                    inlineData: { data: base64Data, mimeType: mimeType || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }
-                },
-                {
-                    text: `Analyze this manual or SOP document thoroughly. Extract and return a strict JSON object with this exact schema:
+            const base64Data = fileBase64.replace(/^data:.*;base64,/, "");
+
+            // Initialize Gemini
+            const ai = new GoogleGenAI({});
+
+            // Parse document content with Gemini
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: [
                     {
-                      "reference": "SOP Code or Reference (e.g. SOP 02)",
-                      "title": "Document Title",
-                      "alert": { 
-                        "type": "danger", 
-                        "title": "Alert Title / Risk Category", 
-                        "text": "Detailed warning description" 
-                      } (or null if no alert box is present),
-                      "sections": [
+                        inlineData: { data: base64Data, mimeType: mimeType || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }
+                    },
+                    {
+                        text: `Analyze this manual or SOP document thoroughly. Extract and return a strict JSON object with this exact schema:
                         {
-                          "heading": "Section Heading",
-                          "items": ["bullet point 1", "bullet point 2"],
-                          "images": []
-                        }
-                      ]
-                    }`
-                }
-            ],
-            responseMimeType: 'application/json'
-        });
+                          "reference": "SOP Code or Reference (e.g. SOP 02)",
+                          "title": "Document Title",
+                          "alert": { 
+                            "type": "danger", 
+                            "title": "Alert Title / Risk Category", 
+                            "text": "Detailed warning description" 
+                          } (or null if no alert box is present),
+                          "sections": [
+                            {
+                              "heading": "Section Heading",
+                              "items": ["bullet point 1", "bullet point 2"],
+                              "images": []
+                            }
+                          ]
+                        }`
+                    }
+                ],
+                responseMimeType: 'application/json'
+            });
 
-        const parsedData = JSON.parse(response.text);
+            const parsedData = JSON.parse(response.text);
 
-        // 3. Insert/Update record in PostgreSQL database (storing file base64 directly)
-        const query = `
-            INSERT INTO sops (slug, reference, title, category, alert_json, sections_json, file_data, updated_at) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP)
-            ON CONFLICT (slug) 
-            DO UPDATE SET 
-                reference = EXCLUDED.reference,
-                title = EXCLUDED.title,
-                category = EXCLUDED.category,
-                alert_json = EXCLUDED.alert_json,
-                sections_json = EXCLUDED.sections_json,
-                file_data = EXCLUDED.file_data,
-                updated_at = CURRENT_TIMESTAMP
-            RETURNING id;
-        `;
+            // Insert or update record in PostgreSQL database
+            const query = `
+                INSERT INTO sops (slug, reference, title, category, alert_json, sections_json, file_data, updated_at) 
+                VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP)
+                ON CONFLICT (slug) 
+                DO UPDATE SET 
+                    reference = EXCLUDED.reference,
+                    title = EXCLUDED.title,
+                    category = EXCLUDED.category,
+                    alert_json = EXCLUDED.alert_json,
+                    sections_json = EXCLUDED.sections_json,
+                    file_data = EXCLUDED.file_data,
+                    updated_at = CURRENT_TIMESTAMP
+                RETURNING id;
+            `;
 
-        const values = [
-            slug,
-            parsedData.reference || 'SOP GEN',
-            parsedData.title || 'Standard Operating Procedure',
-            category || 'Safe Work Procedures',
-            parsedData.alert ? JSON.stringify(parsedData.alert) : null,
-            JSON.stringify(parsedData.sections || []),
-            fileBase64
-        ];
+            const values = [
+                slug,
+                parsedData.reference || 'SOP GEN',
+                parsedData.title || 'Standard Operating Procedure',
+                category || 'Safe Work Procedures',
+                parsedData.alert ? JSON.stringify(parsedData.alert) : null,
+                JSON.stringify(parsedData.sections || []),
+                fileBase64
+            ];
 
-        const dbResult = await pool.query(query, values);
+            const dbResult = await pool.query(query, values);
 
-        return res.status(200).json({ 
-            success: true, 
-            sopId: dbResult.rows[0].id, 
-            title: parsedData.title,
-            slug: slug 
-        });
+            return res.status(200).json({ 
+                success: true, 
+                sopId: dbResult.rows[0].id, 
+                title: parsedData.title,
+                slug: slug 
+            });
+        }
+
+        return res.status(405).json({ success: false, error: 'Method not allowed' });
 
     } catch (err) {
-        console.error('SOP Import Error:', err);
+        console.error('SOP Endpoint Error:', err);
         return res.status(500).json({ success: false, error: err.message });
     }
 }
