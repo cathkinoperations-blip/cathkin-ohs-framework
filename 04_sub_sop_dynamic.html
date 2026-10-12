@@ -51,7 +51,7 @@
 
         async function loadSopContent() {
             try {
-                const response = await fetch(`${API_BASE}/sops?slug=${sopSlug}`);
+                const response = await fetch(`${API_BASE}/import-sop?slug=${encodeURIComponent(slug)}`);
                 const data = await response.json();
 
                 if (!data.success || !data.sop) {
