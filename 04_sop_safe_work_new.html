@@ -61,7 +61,7 @@
                                     <h4>${sop.title}</h4>
                                     <p>${sop.category || 'Standard Operating Procedure'}</p>
                                 </div>
-                                <a href="04_sub_sop_dynamic.html?sop=${sop.slug}" class="btn-link" target="_self">Open SOP &rarr;</a>
+                                <a href="04_sub_sop_dynamic.html?sop=${encodeURIComponent(sop.slug)}" class="btn-link" target="_self">Open SOP &rarr;</a>
                             </div>
                         `;
                     });
