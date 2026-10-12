@@ -31,8 +31,10 @@ export default async function handler(req, res) {
 
         const base64Data = fileBase64.replace(/^data:.*;base64,/, "");
 
-        // 1. Send document to Gemini to parse content into structured JSON
-        const ai = new GoogleGenAI();
+        // 1. Initialize Gemini correctly using the standard library pattern
+        const ai = new GoogleGenAI({}); // Picks up process.env.GEMINI_API_KEY automatically
+
+        // 2. Send document to Gemini to parse content into structured JSON
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: [
@@ -64,7 +66,7 @@ export default async function handler(req, res) {
 
         const parsedData = JSON.parse(response.text);
 
-        // 2. Insert/Update record in PostgreSQL database (storing file base64 directly)
+        // 3. Insert/Update record in PostgreSQL database (storing file base64 directly)
         const query = `
             INSERT INTO sops (slug, reference, title, category, alert_json, sections_json, file_data, updated_at) 
             VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP)
@@ -87,7 +89,7 @@ export default async function handler(req, res) {
             category || 'Safe Work Procedures',
             parsedData.alert ? JSON.stringify(parsedData.alert) : null,
             JSON.stringify(parsedData.sections || []),
-            fileBase64 // Stores file payload directly in DB
+            fileBase64
         ];
 
         const dbResult = await pool.query(query, values);
