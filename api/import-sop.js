@@ -76,8 +76,8 @@ export default async function handler(req, res) {
                 responseMimeType: 'application/json'
             });
 
-            // Safely clean and parse JSON response
-            const rawText = response.text();
+            // FIXED: Use response.text directly as a property (not a function)
+            const rawText = response.text;
             const cleanedText = rawText.replace(/```json\s*([\s\S]*?)\s*```/, '$1').replace(/```\s*([\s\S]*?)\s*```/, '$1').trim();
             const parsedData = JSON.parse(cleanedText);
 
