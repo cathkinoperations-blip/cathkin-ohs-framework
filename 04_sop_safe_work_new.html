@@ -40,49 +40,68 @@
     </div>
 
     <script>
-        const API_BASE = 'https://cathkin-ohs-framework.vercel.app/api';
+    const API_BASE = 'https://cathkin-ohs-framework.vercel.app/api';
 
-        async function loadSopList() {
-            try {
-                // Fetch all SOPs from your backend/database
-                const response = await fetch(`${API_BASE}/import-sop?category=Safe Work Procedures`);
-                const data = await response.json();
+    async function loadSopDetail() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const slug = urlParams.get('sop');
+
+        if (!slug) {
+            document.body.innerHTML = '<h2>Error: No SOP specified.</h2>';
+            return;
+        }
+
+        try {
+            // FIXED: Fetch from /import-sop?slug=... to match your Vercel file route
+            const response = await fetch(`${API_BASE}/import-sop?slug=${encodeURIComponent(slug)}`);
+            const data = await response.json();
+
+            if (data.success && data.sop) {
+                const sop = data.sop;
                 
-                const container = document.getElementById('sop-cards-container');
-                container.innerHTML = '';
+                // Populate document fields
+                document.getElementById('sop-title').textContent = sop.title;
+                document.getElementById('sop-ref').textContent = sop.reference;
+                
+                // Parse JSON fields safely if stored as strings
+                const alertData = typeof sop.alert_json === 'string' ? JSON.parse(sop.alert_json) : sop.alert_json;
+                const sectionsData = typeof sop.sections_json === 'string' ? JSON.parse(sop.sections_json) : sop.sections_json;
 
-                if (data.success && data.sops && data.sops.length > 0) {
-                    data.sops.forEach(sop => {
-                        // Check if alert json exists to determine styling/badges if needed
-                        container.innerHTML += `
-                            <div class="action-card">
-                                <div>
-                                    <span class="badge" style="background: #e2e8f0; color: #1e293b;">${sop.reference}</span>
-                                    <h4>${sop.title}</h4>
-                                    <p>${sop.category || 'Standard Operating Procedure'}</p>
-                                </div>
-                                <a href="04_sub_sop_dynamic.html?sop=${encodeURIComponent(sop.slug)}" class="btn-link" target="_self">Open SOP &rarr;</a>
-                            </div>
-                        `;
-                    });
-                } else {
-                    container.innerHTML = `
-                        <div class="action-card" style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 20px;">
-                            No SOP records found in database. Use the AI import tool to add procedures.
+                // Render alert box if present
+                const alertContainer = document.getElementById('sop-alert-container');
+                if (alertData && alertContainer) {
+                    alertContainer.innerHTML = `
+                        <div class="alert-box ${alertData.type || 'danger'}">
+                            <strong>${alertData.title || 'Warning'}</strong>
+                            <p>${alertData.text || ''}</p>
                         </div>
                     `;
                 }
-            } catch (err) {
-                console.error('Failed to load SOP list:', err);
-                document.getElementById('sop-cards-container').innerHTML = `
-                    <div class="action-card" style="grid-column: 1 / -1; text-align: center; color: #dc2626; padding: 20px;">
-                        ⚠️ Error connecting to database API to load SOPs.
-                    </div>
-                `;
-            }
-        }
 
-        document.addEventListener('DOMContentLoaded', loadSopList);
-    </script>
+                // Render sections
+                const sectionsContainer = document.getElementById('sop-sections-container');
+                if (sectionsContainer && sectionsData) {
+                    sectionsContainer.innerHTML = sectionsData.map((section, idx) => `
+                        <h2>${idx + 3}. ${section.heading}</h2>
+                        <ul>
+                            ${section.items.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    `).join('');
+                }
+            } else {
+                document.getElementById('sop-content-card').innerHTML = '<h2>SOP Document not found in database.</h2>';
+            }
+        } catch (err) {
+            console.error('Failed to load SOP:', err);
+            document.getElementById('sop-content-card').innerHTML = `
+                <div class="action-card" style="grid-column: 1 / -1; text-align: center; color: #dc2626; padding: 20px;">
+                    ⚠️ Connection Error: Unable to connect to the backend database API. Please try again later.
+                </div>
+            `;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadSopDetail);
+</script>
 </body>
 </html>
