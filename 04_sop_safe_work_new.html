@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 04: Safe Operating Procedures | Cathkin Estates HOA</title>
+    <base target="_self">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header-banner">
+        <h1>MODULE 04: SAFE OPERATING PROCEDURES (SOP)</h1>
+        <div class="subtitle">Operational Health & Safety Governance Manual | Cathkin Estates HOA</div>
+        <div class="meta-bar">
+            <span><strong>Document Ref:</strong> OHS-MOD-004</span>
+            <span><strong>Regulatory Standard:</strong> OHS Act §8(2)(e)</span>
+            <span><strong>Scope:</strong> Master Estate Operations & High-Risk Activities</span>
+        </div>
+    </div>
+
+    <h2>1. Purpose & Administrative Scope</h2>
+    <p>Safe Operating Procedures (SOPs) define mandatory operational steps to protect estate staff, contractors, and residents from harm. In accordance with Section 8(2)(e) of the OHS Act, all operators must be formally trained and declared competent on these SOPs before being authorized to execute high-risk maintenance tasks.</p>
+
+    <h2>2. Estate Baseline Risk SOP Framework</h2>
+    <p style="font-size: 9pt; color: #64748b; margin-top: -6px;">Procedures below are loaded dynamically from the central database.</p>
+    
+    <div class="action-card-grid" id="sop-cards-container">
+        <!-- Populated dynamically via JavaScript -->
+        <div class="action-card" style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 30px;">
+            Loading SOP framework from database...
+        </div>
+    </div>
+
+    <!-- Standard Framework Bottom Navigation -->
+    <div class="nav-footer">
+        <a href="03_incident_reporting_coida.html" target="_self" class="btn-index">&larr; Module 03</a>
+        <a href="index.html" target="_self" class="btn-index">Main Index</a>
+        <a href="05_workplace_safety.html" target="_self" class="btn-index">Module 05 &rarr;</a>
+        <button onclick="window.print()" class="btn-print">Print Module</button>
+    </div>
+
+    <script>
+        const API_BASE = 'https://cathkin-ohs-framework.vercel.app/api';
+
+        async function loadSopList() {
+            try {
+                // Fetch all SOPs from your backend/database
+                const response = await fetch(`${API_BASE}/sops?category=Safe Work Procedures`);
+                const data = await response.json();
+                
+                const container = document.getElementById('sop-cards-container');
+                container.innerHTML = '';
+
+                if (data.success && data.sops && data.sops.length > 0) {
+                    data.sops.forEach(sop => {
+                        // Check if alert json exists to determine styling/badges if needed
+                        container.innerHTML += `
+                            <div class="action-card">
+                                <div>
+                                    <span class="badge" style="background: #e2e8f0; color: #1e293b;">${sop.reference}</span>
+                                    <h4>${sop.title}</h4>
+                                    <p>${sop.category || 'Standard Operating Procedure'}</p>
+                                </div>
+                                <a href="04_sub_sop_dynamic.html?sop=${sop.slug}" class="btn-link" target="_self">Open SOP &rarr;</a>
+                            </div>
+                        `;
+                    });
+                } else {
+                    container.innerHTML = `
+                        <div class="action-card" style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 20px;">
+                            No SOP records found in database. Use the AI import tool to add procedures.
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error('Failed to load SOP list:', err);
+                document.getElementById('sop-cards-container').innerHTML = `
+                    <div class="action-card" style="grid-column: 1 / -1; text-align: center; color: #dc2626; padding: 20px;">
+                        ⚠️ Error connecting to database API to load SOPs.
+                    </div>
+                `;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadSopList);
+    </script>
+</body>
+</html>
