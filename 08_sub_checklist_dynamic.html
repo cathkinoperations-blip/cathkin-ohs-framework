@@ -2,91 +2,562 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <title>Dynamic Safety Inspection Log | Cathkin Estates HOA</title>
     <base target="_self">
     <link rel="stylesheet" href="style.css">
     <style>
-        .card { background: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #cbd5e1; padding: 24px; margin-bottom: 24px; }
-        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .mode-selector { display: flex; gap: 8px; margin-bottom: 20px; background: #e2e8f0; padding: 4px; border-radius: 6px; width: fit-content; }
-        .mode-btn { background: transparent; border: none; padding: 8px 16px; font-size: 9.5pt; font-weight: 600; cursor: pointer; border-radius: 4px; color: #475569; transition: all 0.2s; }
-        .mode-btn.active { background: #ffffff; color: var(--primary-color, #1e3a8a); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; background: #f8fafc; padding: 16px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 24px; }
-        .meta-field label { display: block; font-weight: 600; font-size: 8.5pt; color: #1e293b; margin-bottom: 4px; text-transform: uppercase; }
-        .meta-field input { width: 100%; padding: 8px 12px; font-size: 10pt; border: 1px solid #cbd5e1; border-radius: 4px; background: #fff; box-sizing: border-box; }
-        .ppe-container { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 16px; padding-top: 12px; border-top: 1px dashed #cbd5e1; margin-top: 4px; align-items: center; }
-        .ppe-container label { font-weight: 600; color: #1e293b; font-size: 9pt; display: flex; align-items: center; gap: 6px; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; font-size: 10pt; margin-bottom: 10px; }
-        th { background-color: #f1f5f9; color: #334155; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 9pt; border-bottom: 2px solid #cbd5e1; }
-        td { padding: 12px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
-        tr:hover { background-color: #f8fafc; }
-        .risk-badge { padding: 3px 8px; border-radius: 12px; font-size: 7.5pt; font-weight: 700; text-transform: uppercase; }
+        :root {
+            --primary: #1e3a8a;
+            --accent: #2563eb;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #b45309;
+            --bg-page: #f1f5f9;
+            --border: #cbd5e1;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            margin: 0;
+            padding: 16px;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Top Navigation */
+        .nav-footer-custom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--primary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            padding: 6px 0;
+        }
+
+        /* Cards & Headers */
+        .card {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .header-bar {
+            margin-bottom: 18px;
+        }
+
+        .header-bar h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 24px 0 12px 0;
+            font-size: 1.15rem;
+        }
+
+        /* Mode Switcher */
+        .mode-selector {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 20px;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 8px;
+            width: fit-content;
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            color: #475569;
+            transition: all 0.2s;
+            min-height: 42px;
+        }
+
+        .mode-btn.active {
+            background: #ffffff;
+            color: var(--primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Metadata Form Grid */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+        }
+
+        .meta-field label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--text-main);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .meta-field input,
+        .item-note,
+        .dynamic-form-grid input,
+        .dynamic-form-grid select {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #fff;
+            min-height: 42px;
+        }
+
+        .ppe-container {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 18px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--border);
+            margin-top: 4px;
+            align-items: center;
+        }
+
+        .ppe-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            width: 100%;
+        }
+
+        .ppe-container label {
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            background: #fff;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            min-height: 40px;
+        }
+
+        .ppe-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+        }
+
+        /* Desktop Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #334155;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Badges & Status Toggles */
+        .risk-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
         .risk-high { background: #fee2e2; color: #991b1b; }
         .risk-med { background: #ffedd5; color: #9a3412; }
         .risk-low { background: #dcfce7; color: #166534; }
-        .status-toggle { display: inline-flex; background: #e2e8f0; border-radius: 6px; padding: 2px; gap: 2px; }
-        .status-toggle label { padding: 6px 12px; font-size: 8.5pt; font-weight: 600; cursor: pointer; border-radius: 4px; transition: all 0.2s; color: #475569; }
-        .status-toggle input { display: none; }
-        .status-toggle input:checked + span { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .status-pass input:checked + span { color: #16a34a; background: #dcfce7; }
-        .status-fail input:checked + span { color: #dc2626; background: #fee2e2; }
-        .status-na input:checked + span { color: #64748b; background: #e2e8f0; }
-        .item-note { width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 9pt; box-sizing: border-box; }
-        .btn { padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; border: none; font-size: 9pt; display: inline-flex; align-items: center; gap: 6px; }
-        .btn-primary { background: #2563eb; color: white; }
+
+        .status-toggle {
+            display: flex;
+            background: #e2e8f0;
+            border-radius: 6px;
+            padding: 3px;
+            gap: 3px;
+            width: fit-content;
+        }
+
+        .status-toggle label {
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .status-toggle input {
+            display: none;
+        }
+
+        .status-toggle span {
+            display: block;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: all 0.15s;
+            color: #475569;
+            user-select: none;
+        }
+
+        .status-toggle input:checked + span {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+        .status-pass input:checked + span { color: #15803d; background: #dcfce7; }
+        .status-fail input:checked + span { color: #b91c1c; background: #fee2e2; }
+        .status-na input:checked + span { color: #334155; background: #ffffff; }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 42px;
+            transition: opacity 0.2s;
+        }
+        .btn:active { opacity: 0.85; }
+        .btn-primary { background: var(--accent); color: white; }
         .btn-secondary { background: #e2e8f0; color: #334155; }
-        .btn-success { background: #16a34a; color: white; padding: 12px 24px; font-size: 11pt; }
-        .dynamic-form-box { background: #f8fafc; padding: 16px; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 20px; }
-        .dynamic-form-grid { display: flex; gap: 8px; flex-wrap: wrap; }
-        .dynamic-form-grid input, .dynamic-form-grid select { padding: 8px; font-size: 9pt; border: 1px solid #cbd5e1; border-radius: 4px; flex: 1; min-width: 140px; }
-        .nav-footer-custom { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .action-footer { text-align: center; margin-top: 30px; }
+        .btn-success { background: var(--success); color: white; padding: 14px 28px; font-size: 1.05rem; }
+        .btn-sm { font-size: 0.82rem; padding: 6px 12px; min-height: 36px; }
+
+        /* Dynamic Add Item Box */
+        .dynamic-form-box {
+            background: #f8fafc;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .dynamic-form-grid {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .dynamic-form-grid input,
+        .dynamic-form-grid select {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        /* Manager Auth & AI Scan Boxes */
+        .auth-box {
+            background: #fffbeb;
+            border: 1px solid #f59e0b;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .auth-inputs {
+            display: flex;
+            gap: 10px;
+            max-width: 550px;
+            flex-wrap: wrap;
+        }
+
+        .ai-scan-box {
+            background: #f8fafc;
+            border: 1px dashed var(--border);
+            margin-top: 24px;
+            padding: 18px;
+            border-radius: 8px;
+        }
+
+        .ai-upload-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+            flex-wrap: wrap;
+        }
+
+        .action-footer {
+            text-align: center;
+            margin: 24px 0 40px 0;
+        }
+
+        /* =========================================================
+           MOBILE & TABLET RESPONSIVE OVERRIDES (<= 768px)
+           ========================================================= */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                padding-bottom: 90px; /* Space for sticky submit button */
+            }
+
+            .card {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+
+            .header-bar h1 {
+                font-size: 1.25rem;
+            }
+
+            /* Prevent iOS zoom on focus */
+            input, select, textarea {
+                font-size: 16px !important;
+            }
+
+            /* Full-width Mode Selector */
+            .mode-selector {
+                width: 100%;
+            }
+            .mode-btn {
+                flex: 1;
+                padding: 10px 8px;
+                font-size: 0.85rem;
+            }
+
+            /* Stack Metadata Inputs */
+            .meta-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                padding: 12px;
+            }
+
+            .ppe-container label {
+                flex: 1 1 calc(50% - 10px);
+                font-size: 0.85rem;
+            }
+
+            /* Transform Checklist & Defect Tables into Stacked Mobile Cards */
+            table.responsive-table thead {
+                display: none;
+            }
+
+            table.responsive-table,
+            table.responsive-table tbody,
+            table.responsive-table tr,
+            table.responsive-table td {
+                display: block;
+                width: 100%;
+            }
+
+            table.responsive-table tr {
+                background: #ffffff;
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                margin-bottom: 14px;
+                padding: 12px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            }
+
+            table.responsive-table td {
+                padding: 6px 0;
+                border-bottom: none;
+                text-align: left;
+            }
+
+            /* Inline metadata row styling inside mobile card */
+            table.responsive-table td[data-label="Component"] {
+                font-size: 1.05rem;
+                border-bottom: 1px solid #f1f5f9;
+                padding-bottom: 8px;
+                margin-bottom: 4px;
+            }
+
+            table.responsive-table td[data-label="Action"] {
+                color: #334155;
+                font-size: 0.92rem;
+                padding-bottom: 8px;
+            }
+
+            table.responsive-table td[data-label="Frequency"],
+            table.responsive-table td[data-label="Risk"] {
+                display: inline-block;
+                width: auto;
+                margin-right: 12px;
+                padding: 4px 0 8px 0;
+            }
+
+            table.responsive-table td[data-label="Frequency"]::before {
+                content: "Freq: ";
+                font-weight: 600;
+                color: var(--text-muted);
+                font-size: 0.8rem;
+            }
+
+            /* Full-width easy-tap Status Toggle */
+            .status-toggle {
+                width: 100%;
+                margin: 4px 0;
+            }
+
+            .status-toggle span {
+                padding: 10px 8px;
+                font-size: 0.9rem;
+            }
+
+            /* Defect Table Labels on Mobile */
+            table.defect-table td::before {
+                content: attr(data-label);
+                display: block;
+                font-size: 0.78rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                color: var(--text-muted);
+                margin-bottom: 4px;
+            }
+
+            /* Full-width form & upload buttons */
+            .dynamic-form-grid input,
+            .dynamic-form-grid select,
+            .dynamic-form-grid button,
+            .auth-inputs input,
+            .auth-inputs button,
+            .ai-upload-row input,
+            .ai-upload-row button {
+                width: 100%;
+                flex: 1 1 100%;
+            }
+
+            /* Sticky Mobile Submit Footer */
+            .action-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: #ffffff;
+                padding: 12px 16px;
+                margin: 0;
+                border-top: 1px solid var(--border);
+                box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.06);
+                z-index: 100;
+            }
+
+            .action-footer .btn-success {
+                width: 100%;
+            }
+        }
+
+        @media print {
+            body { padding: 0; background: #fff; }
+            .nav-footer-custom, .action-footer, .ai-scan-box, .btn { display: none !important; }
+            .card { box-shadow: none; border: none; padding: 0; }
+        }
     </style>
 </head>
 <body>
 
+<div class="container">
     <div class="nav-footer-custom">
-        <div style="display: flex; gap: 16px; align-items: center;">
-            <a href="08_checklists_inspections_new.html">&larr; Back to Module 08 Hub</a>
-            <a href="08_inspection_history.html" style="font-weight: 600;">📊 View Audit History</a>
+        <div class="nav-links">
+            <a href="08_checklists_inspections_new.html">&larr; Back to Hub</a>
+            <a href="08_inspection_history.html" style="font-weight: 600;">📊 Audit History</a>
         </div>
-        <button class="btn btn-secondary" onclick="window.print()">🖨️ Print / Save PDF</button>
+        <button class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ Print / PDF</button>
     </div>
 
     <div class="card">
         <div class="header-bar">
-            <div>
-                <h1 id="form-title">Loading Checklist...</h1>
-                <p id="form-subtitle" style="margin: 4px 0 0 0; color: #64748b; font-size: 9.5pt;">Operational Safety Check</p>
-            </div>
+            <h1 id="form-title">Loading Checklist...</h1>
+            <p id="form-subtitle" style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 0.9rem;">Operational Safety Check</p>
         </div>
 
         <div class="mode-selector">
             <button class="mode-btn active" id="mode-daily" onclick="switchMode('Daily')">☀️ Daily Pre-Start</button>
-            <button class="mode-btn" id="mode-weekly" onclick="switchMode('Weekly')">📅 Weekly / Monthly Service</button>
+            <button class="mode-btn" id="mode-weekly" onclick="switchMode('Weekly')">📅 Weekly / Monthly</button>
         </div>
 
         <div class="meta-grid">
             <div class="meta-field">
-                <label>Inspection Date</label>
+                <label for="log-date">Inspection Date</label>
                 <input type="date" id="log-date">
             </div>
             <div class="meta-field">
-                <label>Hours Meter / Usage</label>
-                <input type="text" id="log-hours">
+                <label for="log-hours">Hours Meter / Usage</label>
+                <input type="text" id="log-hours" placeholder="e.g. 1420 hrs">
             </div>
             <div class="meta-field">
-                <label>Operator / Inspector Name</label>
-                <input type="text" id="log-operator">
+                <label for="log-operator">Operator / Inspector Name</label>
+                <input type="text" id="log-operator" placeholder="Full Name">
             </div>
             <div class="meta-field">
-                <label>Manager Initials</label>
-                <input type="text" id="log-manager" style="max-width: 100px;">
+                <label for="log-manager">Manager Initials</label>
+                <input type="text" id="log-manager" placeholder="e.g. JD">
             </div>
             <div class="ppe-container" id="ppe-section">
-                <span style="font-weight: 700; font-size: 9pt; color: #1e293b;">PPE Worn & Inspected:</span>
+                <span class="ppe-title">PPE Worn & Inspected:</span>
                 <label><input type="checkbox" class="ppe-check" value="Boots"> Safety Boots</label>
                 <label><input type="checkbox" class="ppe-check" value="Vest"> Hi-Viz Vest</label>
                 <label><input type="checkbox" class="ppe-check" value="Glasses"> Eye Protection</label>
@@ -94,23 +565,31 @@
             </div>
         </div>
 
-        <h2>
+        <h2 class="section-header">
             <span id="section-title-text">Checklist Items</span>
-            <button class="btn btn-secondary" onclick="toggleAddRowForm()" style="font-size: 8pt; padding: 4px 10px;">+ Add Item</button>
+            <button class="btn btn-secondary btn-sm" onclick="toggleAddRowForm()">+ Add Item</button>
         </h2>
         
         <div id="item-form-container" class="dynamic-form-box" style="display:none;">
-            <h4 style="margin:0 0 8px 0; font-size: 9pt;">Add Custom Checklist Item</h4>
+            <h4 style="margin:0 0 10px 0; font-size: 0.9rem;">Add Custom Checklist Item</h4>
             <div class="dynamic-form-grid">
                 <input type="text" id="new-comp" placeholder="Component" style="flex:2;">
                 <input type="text" id="new-desc" placeholder="Action Required" style="flex:3;">
-                <select id="new-freq"><option value="Daily">Daily</option><option value="Weekly">Weekly</option><option value="Monthly">Monthly</option></select>
-                <select id="new-risk"><option value="High">High</option><option value="Med">Med</option><option value="Low">Low</option></select>
+                <select id="new-freq">
+                    <option value="Daily">Daily</option>
+                    <option value="Weekly">Weekly</option>
+                    <option value="Monthly">Monthly</option>
+                </select>
+                <select id="new-risk">
+                    <option value="High">High Risk</option>
+                    <option value="Med">Med Risk</option>
+                    <option value="Low">Low Risk</option>
+                </select>
                 <button class="btn btn-primary" onclick="addNewItem()">Save Item</button>
             </div>
         </div>
 
-        <table>
+        <table class="responsive-table">
             <thead>
                 <tr>
                     <th style="width: 20%;">Component</th>
@@ -122,64 +601,66 @@
                 </tr>
             </thead>
             <tbody id="checklist-tbody">
-                <tr><td colspan="6" style="text-align: center; color: #64748b; padding: 20px;">Loading items...</td></tr>
+                <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">Loading items...</td></tr>
             </tbody>
         </table>
 
         <!-- Defect Log & Authorization Section -->
-        <div class="screen-only-section" style="margin-top: 32px;">
-            <h2>
-                <span>Defect Remedy & Repair Action Log</span>
-                <button class="btn btn-secondary" onclick="addDefectRow()" style="font-size: 8pt; padding: 4px 10px;">+ Add Defect Entry</button>
+        <div class="screen-only-section" style="margin-top: 28px;">
+            <h2 class="section-header">
+                <span>Defect Remedy & Repair Log</span>
+                <button class="btn btn-secondary btn-sm" onclick="addDefectRow()">+ Add Defect</button>
             </h2>
-            <p style="font-size: 9pt; color: #64748b; margin-top: -6px;">Note: If any defects or equipment failures are logged below, a Manager/Admin credential check is strictly required.</p>
-            <table>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: -4px 0 12px 0;">
+                Note: If any defects or equipment failures are logged below, a Manager/Admin credential check is strictly required.
+            </p>
+            <table class="responsive-table defect-table">
                 <thead>
                     <tr>
                         <th style="width: 35%;">Defect / Issue Identified</th>
                         <th style="width: 35%;">Corrective Action Taken</th>
                         <th style="width: 15%;">Target Date</th>
-                        <th style="width: 15%;">Manager Sign-off Initials</th>
+                        <th style="width: 15%;">Manager Initials</th>
                     </tr>
                 </thead>
                 <tbody id="defect-tbody">
                     <tr class="defect-row">
-                        <td><input type="text" class="item-note def-desc" placeholder="Describe issue (leave blank if none)..."></td>
-                        <td><input type="text" class="item-note def-action" placeholder="Action taken..."></td>
-                        <td><input type="date" class="item-note def-date"></td>
-                        <td><input type="text" class="item-note def-sign" placeholder="Initials"></td>
+                        <td data-label="Defect / Issue Identified"><input type="text" class="item-note def-desc" placeholder="Describe issue (leave blank if none)..."></td>
+                        <td data-label="Corrective Action Taken"><input type="text" class="item-note def-action" placeholder="Action taken..."></td>
+                        <td data-label="Target Date"><input type="date" class="item-note def-date"></td>
+                        <td data-label="Manager Initials"><input type="text" class="item-note def-sign" placeholder="Initials"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <div id="manager-auth-box" style="background: #fffbeb; border: 1px solid #f59e0b; padding: 16px; border-radius: 6px; margin-top: 20px; display: none;">
-            <h4 style="margin: 0 0 6px 0; color: #b45309; font-size: 10pt;">🔒 Database Manager Defect Authorization Required</h4>
-            <p style="font-size: 9pt; color: #92400e; margin-bottom: 10px;">Defects have been flagged. Please authenticate with your username and password.</p>
-            <div style="display: flex; gap: 10px; max-width: 500px; flex-wrap: wrap;">
-                <input type="text" id="manager-username-input" class="item-note" placeholder="Username" style="background: #fff; flex: 1; min-width: 180px;">
-                <input type="password" id="manager-password-input" class="item-note" placeholder="Password / PIN" style="background: #fff; flex: 1; min-width: 150px;">
-                <button type="button" class="btn btn-primary" onclick="verifyManagerUser()" style="background: #b45309; white-space: nowrap;">Verify User</button>
+        <div id="manager-auth-box" class="auth-box">
+            <h4 style="margin: 0 0 6px 0; color: var(--warning); font-size: 0.95rem;">🔒 Database Manager Defect Authorization Required</h4>
+            <p style="font-size: 0.85rem; color: #92400e; margin: 0 0 12px 0;">Defects have been flagged. Please authenticate with your username and password.</p>
+            <div class="auth-inputs">
+                <input type="text" id="manager-username-input" class="item-note" placeholder="Username">
+                <input type="password" id="manager-password-input" class="item-note" placeholder="Password / PIN">
+                <button type="button" class="btn btn-primary" onclick="verifyManagerUser()" style="background: var(--warning); white-space: nowrap;">Verify User</button>
             </div>
-            <span id="auth-status-msg" style="font-size: 8.5pt; font-weight: bold; margin-top: 6px; display: block;"></span>
+            <span id="auth-status-msg" style="font-size: 0.85rem; font-weight: bold; margin-top: 8px; display: block;"></span>
         </div>
 
         <!-- AI Scan Section -->
-        <div class="card" style="background: #f8fafc; border: 1px dashed #cbd5e1; margin-top: 24px;">
-            <h3 style="margin-top: 0; font-size: 11pt; color: #1e293b;">🤖 AI Checklist Intake & Scan</h3>
-            <p style="font-size: 9pt; color: #64748b; margin-bottom: 12px;">Upload a scan/photo of the completed paper checklist to auto-extract fields.</p>
-            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input type="file" id="checklist-images" accept="image/*,application/pdf" multiple style="flex: 1; min-width: 220px; background: #fff; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
-                <button type="button" id="btn-analyze-checklist" onclick="analyzeChecklistEvidence()" style="background: #2563eb; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px;">🔍 Analyse Checklist Scan</button>
+        <div class="ai-scan-box">
+            <h3 style="margin: 0 0 6px 0; font-size: 1rem; color: var(--text-main);">🤖 AI Checklist Intake & Scan</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 12px 0;">Take a photo or upload a scan of a completed paper checklist to auto-extract fields.</p>
+            <div class="ai-upload-row">
+                <input type="file" id="checklist-images" accept="image/*,application/pdf" capture="environment" multiple style="flex: 1; background: #fff; padding: 8px; border: 1px solid var(--border); border-radius: 6px;">
+                <button type="button" id="btn-analyze-checklist" class="btn btn-primary" onclick="analyzeChecklistEvidence()">🔍 Analyse Scan</button>
             </div>
-            <div id="analyze-checklist-status" style="display: none; margin-top: 8px; font-size: 12px; font-weight: bold; color: #2563eb;"></div>
+            <div id="analyze-checklist-status" style="display: none; margin-top: 10px; font-size: 0.85rem; font-weight: bold; color: var(--accent);"></div>
         </div>
 
-        <div id="ai-review-container" class="card" style="display: none; background: #fff; border: 1px solid #2563eb; margin-top: 15px; padding: 16px; border-radius: 8px;">
-            <h3 style="margin-top: 0; color: #1e293b; font-size: 11pt;">📋 Extracted Inspection Breakdown</h3>
-            <div id="ai-extracted-metadata" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; font-size: 9pt;"></div>
+        <div id="ai-review-container" class="card" style="display: none; border: 1px solid var(--accent); margin-top: 16px; padding: 16px;">
+            <h3 style="margin-top: 0; color: var(--text-main); font-size: 1rem;">📋 Extracted Inspection Breakdown</h3>
+            <div id="ai-extracted-metadata" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 12px; font-size: 0.85rem;"></div>
             <div style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 8.5pt;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
                     <thead style="background: #f1f5f9; position: sticky; top: 0;">
                         <tr><th style="padding: 8px;">Component</th><th style="padding: 8px; text-align: center;">Status</th><th style="padding: 8px;">Notes</th></tr>
                     </thead>
@@ -187,7 +668,7 @@
                 </table>
             </div>
             <div style="margin-top: 12px; display: flex; gap: 10px; justify-content: flex-end;">
-                <button type="button" class="btn btn-primary" onclick="applyAiReviewEdits()" style="background: #16a34a;">✓ Apply AI Edits</button>
+                <button type="button" class="btn btn-primary" onclick="applyAiReviewEdits()" style="background: var(--success);">✓ Apply AI Edits</button>
             </div>
         </div>
     </div>
@@ -195,6 +676,7 @@
     <div class="action-footer">
         <button class="btn btn-success" onclick="submitInspectionLog()">💾 Submit & Save Inspection Log</button>
     </div>
+</div>
 
 <script>
     const API_BASE = 'https://cathkin-ohs-framework.vercel.app/api';
@@ -207,7 +689,6 @@
 
     async function loadChecklistData() {
         try {
-            // Fetch category meta & items matching category slug
             const res = await fetch(`${API_BASE}/checklist-items?category=${categorySlug}`);
             const data = await res.json();
             
@@ -219,10 +700,11 @@
                 document.getElementById('form-title').textContent = `${categorySlug.toUpperCase()} Inspection Log`;
             }
 
-            allChecklistItems = data.items || data; // handle array or object response
+            allChecklistItems = data.items || data;
             filterAndRenderItems();
         } catch (error) {
             console.error('Error loading checklist:', error);
+            document.getElementById('checklist-tbody').innerHTML = `<tr><td colspan="6" style="text-align: center; color: #dc2626; padding: 20px;">Unable to load checklist items. Check connection.</td></tr>`;
         }
     }
 
@@ -244,7 +726,7 @@
         });
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #64748b; padding: 15px;">No ${currentMode.toLowerCase()} checks listed.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 15px;">No ${currentMode.toLowerCase()} checks listed.</td></tr>`;
             return;
         }
 
@@ -252,18 +734,18 @@
             const riskClass = item.risk_level === 'High' ? 'risk-high' : item.risk_level === 'Med' ? 'risk-med' : 'risk-low';
             tbody.innerHTML += `
                 <tr data-id="${item.id}">
-                    <td><strong style="color: #1e293b;">${item.component}</strong></td>
-                    <td>${item.description}</td>
-                    <td><span style="font-size: 8.5pt; color: #475569;">${item.frequency}</span></td>
-                    <td><span class="risk-badge ${riskClass}">${item.risk_level || 'Med'}</span></td>
-                    <td>
+                    <td data-label="Component"><strong style="color: var(--text-main);">${item.component}</strong></td>
+                    <td data-label="Action">${item.description}</td>
+                    <td data-label="Frequency"><span style="font-size: 0.82rem; color: #475569;">${item.frequency}</span></td>
+                    <td data-label="Risk"><span class="risk-badge ${riskClass}">${item.risk_level || 'Med'}</span></td>
+                    <td data-label="Status">
                         <div class="status-toggle">
                             <label class="status-pass"><input type="radio" name="status-${item.id}" value="Pass"><span>Pass</span></label>
                             <label class="status-fail"><input type="radio" name="status-${item.id}" value="Fail"><span>Fail</span></label>
                             <label class="status-na"><input type="radio" name="status-${item.id}" value="NA"><span>N/A</span></label>
                         </div>
                     </td>
-                    <td><input type="text" class="item-note" placeholder="Note..."></td>
+                    <td data-label="Notes"><input type="text" class="item-note" placeholder="Add note or defect..."></td>
                 </tr>
             `;
         });
@@ -290,6 +772,8 @@
             });
             if (!res.ok) throw new Error('Failed to save');
             alert('Item added successfully!');
+            document.getElementById('new-comp').value = '';
+            document.getElementById('new-desc').value = '';
             toggleAddRowForm();
             loadChecklistData();
         } catch (err) { alert('Error: ' + err.message); }
@@ -300,10 +784,10 @@
         const tr = document.createElement('tr');
         tr.className = 'defect-row';
         tr.innerHTML = `
-            <td><input type="text" class="item-note def-desc" placeholder="Describe issue..."></td>
-            <td><input type="text" class="item-note def-action" placeholder="Action taken..."></td>
-            <td><input type="date" class="item-note def-date"></td>
-            <td><input type="text" class="item-note def-sign" placeholder="Initials"></td>
+            <td data-label="Defect / Issue Identified"><input type="text" class="item-note def-desc" placeholder="Describe issue..."></td>
+            <td data-label="Corrective Action Taken"><input type="text" class="item-note def-action" placeholder="Action taken..."></td>
+            <td data-label="Target Date"><input type="date" class="item-note def-date"></td>
+            <td data-label="Manager Initials"><input type="text" class="item-note def-sign" placeholder="Initials"></td>
         `;
         tbody.appendChild(tr);
     }
@@ -354,7 +838,10 @@
                 statusMsg.style.color = '#b91c1c';
                 statusMsg.textContent = '✕ Authorization denied.';
             }
-        } catch (err) { statusMsg.textContent = 'Connection error.'; }
+        } catch (err) {
+            statusMsg.style.color = '#b91c1c';
+            statusMsg.textContent = 'Connection error.';
+        }
     }
 
     async function submitInspectionLog() {
@@ -375,7 +862,7 @@
         document.querySelectorAll('#checklist-tbody tr').forEach(tr => {
             const id = tr.getAttribute('data-id');
             if (!id) return;
-            const status = tr.querySelector(`input[name="status-${id}"]:checked")`)?.value || 'Unchecked';
+            const status = tr.querySelector(`input[name="status-${id}"]:checked`)?.value || 'Unchecked';
             const note = tr.querySelector('.item-note').value;
             results.push({ itemId: id, status, note });
         });
@@ -434,4 +921,3 @@
 </script>
 </body>
 </html>
-
