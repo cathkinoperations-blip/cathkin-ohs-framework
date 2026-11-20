@@ -103,10 +103,11 @@
                         <th>Verification & Sign-off</th>
                         <th>Evidence Attached</th>
                         <th>Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td colspan="7" style="text-align: center; color: #718096; padding: 20px;">Loading historical records...</td></tr>
+                    <tr><td colspan="8" style="text-align: center; color: #718096; padding: 20px;">Loading historical records...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -155,88 +156,90 @@
     }
 
     function renderTable(incidents) {
-        const tbody = document.querySelector('#history-table tbody');
-        tbody.innerHTML = '';
-    
-        incidents.forEach((inc, incIndex) => {
-            const dateLogged = inc.incident_date ? new Date(inc.incident_date).toLocaleString() : 'N/A';
-            const closedRaw = inc.closed_at || inc.updated_at;
-            const dateClosed = closedRaw ? new Date(closedRaw).toLocaleString() : 'Recorded';
-    
-            const logEvidenceHtml = renderFileList(inc.incident_image_url, incIndex, 'log');
-            const closeEvidenceHtml = renderFileList(inc.close_image_url, incIndex, 'close');
-            const reporterInfo = inc.reporter_name
-                ? `<br><span><strong>By:</strong> ${inc.reporter_name}</span>`
-                : '';
-            const verifierInfo = inc.verified_by
-                ? `<strong>Verified By:</strong> ${inc.verified_by}`
-                : '<strong>Sign-off:</strong> Manager';
-    
-            const fullDesc = inc.description || 'No description provided.';
-            const capaText = `CAPA: ${inc.corrective_action || 'N/A'} | Closure Notes: ${inc.remediation_notes || 'Verified resolved.'}`;
-    
-            let aiNotesHtml = '';
-            let aiPlainText = '';
-            if (inc.ai_close_assessment) {
-                try {
-                    const aiData = typeof inc.ai_close_assessment === 'string'
-                        ? JSON.parse(inc.ai_close_assessment)
-                        : inc.ai_close_assessment;
-                    const badgeClass = aiData.satisfactory ? 'ai-badge-approved' : 'ai-badge-flagged';
-                    const badgeLabel = aiData.satisfactory ? 'AI Approved' : 'AI Flagged';
-                    const badge = `<span class="${badgeClass}">${badgeLabel}</span>`;
-                    aiPlainText = aiData.assessment_notes || 'No assessment notes.';
-                    aiNotesHtml = `
-                        <div class="ai-notes-box">
-                            <div class="ai-notes-header">
-                                <strong>System Assessment:</strong> ${badge}
-                            </div>
-                            <div class="line-clamp-3 ai-notes-body">${aiPlainText}</div>
+    const tbody = document.querySelector('#history-table tbody');
+    tbody.innerHTML = '';
+
+    incidents.forEach((inc, incIndex) => {
+        const dateLogged = inc.incident_date ? new Date(inc.incident_date).toLocaleString() : 'N/A';
+        const closedRaw = inc.closed_at || inc.updated_at;
+        const dateClosed = closedRaw ? new Date(closedRaw).toLocaleString() : 'Recorded';
+
+        const logEvidenceHtml = renderFileList(inc.incident_image_url, incIndex, 'log');
+        const closeEvidenceHtml = renderFileList(inc.close_image_url, incIndex, 'close');
+        const reporterInfo = inc.reporter_name
+            ? `<br><span><strong>By:</strong> ${inc.reporter_name}</span>`
+            : '';
+        const verifierInfo = inc.verified_by
+            ? `<strong>Verified By:</strong> ${inc.verified_by}`
+            : '<strong>Sign-off:</strong> Manager';
+
+        const fullDesc = inc.description || 'No description provided.';
+        const capaText = `CAPA: ${inc.corrective_action || 'N/A'} | Closure Notes: ${inc.remediation_notes || 'Verified resolved.'}`;
+        const detailUrl = `03_sub_gar_annexure_1_detail.html?id=${encodeURIComponent(inc.id)}`;
+
+        let aiNotesHtml = '';
+        let aiPlainText = '';
+        if (inc.ai_close_assessment) {
+            try {
+                const aiData = typeof inc.ai_close_assessment === 'string'
+                    ? JSON.parse(inc.ai_close_assessment)
+                    : inc.ai_close_assessment;
+                const badgeClass = aiData.satisfactory ? 'ai-badge-approved' : 'ai-badge-flagged';
+                const badgeLabel = aiData.satisfactory ? 'AI Approved' : 'AI Flagged';
+                const badge = `<span class="${badgeClass}">${badgeLabel}</span>`;
+                aiPlainText = aiData.assessment_notes || 'No assessment notes.';
+                aiNotesHtml = `
+                    <div class="ai-notes-box">
+                        <div class="ai-notes-header">
+                            <strong>System Assessment:</strong> ${badge}
                         </div>
-                    `;
-                } catch (e) {
-                    aiPlainText = String(inc.ai_close_assessment);
-                    aiNotesHtml = `
-                        <div class="ai-notes-box">
-                            <div class="line-clamp-3 ai-notes-body"><strong>AI Assessment:</strong> ${aiPlainText}</div>
-                        </div>
-                    `;
-                }
+                        <div class="line-clamp-3 ai-notes-body">${aiPlainText}</div>
+                    </div>
+                `;
+            } catch (e) {
+                aiPlainText = String(inc.ai_close_assessment);
+                aiNotesHtml = `
+                    <div class="ai-notes-box">
+                        <div class="line-clamp-3 ai-notes-body"><strong>AI Assessment:</strong> ${aiPlainText}</div>
+                    </div>
+                `;
             }
-    
-            const combinedRemediationTitle = `${capaText}${aiPlainText ? ` | Assessment: ${aiPlainText}` : ''}`.replace(/"/g, '&quot;');
-    
-            tbody.innerHTML += `
-                <tr>
-                    <td>
-                        <div><strong>Logged:</strong> ${dateLogged}</div>
-                        <div class="closed-date-text"><strong>Closed:</strong> ${dateClosed}</div>
-                    </td>
-                    <td>
-                        <strong>${inc.incident_type || 'N/A'}</strong><br>
-                        <span>${inc.location || 'Estate'}</span>${reporterInfo}
-                    </td>
-                    <td>
-                        <div class="line-clamp-3" title="${fullDesc.replace(/"/g, '&quot;')}">${fullDesc}</div>
-                    </td>
-                    <td>
-                        <div class="line-clamp-3" title="${combinedRemediationTitle}">
-                            <strong>CAPA:</strong> ${inc.corrective_action || 'N/A'}<br>
-                            <strong>Closure Notes:</strong> ${inc.remediation_notes || 'Verified resolved.'}
-                        </div>
-                        ${aiNotesHtml}
-                    </td>
-                    <td>${verifierInfo}</td>
-                    <td>
-                        ${logEvidenceHtml ? `<div class="evidence-group-spaced"><strong>Initial:</strong>${logEvidenceHtml}</div>` : ''}
-                        ${closeEvidenceHtml ? `<div><strong>Close-Out:</strong>${closeEvidenceHtml}</div>` : ''}
-                        ${!logEvidenceHtml && !closeEvidenceHtml ? '<span class="evidence-none-text">None</span>' : ''}
-                    </td>
-                    <td><span class="badge-closed">${inc.status || 'Closed'}</span></td>
-                </tr>
-            `;
-        });
-    }
+        }
+
+        const combinedRemediationTitle = `${capaText}${aiPlainText ? ` | Assessment: ${aiPlainText}` : ''}`.replace(/"/g, '&quot;');
+
+        tbody.innerHTML += `
+            <tr>
+                <td>
+                    <div><strong>Logged:</strong> ${dateLogged}</div>
+                    <div class="closed-date-text"><strong>Closed:</strong> ${dateClosed}</div>
+                </td>
+                <td>
+                    <strong>${inc.incident_type || 'N/A'}</strong><br>
+                    <span>${inc.location || 'Estate'}</span>${reporterInfo}
+                </td>
+                <td>
+                    <div class="line-clamp-3" title="${fullDesc.replace(/"/g, '&quot;')}">${fullDesc}</div>
+                </td>
+                <td>
+                    <div class="line-clamp-3" title="${combinedRemediationTitle}">
+                        <strong>CAPA:</strong> ${inc.corrective_action || 'N/A'}<br>
+                        <strong>Closure Notes:</strong> ${inc.remediation_notes || 'Verified resolved.'}
+                    </div>
+                    ${aiNotesHtml}
+                </td>
+                <td>${verifierInfo}</td>
+                <td>
+                    ${logEvidenceHtml ? `<div class="evidence-group-spaced"><strong>Initial:</strong>${logEvidenceHtml}</div>` : ''}
+                    ${closeEvidenceHtml ? `<div><strong>Close-Out:</strong>${closeEvidenceHtml}</div>` : ''}
+                    ${!logEvidenceHtml && !closeEvidenceHtml ? '<span class="evidence-none-text">None</span>' : ''}
+                </td>
+                <td><span class="badge-closed">${inc.status || 'Closed'}</span></td>
+                <td><a href="${detailUrl}" target="_self" class="btn-detail">View Detail</a></td>
+            </tr>
+        `;
+    });
+}
 
     function renderFileList(rawUrl, incIndex, type) {
         if (!rawUrl) return '';
