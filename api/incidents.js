@@ -68,9 +68,9 @@ async function sendNotification({ to, subject, title, bodyHtml, attachments = []
     }
 }
 
-function buildEvidenceEmailBlocks(rawUrl, prefix = 'evidence') {
+function buildEvidenceEmailBlocks(rawUrl, prefix = 'evidence', label = 'Attached Evidence Photos') {
     if (!rawUrl || typeof rawUrl !== 'string') {
-        return { attachments: [], galleryHtml: '' };
+        return { attachments: [], galleryHtml: '', linksHtml: '' };
     }
 
     const parts = rawUrl.split(',').map(s => s.trim()).filter(Boolean);
@@ -88,6 +88,7 @@ function buildEvidenceEmailBlocks(rawUrl, prefix = 'evidence') {
 
     const attachments = [];
     const htmlBlocks = [];
+    const linkItems = [];
 
     items.forEach((item, idx) => {
         if (item.startsWith('data:image/')) {
@@ -111,6 +112,8 @@ function buildEvidenceEmailBlocks(rawUrl, prefix = 'evidence') {
                         <img src="cid:${cid}" alt="Incident Photo ${idx + 1}" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid #e2e8f0;" />
                     </div>
                 `);
+
+                linkItems.push(`<li>Photo ${idx + 1}: Embedded image attachment (no external URL)</li>`);
             }
         } else if (item.startsWith('http://') || item.startsWith('https://')) {
             htmlBlocks.push(`
@@ -119,17 +122,28 @@ function buildEvidenceEmailBlocks(rawUrl, prefix = 'evidence') {
                     <img src="${item}" alt="Incident Photo ${idx + 1}" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid #e2e8f0;" />
                 </div>
             `);
+
+            linkItems.push(`<li>Photo ${idx + 1}: <a href="${item}" target="_blank" rel="noopener noreferrer" style="color: #2b6cb0;">${item}</a></li>`);
         }
     });
 
     const galleryHtml = htmlBlocks.length > 0
         ? `<div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
-               <strong style="display: block; margin-bottom: 8px;">Attached Evidence Photos:</strong>
+               <strong style="display: block; margin-bottom: 8px;">${label}:</strong>
                ${htmlBlocks.join('')}
            </div>`
         : '';
 
-    return { attachments, galleryHtml };
+    const linksHtml = linkItems.length > 0
+        ? `<div style="margin-top: 12px; padding: 10px 12px; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 4px;">
+               <strong style="display: block; margin-bottom: 6px; font-size: 13px;">${label} — URLs &amp; Links:</strong>
+               <ul style="margin: 0; padding-left: 18px; font-size: 12px; color: #2d3748;">
+                   ${linkItems.join('')}
+               </ul>
+           </div>`
+        : '';
+
+    return { attachments, galleryHtml, linksHtml };
 }
 
 export default async function handler(req, res) {
@@ -255,6 +269,12 @@ export default async function handler(req, res) {
                 for (const inc of nearingRes.rows) {
                     const recipients = [...new Set([...nearingRoles])].filter(Boolean);
                     if (recipients.length > 0) {
+                        const { attachments, galleryHtml, linksHtml } = buildEvidenceEmailBlocks(
+                            inc.incident_image_url,
+                            `incident_${inc.id}_nearing`,
+                            'Initial Incident Evidence'
+                        );
+
                         await sendNotification({
                             to: recipients,
                             subject: `Reminder: Incident #${inc.id} Nearing Deadline`,
@@ -263,7 +283,10 @@ export default async function handler(req, res) {
                                 <p>Incident <strong>#${inc.id}</strong> (${inc.incident_type} at <strong>${inc.location}</strong>) is scheduled for completion on <strong>${inc.expected_close_date}</strong> (3 days remaining).</p>
                                 <p><strong>Assigned Responsible Person:</strong> ${inc.responsible_person || 'Unassigned'}</p>
                                 <p><strong>Planned Action:</strong> ${inc.corrective_action || 'None recorded'}</p>
-                            `
+                                ${linksHtml}
+                                ${galleryHtml}
+                            `,
+                            attachments
                         });
                         nearingCount++;
                     }
@@ -282,6 +305,12 @@ export default async function handler(req, res) {
                 for (const inc of overdueRes.rows) {
                     const recipients = [...new Set([inc.reporter_email, ...overdueRoles])].filter(Boolean);
                     if (recipients.length > 0) {
+                        const { attachments, galleryHtml, linksHtml } = buildEvidenceEmailBlocks(
+                            inc.incident_image_url,
+                            `incident_${inc.id}_overdue`,
+                            'Initial Incident Evidence'
+                        );
+
                         await sendNotification({
                             to: recipients,
                             subject: `OVERDUE ESCALATION: Incident #${inc.id}`,
@@ -291,7 +320,10 @@ export default async function handler(req, res) {
                                 <p><strong>Type / Severity:</strong> ${inc.incident_type} | ${inc.severity}</p>
                                 <p><strong>Assigned Responsible Person:</strong> ${inc.responsible_person || 'Unassigned'}</p>
                                 <p><strong>Description:</strong> ${inc.description}</p>
-                            `
+                                ${linksHtml}
+                                ${galleryHtml}
+                            `,
+                            attachments
                         });
                         overdueCount++;
                     }
@@ -332,7 +364,11 @@ export default async function handler(req, res) {
             // Recipients: Reporter + Admin, Manager, HSE, Board, Tester roles
             const roleEmails = await getEmailsByRoles(['Admin', 'Manager', 'HSE', 'Board', 'Tester']);
             const recipients = [...new Set([reporter_email, ...roleEmails])].filter(Boolean);
-            const { attachments, galleryHtml } = buildEvidenceEmailBlocks(incident_image_url, `incident_${newInc.id}`);
+            const { attachments, galleryHtml, linksHtml } = buildEvidenceEmailBlocks(
+                incident_image_url,
+                `incident_${newInc.id}`,
+                'Attached Evidence Photos'
+            );
 
             await sendNotification({
                 to: recipients,
@@ -345,6 +381,7 @@ export default async function handler(req, res) {
                     <p><strong>Expected Close-Out Date:</strong> ${expected_close_date}</p>
                     <p><strong>Description:</strong><br>${description}</p>
                     <p><strong>CAPA / Corrective Action:</strong><br>${corrective_action || 'Pending initial review'}</p>
+                    ${linksHtml}
                     ${galleryHtml}
                 `,
                 attachments
@@ -386,6 +423,26 @@ export default async function handler(req, res) {
             const roleEmails = await getEmailsByRoles(['HSE', 'Board', 'Tester']);
             const recipients = [...new Set([closedInc.reporter_email, ...roleEmails])].filter(Boolean);
 
+            const closeEvidence = buildEvidenceEmailBlocks(
+                closedInc.close_image_url,
+                `incident_${closedInc.id}_close`,
+                'Close-Out / Remediation Evidence'
+            );
+            const initialEvidence = buildEvidenceEmailBlocks(
+                closedInc.incident_image_url,
+                `incident_${closedInc.id}_initial`,
+                'Initial Incident Evidence'
+            );
+
+            const closeAttachments = [
+                ...closeEvidence.attachments,
+                ...initialEvidence.attachments
+            ];
+
+            // Recipients: Reporter + HSE, Board, Tester roles
+            const roleEmails = await getEmailsByRoles(['HSE', 'Board', 'Tester']);
+            const recipients = [...new Set([closedInc.reporter_email, ...roleEmails])].filter(Boolean);
+
             await sendNotification({
                 to: recipients,
                 subject: `Incident Verified & Closed: Ref #${closedInc.id}`,
@@ -403,9 +460,13 @@ export default async function handler(req, res) {
                     </div>
 
                     <p><strong>Description:</strong> ${closedInc.description}</p>
-                `
+                    ${closeEvidence.linksHtml}
+                    ${initialEvidence.linksHtml}
+                    ${closeEvidence.galleryHtml}
+                    ${initialEvidence.galleryHtml}
+                `,
+                attachments: closeAttachments
             });
-
             return res.status(200).json({ success: true, incident: closedInc });
         }
 
