@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Incident Record Detail — Cathkin Estates OHS</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+        header {
+            background: #0f172a;
+            color: #ffffff;
+            padding: 18px 24px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .nav-links a {
+            color: #e2e8f0;
+            text-decoration: none;
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        .nav-links a:hover {
+            background: #334155;
+        }
+        main {
+            max-width: 960px;
+            margin: 24px auto;
+            padding: 0 16px 40px;
+        }
+        .card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+        .top-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .badge-open {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .badge-closed {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .badge-approved {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .badge-flagged {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .meta-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px;
+        }
+        .meta-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+        .meta-value {
+            font-weight: bold;
+            color: #0f172a;
+            word-break: break-word;
+        }
+        .section-block {
+            margin-top: 18px;
+        }
+        .section-block h3 {
+            margin: 0 0 8px;
+            font-size: 1rem;
+            color: #1e3a8a;
+        }
+        .text-box {
+            background: #f8fafc;
+            border-left: 4px solid #2563eb;
+            padding: 12px 16px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .evidence-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+            margin-top: 10px;
+        }
+        .evidence-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 10px;
+            background: #ffffff;
+        }
+        .evidence-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 4px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .evidence-link {
+            font-size: 0.82rem;
+            word-break: break-all;
+        }
+        .evidence-link a {
+            color: #2563eb;
+        }
+        .error-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 16px;
+            border-radius: 8px;
+        }
+        .muted {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Cathkin Estates HOA — OHS Incident Detail</h1>
+        <nav class="nav-links">
+            <a href="03_sub_gar_annexure_1_register.html">Active Register</a>
+            <a href="03_gar_annexure_1_history.html">Closed History</a>
+        </nav>
+    </header>
+
+    <main id="app">
+        <div class="card">
+            <p class="muted">Loading incident record...</p>
+        </div>
+    </main>
+
+    <script>
+        function splitEvidenceItems(rawUrl) {
+            if (!rawUrl || typeof rawUrl !== 'string') return [];
+            const parts = rawUrl.split(',').map(s => s.trim()).filter(Boolean);
+            const items = [];
+            for (let i = 0; i < parts.length; i++) {
+                if (
+                    parts[i].startsWith('data:') &&
+                    parts[i + 1] &&
+                    !parts[i + 1].startsWith('data:') &&
+                    !parts[i + 1].startsWith('http')
+                ) {
+                    items.push(`${parts[i]},${parts[i + 1]}`);
+                    i++;
+                } else {
+                    items.push(parts[i]);
+                }
+            }
+            return items;
+        }
+
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function formatDate(val) {
+            if (!val) return '—';
+            const d = new Date(val);
+            return Number.isNaN(d.getTime()) ? String(val) : d.toLocaleString();
+        }
+
+        function renderEvidenceSection(title, rawUrl) {
+            const items = splitEvidenceItems(rawUrl);
+            if (items.length === 0) {
+                return `
+                    <div class="section-block">
+                        <h3>${escapeHtml(title)}</h3>
+                        <p class="muted">No evidence files recorded.</p>
+                    </div>
+                `;
+            }
+
+            const cardsHtml = items.map((item, idx) => {
+                const isImageData = item.startsWith('data:image/');
+                const isPdfData = item.startsWith('data:application/pdf');
+                const isHttp = item.startsWith('http://') || item.startsWith('https://');
+                const isPdfUrl = isHttp && item.toLowerCase().includes('.pdf');
+
+                let mediaHtml = '';
+                if (isImageData || (isHttp && !isPdfUrl)) {
+                    mediaHtml = `<img src="${escapeHtml(item)}" alt="${escapeHtml(title)} #${idx + 1}" />`;
+                } else if (isPdfData) {
+                    mediaHtml = `<p class="muted">PDF document attached (${Math.round(item.length * 0.75 / 1024)} KB approx.)</p>`;
+                }
+
+                let linkHtml = '';
+                if (isHttp) {
+                    linkHtml = `<div class="evidence-link"><a href="${escapeHtml(item)}" target="_blank" rel="noopener noreferrer">Open URL</a></div>`;
+                } else if (isPdfData) {
+                    linkHtml = `<div class="evidence-link"><a href="${escapeHtml(item)}" download="evidence_${idx + 1}.pdf">Download PDF</a></div>`;
+                } else {
+                    linkHtml = `<div class="evidence-link muted">Stored upload</div>`;
+                }
+
+                return `
+                    <div class="evidence-card">
+                        <div style="font-weight: bold; font-size: 0.85rem; margin-bottom: 6px;">Item ${idx + 1}</div>
+                        ${mediaHtml}
+                        ${linkHtml}
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="section-block">
+                    <h3>${escapeHtml(title)} (${items.length})</h3>
+                    <div class="evidence-grid">${cardsHtml}</div>
+                </div>
+            `;
+        }
+
+        function renderAiSection(rawAi) {
+            if (!rawAi) return '';
+            let badgeHtml = '';
+            let notesText = '';
+
+            try {
+                const parsed = typeof rawAi === 'string' ? JSON.parse(rawAi) : rawAi;
+                notesText = parsed.assessment_notes || JSON.stringify(parsed, null, 2);
+                if (typeof parsed.satisfactory === 'boolean') {
+                    badgeHtml = parsed.satisfactory
+                        ? '<span class="badge badge-approved" style="margin-bottom: 8px;">Verification Approved</span>'
+                        : '<span class="badge badge-flagged" style="margin-bottom: 8px;">Deficiencies Flagged</span>';
+                }
+            } catch (_) {
+                notesText = String(rawAi);
+            }
+
+            return `
+                <div class="section-block">
+                    <h3>AI Close-Out Verification Findings</h3>
+                    <div class="text-box">
+                        ${badgeHtml ? `<div>${badgeHtml}</div>` : ''}
+                        <div>${escapeHtml(notesText)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderIncident(inc) {
+            const statusLower = String(inc.status || '').toLowerCase();
+            const statusClass = statusLower === 'closed' ? 'badge-closed' : 'badge-open';
+
+            document.title = `Incident #${inc.id} — Cathkin Estates OHS`;
+            document.getElementById('app').innerHTML = `
+                <div class="card">
+                    <div class="top-row">
+                        <div>
+                            <h2 style="margin: 0;">Incident #${escapeHtml(inc.id)} — ${escapeHtml(inc.incident_type || 'Incident')}</h2>
+                            <div class="muted">Location: ${escapeHtml(inc.location || '—')}</div>
+                        </div>
+                        <span class="badge ${statusClass}">${escapeHtml(inc.status || 'Open')}</span>
+                    </div>
+
+                    <div class="meta-grid">
+                        <div class="meta-item">
+                            <div class="meta-label">Severity</div>
+                            <div class="meta-value">${escapeHtml(inc.severity || '—')}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Incident Date</div>
+                            <div class="meta-value">${escapeHtml(formatDate(inc.incident_date))}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Expected Close-Out Date</div>
+                            <div class="meta-value">${escapeHtml(formatDate(inc.expected_close_date))}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Verified / Closed At</div>
+                            <div class="meta-value">${escapeHtml(formatDate(inc.verified_at))}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Reported By</div>
+                            <div class="meta-value">${escapeHtml(inc.reported_by || '—')}${inc.reporter_email ? ` (${escapeHtml(inc.reporter_email)})` : ''}</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Responsible Person</div>
+                            <div class="meta-value">${escapeHtml(inc.responsible_person || 'Unassigned')}</div>
+                        </div>
+                    </div>
+
+                    <div class="section-block">
+                        <h3>Description</h3>
+                        <div class="text-box">${escapeHtml(inc.description || 'No description provided.')}</div>
+                    </div>
+
+                    <div class="section-block">
+                        <h3>CAPA / Corrective Action</h3>
+                        <div class="text-box">${escapeHtml(inc.corrective_action || 'Pending initial review')}</div>
+                    </div>
+
+                    ${renderAiSection(inc.ai_close_assessment)}
+                    ${renderEvidenceSection('Initial Incident Evidence', inc.incident_image_url)}
+                    ${renderEvidenceSection('Close-Out / Remediation Evidence', inc.close_image_url)}
+                </div>
+            `;
+        }
+
+        function renderError(message) {
+            document.getElementById('app').innerHTML = `
+                <div class="error-box">
+                    <strong>Unable to load incident:</strong> ${escapeHtml(message)}
+                </div>
+            `;
+        }
+
+        (async function init() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (!id || !/^\d+$/.test(id)) {
+                renderError('Missing or invalid incident ID in URL (expected ?id=...).');
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/incidents?action=get&id=${encodeURIComponent(id)}`);
+                const data = await res.json();
+                if (!res.ok || !data.success || !data.incident) {
+                    renderError(data.error || 'Incident record not found.');
+                    return;
+                }
+                renderIncident(data.incident);
+            } catch (err) {
+                renderError(err.message || 'Network error while loading incident.');
+            }
+        })();
+    </script>
+</body>
+</html>
