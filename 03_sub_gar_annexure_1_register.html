@@ -330,15 +330,17 @@
 
             const data = await response.json();
 
-            if (data.success && data.analysis) {
-                const ext = data.analysis;
+           const rawAnalysis = Array.isArray(data.analysis) ? data.analysis[0] : data.analysis;
+
+            if (data.success && rawAnalysis) {
+                const ext = rawAnalysis;
                 if (ext.incident_type) document.getElementById('incident-type').value = ext.incident_type;
                 if (ext.severity) document.getElementById('severity').value = ext.severity;
                 if (ext.location) document.getElementById('location').value = ext.location;
                 if (ext.description) document.getElementById('description').value = ext.description;
                 if (ext.corrective_action) document.getElementById('corrective-action').value = ext.corrective_action;
                 if (ext.responsible_person) document.getElementById('responsible-person').value = ext.responsible_person;
-
+    
                 statusDiv.style.color = '#2f855a';
                 statusDiv.innerHTML = '✅ Analysis completed! Fields updated below.';
             } else {
