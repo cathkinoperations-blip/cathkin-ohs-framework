@@ -515,12 +515,14 @@ th {
 }
 
 /* Register Table Text Truncation & Action Controls */
-.line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    max-width: 340px;
+#incidents-table,
+#incidents-table td,
+#incidents-table th,
+.line-clamp-3,
+.line-clamp-3 small {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.45;
 }
 .table td {
     vertical-align: top;
