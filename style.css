@@ -513,3 +513,42 @@ th {
         font-size: 10pt; /* Optimal scale for printed paper */
     } 
 }
+
+/* Register Table Text Truncation & Action Controls */
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-width: 340px;
+}
+.table td {
+    vertical-align: top;
+}
+.action-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 112px;
+}
+.btn-detail,
+.btn-close-action {
+    display: inline-block;
+    text-align: center;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    border: none;
+}
+.btn-detail {
+    background: #2b6cb0;
+    color: #ffffff;
+}
+.btn-close-action {
+    background: #c53030;
+    color: #ffffff;
+}
