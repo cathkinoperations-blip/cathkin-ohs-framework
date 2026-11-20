@@ -289,7 +289,7 @@
                             <td><strong>${inc.incident_type}</strong><br><small>${inc.location}</small>${reporterInfo}</td>
                             <td><div class="line-clamp-3" title="${String(inc.description || '').replace(/"/g, '&quot;')}">${inc.description || ''}</div></td>
                             <td><span style="background: #feebc8; color: #9c4221; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; white-space: nowrap;">${inc.severity}</span></td>
-                            <td><div class="line-clamp-3" title="${capaText.replace(/"/g, '&quot;')}"><div style="font-size: 12px; color: #2d3748;"><strong>Action:</strong> ${inc.corrective_action || 'N/A'}<br><strong>Owner:</strong> ${inc.responsible_person || 'N/A'}</div></div></td>
+                            <td><div class="line-clamp-3" title="${capaText.replace(/"/g, '&quot;')}"><strong>Action:</strong> ${inc.corrective_action || 'N/A'}<br><strong>Owner:</strong> ${inc.responsible_person || 'N/A'}</div></td>
                             <td><span style="background: #ebf8ff; color: #2b6cb0; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; white-space: nowrap;">${inc.status}</span></td>
                             <td>
                                 <div class="action-stack">
