@@ -245,7 +245,7 @@ export default async function handler(req, res) {
             const { 
                 incident_date, expected_close_date, reported_by, reporter_email, 
                 incident_type, location, description, severity, corrective_action, 
-                responsible_person, incident_image_url 
+                responsible_person, incident_image_url,  
             } = req.body;
 
             const query = `
