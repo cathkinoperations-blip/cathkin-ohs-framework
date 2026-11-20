@@ -91,6 +91,17 @@
                             🔍 Analyse Attachments
                         </button>
                     </div>
+                    <div style="margin-top: 12px;">
+                      <label for="analysis-comments" style="font-size: 12px; font-weight: 600; color: #4a5568; display: block; margin-bottom: 4px;">
+                        Optional Context / Comments for AI Analysis
+                      </label>
+                      <textarea
+                        id="analysis-comments"
+                        rows="2"
+                        placeholder="e.g., Mini-sub near Village 4; lock latch was found unlatched during morning patrol..."
+                        style="width: 100%; padding: 8px 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 13px; box-sizing: border-box; min-height: 58px;"
+                      ></textarea>
+                    </div>
                     <div class="file-hint"><strong>Required:</strong> 1 to 5 attachments. Click <em>Analyse Attachments</em> to trigger intake scanning.</div>
                     <div id="analyze-status" style="display: none; margin-top: 8px; font-size: 12px; font-weight: bold; color: #2b6cb0;"></div>
                 </div>
@@ -294,6 +305,7 @@
     // AI Intake Analysis
     async function analyzeEvidence() {
         const fileInput = document.getElementById('incident-image');
+        const commentsInput = document.getElementById('analysis-comments');
         const statusDiv = document.getElementById('analyze-status');
         const btn = document.getElementById('btn-analyze');
 
@@ -306,6 +318,8 @@
             alert('A maximum of 5 files is allowed.');
             return;
         }
+
+        const comments = commentsInput ? commentsInput.value.trim() : '';
 
         statusDiv.style.display = 'block';
         statusDiv.style.color = '#2b6cb0';
@@ -325,12 +339,16 @@
             const response = await fetch('/api/incidents?action=analyze-intake', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'analyze-intake', images: imagesPayload })
+                body: JSON.stringify({
+                    action: 'analyze-intake',
+                    images: imagesPayload,
+                    comments: comments || null
+                })
             });
 
             const data = await response.json();
 
-           const rawAnalysis = Array.isArray(data.analysis) ? data.analysis[0] : data.analysis;
+            const rawAnalysis = Array.isArray(data.analysis) ? data.analysis[0] : data.analysis;
 
             if (data.success && rawAnalysis) {
                 const ext = rawAnalysis;
@@ -340,7 +358,7 @@
                 if (ext.description) document.getElementById('description').value = ext.description;
                 if (ext.corrective_action) document.getElementById('corrective-action').value = ext.corrective_action;
                 if (ext.responsible_person) document.getElementById('responsible-person').value = ext.responsible_person;
-    
+
                 statusDiv.style.color = '#2f855a';
                 statusDiv.innerHTML = '✅ Analysis completed! Fields updated below.';
             } else {
