@@ -146,6 +146,25 @@ function buildEvidenceEmailBlocks(rawUrl, prefix = 'evidence', label = 'Attached
     return { attachments, galleryHtml, linksHtml };
 }
 
+function getIncidentDetailUrl(incidentId) {
+    const baseUrl = (process.env.APP_BASE_URL || 'https://cathkin-ohs-framework.vercel.app').replace(/\/+$/, '');
+    return `${baseUrl}/03_sub_gar_annexure_1_detail.html?id=${encodeURIComponent(incidentId)}`;
+}
+
+function buildIncidentLinkHtml(incidentId, label = 'View Full Incident Record') {
+    const url = getIncidentDetailUrl(incidentId);
+    return `
+        <div style="margin: 16px 0;">
+            <a href="${url}" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #2b6cb0; color: #ffffff; text-decoration: none; padding: 10px 16px; border-radius: 5px; font-weight: bold; font-size: 13px;">
+                ${label} (#${incidentId})
+            </a>
+            <div style="margin-top: 6px; font-size: 12px; color: #4a5568;">
+                Direct link: <a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #2b6cb0;">${url}</a>
+            </div>
+        </div>
+    `;
+}
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -171,6 +190,21 @@ export default async function handler(req, res) {
         if (req.method === 'GET' && action === 'history') {
             const result = await pool.query(`SELECT * FROM incident_register WHERE status = 'Closed' ORDER BY verified_at DESC;`);
             return res.status(200).json({ success: true, incidents: result.rows });
+        }
+
+        // Action: Get Single Incident by ID
+        if (req.method === 'GET' && action === 'get') {
+            const id = Number(req.query.id);
+            if (!Number.isInteger(id) || id <= 0) {
+                return res.status(400).json({ success: false, error: 'Valid incident id is required' });
+            }
+
+            const result = await pool.query(`SELECT * FROM incident_register WHERE id = $1;`, [id]);
+            if (result.rowCount === 0) {
+                return res.status(404).json({ success: false, error: 'Incident not found' });
+            }
+
+            return res.status(200).json({ success: true, incident: result.rows[0] });
         }
 
         // Action: AI Intake Analysis from Multiple Photos (up to 5)
@@ -283,6 +317,7 @@ export default async function handler(req, res) {
                                 <p>Incident <strong>#${inc.id}</strong> (${inc.incident_type} at <strong>${inc.location}</strong>) is scheduled for completion on <strong>${inc.expected_close_date}</strong> (3 days remaining).</p>
                                 <p><strong>Assigned Responsible Person:</strong> ${inc.responsible_person || 'Unassigned'}</p>
                                 <p><strong>Planned Action:</strong> ${inc.corrective_action || 'None recorded'}</p>
+                                ${buildIncidentLinkHtml(inc.id, 'Open Incident Record')}
                                 ${linksHtml}
                                 ${galleryHtml}
                             `,
@@ -319,7 +354,8 @@ export default async function handler(req, res) {
                                 <p>Incident <strong>#${inc.id}</strong> at <strong>${inc.location}</strong> has passed its scheduled close-out date of <strong>${inc.expected_close_date}</strong>.</p>
                                 <p><strong>Type / Severity:</strong> ${inc.incident_type} | ${inc.severity}</p>
                                 <p><strong>Assigned Responsible Person:</strong> ${inc.responsible_person || 'Unassigned'}</p>
-                                <p><strong>Description:</strong> ${inc.description}</p>
+                               <p><strong>Description:</strong> ${inc.description}</p>
+                                ${buildIncidentLinkHtml(inc.id, 'Review Overdue Incident')}
                                 ${linksHtml}
                                 ${galleryHtml}
                             `,
@@ -381,6 +417,7 @@ export default async function handler(req, res) {
                     <p><strong>Expected Close-Out Date:</strong> ${expected_close_date}</p>
                     <p><strong>Description:</strong><br>${description}</p>
                     <p><strong>CAPA / Corrective Action:</strong><br>${corrective_action || 'Pending initial review'}</p>
+                    ${buildIncidentLinkHtml(newInc.id, 'View Logged Incident')}
                     ${linksHtml}
                     ${galleryHtml}
                 `,
@@ -460,6 +497,7 @@ export default async function handler(req, res) {
                     </div>
 
                     <p><strong>Description:</strong> ${closedInc.description}</p>
+                    ${buildIncidentLinkHtml(closedInc.id, 'View Closed Incident Record')}
                     ${closeEvidence.linksHtml}
                     ${initialEvidence.linksHtml}
                     ${closeEvidence.galleryHtml}
