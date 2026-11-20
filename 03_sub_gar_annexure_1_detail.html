@@ -466,13 +466,6 @@ async function handleEditSubmit(e) {
     }
 }
 
-        function toDatetimeLocalValue(val) {
-    if (!val) return '';
-    const d = new Date(val);
-    if (Number.isNaN(d.getTime())) return '';
-    const pad = n => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
 
 function renderEditSection(inc) {
     return `
@@ -599,7 +592,7 @@ async function handleEditSubmit(e) {
             document.title = `Incident #${inc.id} — Cathkin Estates OHS`;
             document.getElementById('app').innerHTML = `
                 <div class="card">
-                   <div class="top-row">
+                    <div class="top-row">
                         <div>
                             <h2 style="margin: 0;">Incident #${escapeHtml(inc.id)} — ${escapeHtml(inc.incident_type || 'Incident')}</h2>
                             <div class="muted">Location: ${escapeHtml(inc.location || '—')}</div>
@@ -607,7 +600,6 @@ async function handleEditSubmit(e) {
                         <div class="detail-status-actions">
                             <span class="badge ${statusClass}">${escapeHtml(inc.status || 'Open')}</span>
                             <button type="button" id="btn-toggle-edit" class="btn btn-edit-incident">Edit Incident</button>
-                        </div>
                         </div>
                     </div>
 
@@ -653,6 +645,7 @@ async function handleEditSubmit(e) {
                     ${renderEvidenceSection('Close-Out / Remediation Evidence', inc.close_image_url)}
                 </div>
 
+                ${renderEditSection(inc)}
                 ${renderCloseOutSection(inc)}
             `;
 
