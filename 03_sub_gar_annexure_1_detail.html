@@ -4,242 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Incident Record Detail — Cathkin Estates OHS</title>
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f1f5f9;
-            color: #1e293b;
-            line-height: 1.5;
-        }
-        header {
-            background: #0f172a;
-            color: #ffffff;
-            padding: 18px 24px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-        header h1 {
-            margin: 0;
-            font-size: 1.2rem;
-        }
-        .nav-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .nav-links a {
-            color: #e2e8f0;
-            text-decoration: none;
-            background: #1e293b;
-            border: 1px solid #334155;
-            padding: 8px 14px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-        .nav-links a:hover {
-            background: #334155;
-        }
-        main {
-            max-width: 960px;
-            margin: 24px auto;
-            padding: 0 16px 40px;
-        }
-        .card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-        }
-        .top-row {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 14px;
-            margin-bottom: 18px;
-        }
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        .badge-open {
-            background: #fef3c7;
-            color: #92400e;
-        }
-        .badge-closed {
-            background: #dcfce7;
-            color: #166534;
-        }
-        .badge-approved {
-            background: #dcfce7;
-            color: #166534;
-        }
-        .badge-flagged {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-        .meta-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 14px;
-            margin-bottom: 20px;
-        }
-        .meta-item {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 12px;
-        }
-        .meta-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            color: #64748b;
-            margin-bottom: 4px;
-        }
-        .meta-value {
-            font-weight: bold;
-            color: #0f172a;
-            word-break: break-word;
-        }
-        .section-block {
-            margin-top: 18px;
-        }
-        .section-block h3 {
-            margin: 0 0 8px;
-            font-size: 1rem;
-            color: #1e3a8a;
-        }
-        .text-box {
-            background: #f8fafc;
-            border-left: 4px solid #2563eb;
-            padding: 12px 16px;
-            border-radius: 4px;
-            white-space: pre-wrap;
-        }
-        .evidence-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 14px;
-            margin-top: 10px;
-        }
-        .evidence-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 10px;
-            background: #ffffff;
-        }
-        .evidence-card img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            border-radius: 4px;
-            display: block;
-            margin-bottom: 8px;
-        }
-        .evidence-link {
-            font-size: 0.82rem;
-            word-break: break-all;
-        }
-        .evidence-link a {
-            color: #2563eb;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 14px;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 14px;
-        }
-        .form-group label {
-            font-weight: bold;
-            font-size: 0.88rem;
-            margin-bottom: 6px;
-            color: #1e293b;
-        }
-        .form-group input,
-        .form-group textarea {
-            padding: 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 0.92rem;
-            font-family: inherit;
-        }
-        .form-group textarea {
-            min-height: 90px;
-            resize: vertical;
-        }
-        .auth-box {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-        .auth-box h4 {
-            margin: 0 0 10px;
-            font-size: 0.95rem;
-            color: #0f172a;
-        }
-        .btn {
-            border: none;
-            border-radius: 6px;
-            padding: 10px 16px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .btn-blue {
-            background: #2563eb;
-            color: #ffffff;
-        }
-        .btn-green {
-            background: #15803d;
-            color: #ffffff;
-        }
-        .eval-banner {
-            display: none;
-            margin-top: 10px;
-            padding: 10px 12px;
-            border-radius: 6px;
-            font-size: 0.88rem;
-        }
-        .required-star {
-            color: #dc2626;
-        }
-        .error-box {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #991b1b;
-            padding: 16px;
-            border-radius: 8px;
-        }
-        .muted {
-            color: #64748b;
-            font-size: 0.9rem;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="detail-page">
     <header>
         <h1>Cathkin Estates HOA — OHS Incident Detail</h1>
         <nav class="nav-links">
@@ -599,6 +366,231 @@
             }
         }
 
+        function toDatetimeLocalValue(val) {
+    if (!val) return '';
+    const d = new Date(val);
+    if (Number.isNaN(d.getTime())) return '';
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function renderEditSection(inc) {
+    return `
+        <div class="card detail-edit-card" id="edit-incident-card">
+            <h3 class="detail-edit-header">Edit Incident #${escapeHtml(inc.id)}</h3>
+            <form id="detail-edit-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="edit-type">Incident Type</label>
+                        <input type="text" id="edit-type" value="${escapeHtml(inc.incident_type || '')}" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-severity">Severity</label>
+                        <select id="edit-severity">
+                            ${['Low', 'Moderate', 'High', 'Critical'].map(sev =>
+                                `<option value="${sev}" ${String(inc.severity || '').toLowerCase() === sev.toLowerCase() ? 'selected' : ''}>${sev}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="edit-location">Location</label>
+                        <input type="text" id="edit-location" value="${escapeHtml(inc.location || '')}" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-expected-close">Expected Close-Out Date</label>
+                        <input type="datetime-local" id="edit-expected-close" value="${escapeHtml(toDatetimeLocalValue(inc.expected_close_date))}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-responsible">Responsible Person</label>
+                    <input type="text" id="edit-responsible" value="${escapeHtml(inc.responsible_person || '')}" />
+                </div>
+                <div class="form-group">
+                    <label for="edit-description">Description</label>
+                    <textarea id="edit-description" required>${escapeHtml(inc.description || '')}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-capa">CAPA / Corrective Action</label>
+                    <textarea id="edit-capa">${escapeHtml(inc.corrective_action || '')}</textarea>
+                </div>
+                <div class="detail-edit-actions">
+                    <button type="button" id="btn-cancel-edit" class="btn btn-cancel-edit">Cancel</button>
+                    <button type="submit" id="btn-save-edit" class="btn btn-edit-incident">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    `;
+}
+
+async function handleEditSubmit(e) {
+    e.preventDefault();
+    if (!activeIncident) return;
+
+    const saveBtn = document.getElementById('btn-save-edit');
+    saveBtn.disabled = true;
+
+    const expectedVal = document.getElementById('edit-expected-close').value;
+    const payload = {
+        action: 'update',
+        id: activeIncident.id,
+        incident_type: document.getElementById('edit-type').value.trim(),
+        severity: document.getElementById('edit-severity').value,
+        location: document.getElementById('edit-location').value.trim(),
+        expected_close_date: expectedVal ? new Date(expectedVal).toISOString() : null,
+        responsible_person: document.getElementById('edit-responsible').value.trim(),
+        description: document.getElementById('edit-description').value.trim(),
+        corrective_action: document.getElementById('edit-capa').value.trim()
+    };
+
+    try {
+        const res = await fetch('/api/incidents?action=update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            alert('Error updating incident: ' + (data.error || 'Server error'));
+            return;
+        }
+        alert('Incident updated successfully.');
+        await loadIncident(activeIncident.id);
+    } catch (err) {
+        console.error('Update incident error:', err);
+        alert('Failed to save incident changes.');
+    } finally {
+        const btn = document.getElementById('btn-save-edit');
+        if (btn) btn.disabled = false;
+    }
+}
+
+        function toDatetimeLocalValue(val) {
+    if (!val) return '';
+    const d = new Date(val);
+    if (Number.isNaN(d.getTime())) return '';
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function renderEditSection(inc) {
+    return `
+        <div class="card detail-edit-card" id="edit-incident-card">
+            <h3 class="detail-edit-header">Edit Incident #${escapeHtml(inc.id)}</h3>
+            <form id="detail-edit-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="edit-type">Incident Type</label>
+                        <input type="text" id="edit-type" value="${escapeHtml(inc.incident_type || '')}" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-severity">Severity</label>
+                        <select id="edit-severity">
+                            ${['Low', 'Moderate', 'High', 'Critical'].map(sev =>
+                                `<option value="${sev}" ${String(inc.severity || '').toLowerCase() === sev.toLowerCase() ? 'selected' : ''}>${sev}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="edit-location">Location</label>
+                        <input type="text" id="edit-location" value="${escapeHtml(inc.location || '')}" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-expected-close">Expected Close-Out Date</label>
+                        <input type="datetime-local" id="edit-expected-close" value="${escapeHtml(toDatetimeLocalValue(inc.expected_close_date))}" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-responsible">Responsible Person</label>
+                    <input type="text" id="edit-responsible" value="${escapeHtml(inc.responsible_person || '')}" />
+                </div>
+                <div class="form-group">
+                    <label for="edit-description">Description</label>
+                    <textarea id="edit-description" required>${escapeHtml(inc.description || '')}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-capa">CAPA / Corrective Action</label>
+                    <textarea id="edit-capa">${escapeHtml(inc.corrective_action || '')}</textarea>
+                </div>
+                <div class="detail-edit-actions">
+                    <button type="button" id="btn-cancel-edit" class="btn btn-cancel-edit">Cancel</button>
+                    <button type="submit" id="btn-save-edit" class="btn btn-edit-incident">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    `;
+}
+
+async function handleEditSubmit(e) {
+    e.preventDefault();
+    if (!activeIncident) return;
+
+    const saveBtn = document.getElementById('btn-save-edit');
+    saveBtn.disabled = true;
+
+    const expectedVal = document.getElementById('edit-expected-close').value;
+    const payload = {
+        action: 'update',
+        id: activeIncident.id,
+        incident_type: document.getElementById('edit-type').value.trim(),
+        severity: document.getElementById('edit-severity').value,
+        location: document.getElementById('edit-location').value.trim(),
+        expected_close_date: expectedVal ? new Date(expectedVal).toISOString() : null,
+        responsible_person: document.getElementById('edit-responsible').value.trim(),
+        description: document.getElementById('edit-description').value.trim(),
+        corrective_action: document.getElementById('edit-capa').value.trim()
+    };
+
+    try {
+        const res = await fetch('/api/incidents?action=update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            alert('Error updating incident: ' + (data.error || 'Server error'));
+            return;
+        }
+        alert('Incident updated successfully.');
+        await loadIncident(activeIncident.id);
+    } catch (err) {
+        console.error('Update incident error:', err);
+        alert('Failed to save incident changes.');
+    } finally {
+        const btn = document.getElementById('btn-save-edit');
+        if (btn) btn.disabled = false;
+    }
+}
+
+    function bindEditEvents() {
+        const toggleBtn = document.getElementById('btn-toggle-edit');
+        const cancelBtn = document.getElementById('btn-cancel-edit');
+        const editForm = document.getElementById('detail-edit-form');
+        const editCard = document.getElementById('edit-incident-card');
+    
+        if (toggleBtn && editCard) {
+            toggleBtn.addEventListener('click', () => {
+                const isHidden = editCard.style.display === 'none' || !editCard.style.display;
+                editCard.style.display = isHidden ? 'block' : 'none';
+                if (isHidden) {
+                    editCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+        }
+        if (cancelBtn && editCard) {
+            cancelBtn.addEventListener('click', () => {
+                editCard.style.display = 'none';
+            });
+        }
+        if (editForm) {
+            editForm.addEventListener('submit', handleEditSubmit);
+        }
+    }
+        
         function renderIncident(inc) {
             activeIncident = inc;
             const statusLower = String(inc.status || '').toLowerCase();
@@ -607,12 +599,16 @@
             document.title = `Incident #${inc.id} — Cathkin Estates OHS`;
             document.getElementById('app').innerHTML = `
                 <div class="card">
-                    <div class="top-row">
+                   <div class="top-row">
                         <div>
                             <h2 style="margin: 0;">Incident #${escapeHtml(inc.id)} — ${escapeHtml(inc.incident_type || 'Incident')}</h2>
                             <div class="muted">Location: ${escapeHtml(inc.location || '—')}</div>
                         </div>
-                        <span class="badge ${statusClass}">${escapeHtml(inc.status || 'Open')}</span>
+                        <div class="detail-status-actions">
+                            <span class="badge ${statusClass}">${escapeHtml(inc.status || 'Open')}</span>
+                            <button type="button" id="btn-toggle-edit" class="btn btn-edit-incident">Edit Incident</button>
+                        </div>
+                        </div>
                     </div>
 
                     <div class="meta-grid">
@@ -661,6 +657,7 @@
             `;
 
             bindCloseOutEvents();
+            bindEditEvents();
         }
 
         function renderError(message) {
