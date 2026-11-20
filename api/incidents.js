@@ -426,6 +426,142 @@ export default async function handler(req, res) {
             return res.status(200).json({ success: true, incident: newInc });
         }
 
+        // Action: Update Existing Incident
+        if (req.method === 'POST' && action === 'update') {
+            const {
+                id,
+                incident_type,
+                severity,
+                location,
+                expected_close_date,
+                responsible_person,
+                description,
+                corrective_action
+            } = req.body;
+        
+            const incidentId = Number(id);
+            if (!Number.isInteger(incidentId) || incidentId <= 0) {
+                return res.status(400).json({ success: false, error: 'Valid incident id is required' });
+            }
+        
+            const query = `
+                UPDATE incident_register
+                SET
+                    incident_type = COALESCE($2, incident_type),
+                    severity = COALESCE($3, severity),
+                    location = COALESCE($4, location),
+                    expected_close_date = COALESCE($5, expected_close_date),
+                    responsible_person = COALESCE($6, responsible_person),
+                    description = COALESCE($7, description),
+                    corrective_action = COALESCE($8, corrective_action)
+                WHERE id = $1
+                RETURNING *;
+            `;
+        
+            const result = await pool.query(query, [
+                incidentId,
+                incident_type,
+                severity,
+                location,
+                expected_close_date,
+                responsible_person,
+                description,
+                corrective_action
+            ]);
+        
+            if (result.rowCount === 0) {
+                return res.status(404).json({ success: false, error: 'Incident not found' });
+            }
+        
+            return res.status(200).json({ success: true, incident: result.rows[0] });
+        }
+
+
+        // Action: Run / Return AI Analysis for an Existing Incident
+        if (req.method === 'POST' && action === 'run-ai-analysis') {
+            if (!ai) {
+                return res.status(500).json({ success: false, error: "GEMINI_API_KEY is missing from Environment Variables." });
+            }
+        
+            const { id } = req.body;
+            const incidentId = Number(id);
+            if (!Number.isInteger(incidentId) || incidentId <= 0) {
+                return res.status(400).json({ success: false, error: 'Valid incident id is required' });
+            }
+        
+            const existing = await pool.query('SELECT * FROM incident_register WHERE id = $1;', [incidentId]);
+            if (existing.rowCount === 0) {
+                return res.status(404).json({ success: false, error: 'Incident not found' });
+            }
+        
+            const inc = existing.rows[0];
+            const rawSources = [inc.close_image_url, inc.incident_image_url]
+                .filter(Boolean)
+                .flatMap(str => String(str).split(',').map(s => s.trim()).filter(Boolean))
+                .slice(0, 5);
+        
+            const imageParts = [];
+            for (const src of rawSources) {
+                try {
+                    if (src.startsWith('data:')) {
+                        const match = src.match(/^data:([^;]+);base64,(.+)$/);
+                        if (match) {
+                            imageParts.push({
+                                inlineData: {
+                                    data: match[2],
+                                    mimeType: match[1] || 'image/jpeg'
+                                }
+                            });
+                        }
+                    } else if (/^https?:\/\//i.test(src)) {
+                        const imgRes = await fetch(src);
+                        if (imgRes.ok) {
+                            const mimeType = (imgRes.headers.get('content-type') || 'image/jpeg').split(';')[0].trim();
+                            if (mimeType.startsWith('image/')) {
+                                const arrayBuf = await imgRes.arrayBuffer();
+                                const base64Data = Buffer.from(arrayBuf).toString('base64');
+                                imageParts.push({
+                                    inlineData: {
+                                        data: base64Data,
+                                        mimeType
+                                    }
+                                });
+                            }
+                        }
+                    }
+                } catch (imgErr) {
+                    console.warn('Could not load stored evidence image for AI analysis:', src, imgErr);
+                }
+            }
+        
+            const promptText = `You are an OHS compliance auditor. Evaluate this incident and its available evidence/remediation photos against the original incident description: "${inc.description || ''}" and planned corrective action: "${inc.corrective_action || ''}". Return strict JSON with keys: "satisfactory" (boolean true or false), "assessment_notes" (detailed justification explaining whether the incident/remediation is satisfactory or what deficiencies remain across the provided information and images).`;
+        
+            const response = await ai.models.generateContent({
+                model: 'gemini-3.5-flash',
+                contents: [
+                    ...imageParts,
+                    { text: promptText }
+                ],
+                config: { responseMimeType: 'application/json' }
+            });
+        
+            const parsedEvaluation = JSON.parse(response.text);
+        
+            const updated = await pool.query(
+                `UPDATE incident_register
+                 SET ai_close_assessment = $2
+                 WHERE id = $1
+                 RETURNING *;`,
+                [incidentId, JSON.stringify(parsedEvaluation)]
+            );
+        
+            return res.status(200).json({
+                success: true,
+                evaluation: parsedEvaluation,
+                ai_close_assessment: parsedEvaluation,
+                incident: updated.rows[0]
+            });
+        }
         // Action: Close Incident
         if (req.method === 'POST' && action === 'close') {
             const { id, close_image_url, ai_close_assessment, verified_by } = req.body;
