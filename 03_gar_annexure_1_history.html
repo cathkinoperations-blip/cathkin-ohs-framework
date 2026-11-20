@@ -157,69 +157,80 @@
     function renderTable(incidents) {
         const tbody = document.querySelector('#history-table tbody');
         tbody.innerHTML = '';
-
+    
         incidents.forEach((inc, incIndex) => {
             const dateLogged = inc.incident_date ? new Date(inc.incident_date).toLocaleString() : 'N/A';
-            const dateClosed = inc.closed_at ? new Date(inc.closed_at).toLocaleString() : (inc.updated_at ? new Date(inc.updated_at).toLocaleString() : 'Closed');
-
-            // Format initial evidence
-            let logEvidenceHtml = renderFileList(inc.incident_image_url, incIndex, 'log');
-            // Format close-out evidence
-            let closeEvidenceHtml = renderFileList(inc.close_image_url, incIndex, 'close');
-
-            const reporterInfo = inc.reporter_name ? `<br><small style="color: #718096;"><strong>By:</strong> ${inc.reporter_name}</small>` : '';
-            const verifierInfo = inc.verified_by ? `<strong>Verified By:</strong> ${inc.verified_by}` : '<strong>Sign-off:</strong> Manager';
-            
-
-            // Extract and format AI Close-Out Assessment
+            const closedRaw = inc.closed_at || inc.updated_at;
+            const dateClosed = closedRaw ? new Date(closedRaw).toLocaleString() : 'Recorded';
+    
+            const logEvidenceHtml = renderFileList(inc.incident_image_url, incIndex, 'log');
+            const closeEvidenceHtml = renderFileList(inc.close_image_url, incIndex, 'close');
+            const reporterInfo = inc.reporter_name
+                ? `<br><span><strong>By:</strong> ${inc.reporter_name}</span>`
+                : '';
+            const verifierInfo = inc.verified_by
+                ? `<strong>Verified By:</strong> ${inc.verified_by}`
+                : '<strong>Sign-off:</strong> Manager';
+    
+            const fullDesc = inc.description || 'No description provided.';
+            const capaText = `CAPA: ${inc.corrective_action || 'N/A'} | Closure Notes: ${inc.remediation_notes || 'Verified resolved.'}`;
+    
             let aiNotesHtml = '';
+            let aiPlainText = '';
             if (inc.ai_close_assessment) {
                 try {
-                    const aiData = typeof inc.ai_close_assessment === 'string' 
-                        ? JSON.parse(inc.ai_close_assessment) 
+                    const aiData = typeof inc.ai_close_assessment === 'string'
+                        ? JSON.parse(inc.ai_close_assessment)
                         : inc.ai_close_assessment;
-
-                    const badge = aiData.satisfactory 
-                        ? '<span style="background: #c6f6d5; color: #22543d; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: bold;">AI Approved</span>' 
-                        : '<span style="background: #fed7d7; color: #742a2a; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: bold;">AI Flagged</span>';
-
+                    const badgeClass = aiData.satisfactory ? 'ai-badge-approved' : 'ai-badge-flagged';
+                    const badgeLabel = aiData.satisfactory ? 'AI Approved' : 'AI Flagged';
+                    const badge = `<span class="${badgeClass}">${badgeLabel}</span>`;
+                    aiPlainText = aiData.assessment_notes || 'No assessment notes.';
                     aiNotesHtml = `
-                        <div style="margin-top: 6px; padding: 6px; background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 4px;">
-                            <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">
+                        <div class="ai-notes-box">
+                            <div class="ai-notes-header">
                                 <strong>System Assessment:</strong> ${badge}
                             </div>
-                            <span style="color: #4a5568; display: block; line-height: 1.3; font-size: 11px;">${aiData.assessment_notes || 'No assessment notes.'}</span>
+                            <div class="line-clamp-3 ai-notes-body">${aiPlainText}</div>
                         </div>
                     `;
                 } catch (e) {
-                    aiNotesHtml = `<br><span style="color: #4a5568; font-size: 11px;"><strong>AI Assessment:</strong> ${inc.ai_close_assessment}</span>`;
+                    aiPlainText = String(inc.ai_close_assessment);
+                    aiNotesHtml = `
+                        <div class="ai-notes-box">
+                            <div class="line-clamp-3 ai-notes-body"><strong>AI Assessment:</strong> ${aiPlainText}</div>
+                        </div>
+                    `;
                 }
             }
-
+    
+            const combinedRemediationTitle = `${capaText}${aiPlainText ? ` | Assessment: ${aiPlainText}` : ''}`.replace(/"/g, '&quot;');
+    
             tbody.innerHTML += `
                 <tr>
                     <td>
-                        <small><strong>Logged:</strong> ${dateLogged}</small><br>
-                        <small style="color: #276749;"><strong>Closed:</strong> ${dateClosed}</small>
+                        <div><strong>Logged:</strong> ${dateLogged}</div>
+                        <div class="closed-date-text"><strong>Closed:</strong> ${dateClosed}</div>
                     </td>
                     <td>
                         <strong>${inc.incident_type || 'N/A'}</strong><br>
-                        <small>${inc.location || 'Estate'}</small>
-                        ${reporterInfo}
+                        <span>${inc.location || 'Estate'}</span>${reporterInfo}
                     </td>
-                    <td><small>${inc.description || 'No description provided.'}</small></td>
                     <td>
-                        <small>
+                        <div class="line-clamp-3" title="${fullDesc.replace(/"/g, '&quot;')}">${fullDesc}</div>
+                    </td>
+                    <td>
+                        <div class="line-clamp-3" title="${combinedRemediationTitle}">
                             <strong>CAPA:</strong> ${inc.corrective_action || 'N/A'}<br>
                             <strong>Closure Notes:</strong> ${inc.remediation_notes || 'Verified resolved.'}
-                        </small>
+                        </div>
                         ${aiNotesHtml}
                     </td>
-                    <td><small>${verifierInfo}</small></td>
+                    <td>${verifierInfo}</td>
                     <td>
-                        ${logEvidenceHtml ? `<div style="margin-bottom:4px;"><small><strong>Initial:</strong></small>${logEvidenceHtml}</div>` : ''}
-                        ${closeEvidenceHtml ? `<div><small><strong>Close-Out:</strong></small>${closeEvidenceHtml}</div>` : ''}
-                        ${!logEvidenceHtml && !closeEvidenceHtml ? '<small style="color:#a0aec0;">None</small>' : ''}
+                        ${logEvidenceHtml ? `<div class="evidence-group-spaced"><strong>Initial:</strong>${logEvidenceHtml}</div>` : ''}
+                        ${closeEvidenceHtml ? `<div><strong>Close-Out:</strong>${closeEvidenceHtml}</div>` : ''}
+                        ${!logEvidenceHtml && !closeEvidenceHtml ? '<span class="evidence-none-text">None</span>' : ''}
                     </td>
                     <td><span class="badge-closed">${inc.status || 'Closed'}</span></td>
                 </tr>
