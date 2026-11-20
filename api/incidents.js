@@ -476,10 +476,6 @@ export default async function handler(req, res) {
                 ...initialEvidence.attachments
             ];
 
-            // Recipients: Reporter + HSE, Board, Tester roles
-            const roleEmails = await getEmailsByRoles(['HSE', 'Board', 'Tester']);
-            const recipients = [...new Set([closedInc.reporter_email, ...roleEmails])].filter(Boolean);
-
             await sendNotification({
                 to: recipients,
                 subject: `Incident Verified & Closed: Ref #${closedInc.id}`,
