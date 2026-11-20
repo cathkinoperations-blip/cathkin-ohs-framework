@@ -136,26 +136,6 @@ export default async function handler(req, res) {
             return res.status(200).json({ success: true, analysis: analysisObj });
         }
 
-            const response = await ai.models.generateContent({
-                model: 'gemini-3.5-flash-lite',
-                contents: [
-                    ...imageParts,
-                    {
-                        text: `Analyze these incident or hazard photos (up to 5 provided) for an OHS estate register. Synthesize the visual evidence and return strict JSON with keys: 
-                        "incident_type" (choose strictly from: Injury, Occupational Illness, Property Damage, Near-Miss), 
-                        "location" (suggest estate area if visible, else general), 
-                        "description" (detailed professional safety description covering all visual angles provided), 
-                        "severity" (choose strictly from: Minor, Moderate, Severe, Reportable (Section 24)), 
-                        "corrective_action" (suggested CAPA), 
-                        "responsible_person" (suggest role like Estate Manager or Maintenance Lead).`
-                    }
-                ],
-                config: { responseMimeType: 'application/json' }
-            });
-
-            return res.status(200).json({ success: true, analysis: JSON.parse(response.text) });
-        }
-
         // Action: AI Close-Out Verification Assessment from Multiple Photos (up to 5)
         if (req.method === 'POST' && action === 'analyze-close') {
             if (!ai) {
