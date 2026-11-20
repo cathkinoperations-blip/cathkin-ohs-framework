@@ -603,3 +603,48 @@ th {
     background: #c53030;
     color: #ffffff;
 }
+
+/* Incident Detail Edit Controls */
+.btn-edit-incident {
+    background: #d97706;
+    color: #ffffff;
+}
+.btn-edit-incident:hover {
+    background: #b45309;
+}
+.btn-cancel-edit {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+.btn-cancel-edit:hover {
+    background: #cbd5e1;
+}
+.detail-edit-card {
+    display: none;
+    border-left: 4px solid #d97706;
+}
+.detail-edit-header {
+    margin-top: 0;
+    color: #0f172a;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+.detail-edit-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.detail-status-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.form-group select {
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.92rem;
+    font-family: inherit;
+    background: #ffffff;
+}
