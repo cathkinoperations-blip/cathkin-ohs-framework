@@ -282,22 +282,21 @@
 
                     const reporterInfo = inc.reported_by ? `<br><small style="color: #4a5568;"><strong>Reporter:</strong> ${inc.reported_by}</small>` : '';
                     const detailUrl = `03_sub_gar_annexure_1_detail.html?id=${encodeURIComponent(inc.id)}`;
-
+                    const capaText = `Action: ${inc.corrective_action || 'N/A'} | Owner: ${inc.responsible_person || 'N/A'}`;
                     tbody.innerHTML += `
                         <tr>
                             <td>${new Date(inc.incident_date).toLocaleString()}${evidenceHtml}</td>
                             <td><strong>${inc.incident_type}</strong><br><small>${inc.location}</small>${reporterInfo}</td>
-                            <td>${inc.description}</td>
-                            <td><span style="background: #feebc8; color: #9c4221; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.severity}</span></td>
-                            <td><small><strong>Action:</strong> ${inc.corrective_action || 'N/A'}<br><strong>Owner:</strong> ${inc.responsible_person || 'N/A'}</small></td>
+                            <td><div class="line-clamp-3" title="${String(inc.description || '').replace(/"/g, '&quot;')}">${inc.description || ''}</div></td>
+                            <td><span style="background: #feebc8; color: #9c4221; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; white-space: nowrap;">${inc.severity}</span></td>
+                            <td><div class="line-clamp-3" title="${capaText.replace(/"/g, '&quot;')}"><small><strong>Action:</strong> ${inc.corrective_action || 'N/A'}<br><strong>Owner:</strong> ${inc.responsible_person || 'N/A'}</small></div></td>
+                            <td><span style="background: #ebf8ff; color: #2b6cb0; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold; white-space: nowrap;">${inc.status}</span></td>
                             <td>
-                                <div style="display: flex; flex-direction: column; gap: 6px;">
-                                    <a href="${detailUrl}" target="_self" style="display: inline-block; text-align: center; background: #2b6cb0; color: white; text-decoration: none; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold;">View Detail</a>
-                                    <button onclick="openCloseModal('${inc.id}')" style="background: #c53030; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Close &amp; Verify</button>
+                                <div class="action-stack">
+                                    <a href="${detailUrl}" target="_self" class="btn-detail">View Detail</a>
+                                    <button type="button" onclick="openCloseModal('${inc.id}')" class="btn-close-action">Close &amp; Verify</button>
                                 </div>
                             </td>
-                            <td><span style="background: #ebf8ff; color: #2b6cb0; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: bold;">${inc.status}</span></td>
-                            <td><button onclick="openCloseModal('${inc.id}')" style="background: #c53030; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Close & Verify</button></td>
                         </tr>
                     `;
                 });
