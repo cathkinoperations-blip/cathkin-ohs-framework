@@ -156,6 +156,76 @@
         .evidence-link a {
             color: #2563eb;
         }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 14px;
+        }
+        .form-group label {
+            font-weight: bold;
+            font-size: 0.88rem;
+            margin-bottom: 6px;
+            color: #1e293b;
+        }
+        .form-group input,
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.92rem;
+            font-family: inherit;
+        }
+        .form-group textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+        .auth-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .auth-box h4 {
+            margin: 0 0 10px;
+            font-size: 0.95rem;
+            color: #0f172a;
+        }
+        .btn {
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .btn-blue {
+            background: #2563eb;
+            color: #ffffff;
+        }
+        .btn-green {
+            background: #15803d;
+            color: #ffffff;
+        }
+        .eval-banner {
+            display: none;
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+        }
+        .required-star {
+            color: #dc2626;
+        }
         .error-box {
             background: #fef2f2;
             border: 1px solid #fecaca;
@@ -185,6 +255,9 @@
     </main>
 
     <script>
+        let activeIncident = null;
+        let currentCloseAiAssessment = null;
+
         function splitEvidenceItems(rawUrl) {
             if (!rawUrl || typeof rawUrl !== 'string') return [];
             const parts = rawUrl.split(',').map(s => s.trim()).filter(Boolean);
@@ -217,6 +290,15 @@
             if (!val) return '—';
             const d = new Date(val);
             return Number.isNaN(d.getTime()) ? String(val) : d.toLocaleString();
+        }
+
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
         }
 
         function renderEvidenceSection(title, rawUrl) {
@@ -297,7 +379,228 @@
             `;
         }
 
+        function renderCloseOutSection(inc) {
+            if (String(inc.status || '').toLowerCase() === 'closed') {
+                return '';
+            }
+
+            return `
+                <div class="card" id="close-out-card">
+                    <h3 style="margin-top: 0; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
+                        Close-Out Verification &amp; Closure
+                    </h3>
+                    <form id="detail-close-form">
+                        <div class="form-group">
+                            <label for="close-image">Close-Out Evidence (Photos &amp; PDFs, up to 5) <span class="required-star">*</span></label>
+                            <input type="file" id="close-image" accept="image/*,application/pdf" multiple required />
+                            <div class="muted" style="margin-top: 4px;">Upload remediation evidence, then run AI close-out verification before closing.</div>
+                        </div>
+
+                        <div class="form-group">
+                            <div>
+                                <button type="button" id="btn-eval-close" class="btn btn-blue">Run Close-Out Verification</button>
+                            </div>
+                            <div id="close-eval-status" class="eval-banner"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="close-notes">Manager Remediation Notes <span class="required-star">*</span></label>
+                            <textarea id="close-notes" placeholder="Confirm how the issue was resolved..." required></textarea>
+                        </div>
+
+                        <div class="auth-box">
+                            <h4>Manager Authentication Required</h4>
+                            <div class="form-grid">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="mgr-username">Username <span class="required-star">*</span></label>
+                                    <input type="text" id="mgr-username" placeholder="Manager username" required />
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label for="mgr-password">Password / PIN <span class="required-star">*</span></label>
+                                    <input type="password" id="mgr-password" placeholder="Password or PIN" required />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end;">
+                            <button type="submit" id="btn-confirm-close" class="btn btn-green">Confirm &amp; Close Incident</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+        }
+
+        async function handleEvaluateCloseOut() {
+            const fileInput = document.getElementById('close-image');
+            const statusDiv = document.getElementById('close-eval-status');
+            const btn = document.getElementById('btn-eval-close');
+
+            if (!activeIncident) {
+                alert('Incident context not loaded.');
+                return;
+            }
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('Please upload close-out evidence files first.');
+                return;
+            }
+            if (fileInput.files.length > 5) {
+                alert('A maximum of 5 files is allowed.');
+                return;
+            }
+
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = '#eff6ff';
+            statusDiv.style.color = '#1d4ed8';
+            statusDiv.textContent = 'Verifying close-out evidence...';
+            btn.disabled = true;
+
+            try {
+                const imagesPayload = [];
+                for (const file of fileInput.files) {
+                    const b64 = await toBase64(file);
+                    imagesPayload.push({
+                        imageBase64: b64,
+                        mimeType: file.type || 'image/jpeg'
+                    });
+                }
+
+                const res = await fetch('/api/incidents?action=analyze-close', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'analyze-close',
+                        images: imagesPayload,
+                        description: activeIncident.description,
+                        corrective_action: activeIncident.corrective_action
+                    })
+                });
+                const data = await res.json();
+
+                if (!res.ok || !data.success || !data.evaluation) {
+                    throw new Error(data.error || 'Close-out verification failed.');
+                }
+
+                currentCloseAiAssessment = JSON.stringify(data.evaluation);
+                const evalData = data.evaluation;
+                statusDiv.style.background = evalData.satisfactory ? '#dcfce7' : '#fee2e2';
+                statusDiv.style.color = evalData.satisfactory ? '#166534' : '#991b1b';
+                statusDiv.innerHTML = `<strong>${evalData.satisfactory ? 'Remediation Approved' : 'Deficiencies Noted'}:</strong> ${escapeHtml(evalData.assessment_notes || '')}`;
+
+                const notesField = document.getElementById('close-notes');
+                if (notesField && !notesField.value.trim() && evalData.assessment_notes) {
+                    notesField.value = evalData.assessment_notes;
+                }
+            } catch (err) {
+                statusDiv.style.background = '#fee2e2';
+                statusDiv.style.color = '#991b1b';
+                statusDiv.textContent = `Verification failed: ${err.message}`;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function handleCloseSubmit(e) {
+            e.preventDefault();
+
+            if (!currentCloseAiAssessment) {
+                alert('Verification required! Please click "Run Close-Out Verification" before confirming close-out.');
+                return;
+            }
+
+            const notes = document.getElementById('close-notes').value.trim();
+            const fileInput = document.getElementById('close-image');
+            const username = document.getElementById('mgr-username').value.trim();
+            const password = document.getElementById('mgr-password').value;
+            const submitBtn = document.getElementById('btn-confirm-close');
+
+            if (!notes) {
+                alert('Please enter manager remediation notes.');
+                return;
+            }
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert('Please attach close-out evidence files before submitting.');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            try {
+                const filesBase64 = [];
+                for (const file of fileInput.files) {
+                    const b64 = await toBase64(file);
+                    filesBase64.push(b64);
+                }
+
+                const authRes = await fetch('/api/verify-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username,
+                        password,
+                        requiredRole: 'Manager'
+                    })
+                });
+                const authData = await authRes.json();
+
+                if (!authData.authorized) {
+                    alert('Authorization failed: ' + (authData.message || 'Invalid manager credentials.'));
+                    return;
+                }
+
+                const closeRes = await fetch('/api/incidents?action=close', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'close',
+                        id: activeIncident.id,
+                        close_image_url: filesBase64.join(','),
+                        ai_close_assessment: currentCloseAiAssessment,
+                        verified_by: authData.fullName || username
+                    })
+                });
+                const closeResult = await closeRes.json();
+
+                if (!closeRes.ok || !closeResult.success) {
+                    alert('Error closing incident: ' + (closeResult.error || 'Server error'));
+                    return;
+                }
+
+                alert('Incident successfully verified and closed by ' + (authData.fullName || username) + '!');
+                currentCloseAiAssessment = null;
+                await loadIncident(activeIncident.id);
+            } catch (err) {
+                console.error('Close-out error:', err);
+                alert('Failed to process close-out verification.');
+            } finally {
+                if (document.getElementById('btn-confirm-close')) {
+                    document.getElementById('btn-confirm-close').disabled = false;
+                }
+            }
+        }
+
+        function bindCloseOutEvents() {
+            const evalBtn = document.getElementById('btn-eval-close');
+            const closeForm = document.getElementById('detail-close-form');
+            const fileInput = document.getElementById('close-image');
+
+            if (evalBtn) {
+                evalBtn.addEventListener('click', handleEvaluateCloseOut);
+            }
+            if (closeForm) {
+                closeForm.addEventListener('submit', handleCloseSubmit);
+            }
+            if (fileInput) {
+                fileInput.addEventListener('change', () => {
+                    currentCloseAiAssessment = null;
+                    const statusDiv = document.getElementById('close-eval-status');
+                    if (statusDiv) {
+                        statusDiv.style.display = 'none';
+                    }
+                });
+            }
+        }
+
         function renderIncident(inc) {
+            activeIncident = inc;
             const statusLower = String(inc.status || '').toLowerCase();
             const statusClass = statusLower === 'closed' ? 'badge-closed' : 'badge-open';
 
@@ -353,7 +656,11 @@
                     ${renderEvidenceSection('Initial Incident Evidence', inc.incident_image_url)}
                     ${renderEvidenceSection('Close-Out / Remediation Evidence', inc.close_image_url)}
                 </div>
+
+                ${renderCloseOutSection(inc)}
             `;
+
+            bindCloseOutEvents();
         }
 
         function renderError(message) {
@@ -364,14 +671,7 @@
             `;
         }
 
-        (async function init() {
-            const params = new URLSearchParams(window.location.search);
-            const id = params.get('id');
-            if (!id || !/^\d+$/.test(id)) {
-                renderError('Missing or invalid incident ID in URL (expected ?id=...).');
-                return;
-            }
-
+        async function loadIncident(id) {
             try {
                 const res = await fetch(`/api/incidents?action=get&id=${encodeURIComponent(id)}`);
                 const data = await res.json();
@@ -383,6 +683,16 @@
             } catch (err) {
                 renderError(err.message || 'Network error while loading incident.');
             }
+        }
+
+        (async function init() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if (!id || !/^\d+$/.test(id)) {
+                renderError('Missing or invalid incident ID in URL (expected ?id=...).');
+                return;
+            }
+            await loadIncident(id);
         })();
     </script>
 </body>
