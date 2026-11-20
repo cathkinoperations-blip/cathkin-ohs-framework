@@ -99,8 +99,8 @@ export default async function handler(req, res) {
             if (!ai) {
                 return res.status(500).json({ success: false, error: "GEMINI_API_KEY is missing from Environment Variables." });
             }
-            const { images } = req.body;
-            
+            const { images, comments } = req.body;
+
             const imageParts = (images || []).map(img => {
                 let base64Data = img.imageBase64;
                 if (base64Data.includes(',')) {
@@ -113,6 +113,28 @@ export default async function handler(req, res) {
                     }
                 };
             });
+
+            const trimmedComments = typeof comments === 'string' ? comments.trim() : '';
+            const commentsInstruction = trimmedComments
+                ? `\n\nOptional reporter context/comments (use to clarify location, equipment, or context while verifying against visual evidence): "${trimmedComments}"`
+                : '';
+
+            const response = await ai.models.generateContent({
+                model: 'gemini-3.5-flash-lite',
+                contents: [
+                    ...imageParts,
+                    {
+                        text: `Analyze these incident or hazard photos (up to 5 provided) for an OHS estate register. Synthesize the visual evidence and return strict JSON with keys: "incident_type" (choose strictly from: Injury, Occupational Illness, Property Damage, Near-Miss), "location" (suggest estate area if visible, else general), "description" (detailed professional safety description covering all visual angles provided), "severity" (choose strictly from: Minor, Moderate, Severe, Reportable (Section 24)), "corrective_action" (suggested CAPA), "responsible_person" (suggest role like Estate Manager or Maintenance Lead).${commentsInstruction}`
+                    }
+                ],
+                config: { responseMimeType: 'application/json' }
+            });
+
+            const parsed = JSON.parse(response.text);
+            const analysisObj = Array.isArray(parsed) ? parsed[0] : parsed;
+
+            return res.status(200).json({ success: true, analysis: analysisObj });
+        }
 
             const response = await ai.models.generateContent({
                 model: 'gemini-3.5-flash-lite',
