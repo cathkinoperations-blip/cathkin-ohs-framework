@@ -36,7 +36,7 @@ async function getEmailsByRoles(roles = []) {
 }
 
 // Helper: Dispatch formatted HTML notifications
-async function sendNotification({ to, subject, title, bodyHtml }) {
+async function sendNotification({ to, subject, title, bodyHtml, attachments = [] }) {
     const recipientList = Array.isArray(to) ? [...new Set(to.filter(Boolean))] : [to];
     if (recipientList.length === 0) return;
 
@@ -60,11 +60,76 @@ async function sendNotification({ to, subject, title, bodyHtml }) {
             from: `"Cathkin Operations" <${process.env.GMAIL_USER}>`,
             to: recipientList.join(','),
             subject: `[Cathkin OHS] ${subject}`,
-            html: emailContent
+            html: emailContent,
+            attachments
         });
     } catch (err) {
         console.error('Failed to send email notification:', err);
     }
+}
+
+function buildEvidenceEmailBlocks(rawUrl, prefix = 'evidence') {
+    if (!rawUrl || typeof rawUrl !== 'string') {
+        return { attachments: [], galleryHtml: '' };
+    }
+
+    const parts = rawUrl.split(',').map(s => s.trim()).filter(Boolean);
+    const items = [];
+
+    // Rejoin base64 data URIs that contain a comma after the metadata header
+    for (let i = 0; i < parts.length; i++) {
+        if (parts[i].startsWith('data:') && parts[i + 1] && !parts[i + 1].startsWith('data:') && !parts[i + 1].startsWith('http')) {
+            items.push(`${parts[i]},${parts[i + 1]}`);
+            i++;
+        } else {
+            items.push(parts[i]);
+        }
+    }
+
+    const attachments = [];
+    const htmlBlocks = [];
+
+    items.forEach((item, idx) => {
+        if (item.startsWith('data:image/')) {
+            const match = item.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+            if (match) {
+                const mimeType = match[1];
+                const base64Content = match[2];
+                const ext = mimeType.split('/')[1]?.split('+')[0] || 'jpg';
+                const cid = `${prefix}_${idx}_${Date.now()}@cathkin`;
+
+                attachments.push({
+                    filename: `${prefix}_${idx + 1}.${ext}`,
+                    content: Buffer.from(base64Content, 'base64'),
+                    contentType: mimeType,
+                    cid
+                });
+
+                htmlBlocks.push(`
+                    <div style="margin-bottom: 12px;">
+                        <div style="font-size: 12px; color: #4a5568; margin-bottom: 4px;">Photo ${idx + 1}</div>
+                        <img src="cid:${cid}" alt="Incident Photo ${idx + 1}" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid #e2e8f0;" />
+                    </div>
+                `);
+            }
+        } else if (item.startsWith('http://') || item.startsWith('https://')) {
+            htmlBlocks.push(`
+                <div style="margin-bottom: 12px;">
+                    <div style="font-size: 12px; color: #4a5568; margin-bottom: 4px;">Photo ${idx + 1}</div>
+                    <img src="${item}" alt="Incident Photo ${idx + 1}" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid #e2e8f0;" />
+                </div>
+            `);
+        }
+    });
+
+    const galleryHtml = htmlBlocks.length > 0
+        ? `<div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+               <strong style="display: block; margin-bottom: 8px;">Attached Evidence Photos:</strong>
+               ${htmlBlocks.join('')}
+           </div>`
+        : '';
+
+    return { attachments, galleryHtml };
 }
 
 export default async function handler(req, res) {
@@ -267,6 +332,7 @@ export default async function handler(req, res) {
             // Recipients: Reporter + Admin, Manager, HSE, Board, Tester roles
             const roleEmails = await getEmailsByRoles(['Admin', 'Manager', 'HSE', 'Board', 'Tester']);
             const recipients = [...new Set([reporter_email, ...roleEmails])].filter(Boolean);
+            const { attachments, galleryHtml } = buildEvidenceEmailBlocks(incident_image_url, `incident_${newInc.id}`);
 
             await sendNotification({
                 to: recipients,
@@ -279,9 +345,10 @@ export default async function handler(req, res) {
                     <p><strong>Expected Close-Out Date:</strong> ${expected_close_date}</p>
                     <p><strong>Description:</strong><br>${description}</p>
                     <p><strong>CAPA / Corrective Action:</strong><br>${corrective_action || 'Pending initial review'}</p>
-                `
+                    ${galleryHtml}
+                `,
+                attachments
             });
-
             return res.status(200).json({ success: true, incident: newInc });
         }
 
